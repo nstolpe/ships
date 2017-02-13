@@ -119,20 +119,25 @@ const Models = {
 				x: 0,
 				y: 0
 			},
+			positionVelocity: 0,
+			maxPositionVelocity: 2,
+			positionVelocityIncrement: .01,
+			positionAcceleration: ternaryState.EQUAL,
 			velocity: {
 				x: 0,
-				y: 0,
-				max: {
-					x: 5,
-					y: 5
-				}
+				y: 0
 			},
 			rotation: 0,
 			rotationVelocity: 0,
-			maxRotationVelocity: .1,
+			maxRotationVelocity: 1,
 			rotationVelocityIncrement: .001,
-			rotationAcceleration: 0,
-			rotationAccelerating: ternaryState.EQUAL,
+			rotationAcceleration: ternaryState.EQUAL,
+			updatePositionVelocity( delta, limit, reverse ) {
+				if ( reverse )
+					this.positionVelocity = Math.max( this.positionVelocity - ( delta * this.positionVelocityIncrement ), limit );
+				else
+					this.positionVelocity = Math.min( this.positionVelocity + ( delta * this.positionVelocityIncrement ), limit );
+			},
 			updateRotationVelocity( delta, limit, reverse ) {
 				if ( reverse )
 					this.rotationVelocity = Math.max( this.rotationVelocity - ( delta * this.rotationVelocityIncrement ), limit );
@@ -140,7 +145,7 @@ const Models = {
 					this.rotationVelocity = Math.min( this.rotationVelocity + ( delta * this.rotationVelocityIncrement ), limit );
 			},
 			update( delta ) {
-				switch ( this.rotationAccelerating ) {
+				switch ( this.rotationAcceleration ) {
 					case ternaryState.MINUS:
 						this.updateRotationVelocity( delta, -this.maxRotationVelocity, true );
 						break;
@@ -156,6 +161,27 @@ const Models = {
 				}
 
 				this.rotation += this.rotationVelocity * delta;
+
+				switch ( this.positionAcceleration ) {
+					case ternaryState.MINUS:
+						this.updatePositionVelocity( delta, -this.maxPositionVelocity, true );
+						break;
+					case ternaryState.PLUS:
+						this.updatePositionVelocity( delta, this.maxPositionVelocity, false );
+						break;
+					case ternaryState.EQUAL:
+					default:
+						if ( this.positionVelocity !== 0 ) {
+							this.updatePositionVelocity( delta, 0, this.positionVelocity > 0 );
+						}
+						break;
+				}
+				console.log( this.positionVelocity );
+				let vx = this.positionVelocity * Math.cos( this.rotation ),
+					vy = this.positionVelocity * Math.sin( this.rotation );
+
+				this.position.x += vx * delta;
+				this.position.y += vy * delta;
 			}
 		}
 	}
@@ -168,28 +194,43 @@ function setupInput() {
 		D = keyboard( 68 );
 
 	W.press = () => {
-		turtle.velocity;
+		console.log( 'press w' );
+		turtle.positionAcceleration = ternaryState.PLUS;
 	}
 	W.release = () => {
 		console.log( 'release w' );
+		if ( !S.isDown )
+			turtle.positionAcceleration = ternaryState.EQUAL;
 	}
+
+	S.press = () => {
+		console.log( 'press s' );
+		turtle.positionAcceleration = ternaryState.MINUS;
+	}
+	S.release = () => {
+		console.log( 'release s' );
+		if ( !W.isDown )
+			turtle.positionAcceleration = ternaryState.EQUAL;
+	}
+
 	A.press = () => {
 		console.log( 'A press');
-		turtle.rotationAccelerating = ternaryState.MINUS;
+		turtle.rotationAcceleration = ternaryState.MINUS;
 	}
 	A.release = () => {
 		console.log( 'A release');
 		if ( !D.isDown )
-			turtle.rotationAccelerating = ternaryState.EQUAL;
+			turtle.rotationAcceleration = ternaryState.EQUAL;
 	}
+
 	D.press = () => {
 		console.log( 'D press');
-		turtle.rotationAccelerating = ternaryState.PLUS;
+		turtle.rotationAcceleration = ternaryState.PLUS;
 	}
 	D.release = () => {
 		console.log( 'D release');
 		if ( !A.isDown )
-			turtle.rotationAccelerating = ternaryState.EQUAL;
+			turtle.rotationAcceleration = ternaryState.EQUAL;
 	}
 }
 
