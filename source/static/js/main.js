@@ -1,73 +1,228 @@
-const stage = document.getElementById('canvas'),
-	ctx = stage.getContext('2d');
+'use strict'
 
-// let i = 0;
+const PIXI = require( 'pixi.js' ),
+	TextureCache = PIXI.utils.TextureCache,
+	Sprite = PIXI.Sprite,
+	Container = PIXI.Container,
+	loader = PIXI.loader,
+	view = document.getElementById('view'),
+	viewWidth = 1000,
+	viewHeight = 800,
+	scale = window.devicePixelRatio,
+	app = new PIXI.Application( viewWidth * scale, viewHeight * scale, { view: view, backgroundColor : 0x000000 } ),
+	Helper = {
+		toDegrees( angle ) {
+			return angle * ( 180 / Math.PI );
+		},
+		toRadians( angle ) {
+			return angle * ( Math.PI / 180 );
+		}
+	},
+	ternaryState = Object.freeze( { 
+		MINUS: -1,
+		EQUAL: 0,
+		PLUS: 1
+	} );
 
-function draw(delta) {
-	let bg = '#000000';
+view.style.width = viewWidth + 'px';
+view.style.height = viewHeight + 'px';
 
-	ctx.clearRect(0, 0, stage.width, stage.height);
+loader
+	.add( "../assets/spritesheets/ships.json" )
+	.load( setup );
 
-	ctx.fillStyle = bg;
-	ctx.fillRect(0, 0, stage.width, stage.height);
-
-	ctx.save();
-
-	ctx.translate(250, 250);
-	ctx.rotate((Math.PI * i / 16) / 4);
-
-	ctx.fillStyle = 'red';
-	ctx.fillRect(-40, -40, 80, 80);
-
-	ctx.restore();
-	i++;
-	window.requestAnimationFrame(draw);
+function setup() {
+	var id = PIXI.loader.resources["../assets/spritesheets/ships.json"].textures;
+	window.turtle = Models.turtle();
+	turtle.position = { x: viewWidth * scale / 2, y: viewHeight * scale / 2 };
+	app.stage.addChild( turtle.root );
+	setupInput();
+	app.ticker.add( animate );
 }
 
-window.requestAnimationFrame(draw);
+function animate( delta ) {
+	turtle.update( delta ); 
+	turtle.root.position.set( turtle.position.x, turtle.position.y );
+	turtle.root.rotation = turtle.rotation;
+}
 
-const Renderer = function(options) {
-	let delta;
-	options = options || {};
+const Models = {
+	turtle() {
+		const root = new Container(),
+			id = PIXI.loader.resources["../assets/spritesheets/ships.json"].textures,
+			body = new Sprite( id[ "turtle-body.png" ] ),
+			rudder = new Sprite( id[ "turtle-rudder.png" ] ),
+			cannonForeRight = new Sprite( id[ "turtle-cannon-small.png" ] ),
+			cannonMidRight = new Sprite( id[ "turtle-cannon-large.png" ] ),
+			cannonAftRight = new Sprite( id[ "turtle-cannon-small.png" ] ),
+			cannonForeLeft = new Sprite( id[ "turtle-cannon-small.png" ] ),
+			cannonMidLeft = new Sprite( id[ "turtle-cannon-large.png" ] ),
+			cannonAftLeft = new Sprite( id[ "turtle-cannon-small.png" ] );
 
-	return {
-		fps: options.fps || 30,
-		now: undefined,
-		then: undefined,
-		delta() {
-			return delta;
-		},
-		interval() {
-			return 1000 / this.fps;
-		},
-		render() {
-			if (this.then === undefined) this.then = Date.now();
-			requestAnimationFrame(this.render);
-			this.now = Date.now();
-			delta = this.now - this.then;
-			if (delta > this.interval()) {
-				this.then = this.now - (delta % this.interval());
-				draw(delta);
+		body.x = 15;
+
+		root.addChild( rudder );
+		root.addChild( cannonForeRight );
+		root.addChild( cannonMidRight );
+		root.addChild( cannonAftRight );
+		root.addChild( cannonForeLeft );
+		root.addChild( cannonMidLeft );
+		root.addChild( cannonAftLeft );
+		root.addChild( body );
+
+		cannonMidRight.pivot.y = cannonMidRight.height / 2;
+		cannonMidRight.x = 79;
+		cannonMidRight.y = 59;
+
+		cannonForeRight.pivot.y = cannonForeRight.height / 2
+		cannonForeRight.rotation = Helper.toRadians( -23 );
+		cannonForeRight.x = 75;
+		cannonForeRight.y = 27;
+
+		cannonAftRight.pivot.y = cannonAftRight.height / 2
+		cannonAftRight.rotation = Helper.toRadians( 23 );
+		cannonAftRight.x = 75;
+		cannonAftRight.y = 93;
+
+		cannonMidLeft.pivot.y = cannonMidRight.height / 2;
+		cannonMidLeft.rotation = Helper.toRadians( 180 );
+		cannonMidLeft.x = cannonMidLeft.width;
+		cannonMidLeft.y = 59;
+
+		cannonForeLeft.pivot.y = cannonForeRight.height / 2
+		cannonForeLeft.rotation = Helper.toRadians( -157 );
+		cannonForeLeft.x = 41; // width of cannonMidLeft + 4 (diff of cannonMidRight.x and cannon)
+		cannonForeLeft.y = 27;
+
+		cannonAftLeft.pivot.y = cannonAftRight.height / 2
+		cannonAftLeft.rotation = Helper.toRadians( 157 );
+		cannonAftLeft.x = 41;
+		cannonAftLeft.y = 93;
+		
+		rudder.x = root.width / 2 - rudder.width / 2;
+		rudder.y = 110;
+
+		root.pivot.x = root.width / 2;
+		root.pivot.y = root.height / 2;
+
+		return {
+			root: root,
+			body: body,
+			rudder: rudder,
+			cannonForeRight: cannonForeRight,
+			cannonMidRight: cannonMidRight,
+			cannonAftRight: cannonAftRight,
+			cannonForeLeft: cannonForeLeft,
+			cannonMidLeft: cannonMidLeft,
+			cannonAftLeft: cannonAftLeft,
+			position: {
+				x: 0,
+				y: 0
+			},
+			velocity: {
+				x: 0,
+				y: 0,
+				max: {
+					x: 5,
+					y: 5
+				}
+			},
+			rotation: 0,
+			rotationVelocity: 0,
+			maxRotationVelocity: .1,
+			rotationVelocityIncrement: .001,
+			rotationAcceleration: 0,
+			rotationAccelerating: ternaryState.EQUAL,
+			updateRotationVelocity( delta, limit, reverse ) {
+				if ( reverse )
+					this.rotationVelocity = Math.max( this.rotationVelocity - ( delta * this.rotationVelocityIncrement ), limit );
+				else
+					this.rotationVelocity = Math.min( this.rotationVelocity + ( delta * this.rotationVelocityIncrement ), limit );
+			},
+			update( delta ) {
+				switch ( this.rotationAccelerating ) {
+					case ternaryState.MINUS:
+						this.updateRotationVelocity( delta, -this.maxRotationVelocity, true );
+						break;
+					case ternaryState.PLUS:
+						this.updateRotationVelocity( delta, this.maxRotationVelocity, false );
+						break;
+					case ternaryState.EQUAL:
+					default:
+						if ( this.rotationVelocity !== 0 ) {
+							this.updateRotationVelocity( delta, 0, this.rotationVelocity > 0 );
+						}
+						break;
+				}
+
+				this.rotation += this.rotationVelocity * delta;
 			}
 		}
 	}
 }
-// let renderer = Renderer();
-// var fps = 30;
-// var now;
-// var then = Date.now();
-// var interval = 1000/fps;
-// var delta;
-  
-// function draw() {
-// 	requestAnimationFrame(draw);
 
-// 	now = Date.now();
-// 	delta = now - then;
-// 	if (delta > interval) {
-// 	then = now - (delta % interval);
-// 	// ... Code for Drawing the Frame ...
-// 	}
-// }
+function setupInput() {
+	let W = keyboard( 87 ),
+		A = keyboard( 65 ),
+		S = keyboard( 83 ),
+		D = keyboard( 68 );
 
-// draw();
+	W.press = () => {
+		turtle.velocity;
+	}
+	W.release = () => {
+		console.log( 'release w' );
+	}
+	A.press = () => {
+		console.log( 'A press');
+		turtle.rotationAccelerating = ternaryState.MINUS;
+	}
+	A.release = () => {
+		console.log( 'A release');
+		if ( !D.isDown )
+			turtle.rotationAccelerating = ternaryState.EQUAL;
+	}
+	D.press = () => {
+		console.log( 'D press');
+		turtle.rotationAccelerating = ternaryState.PLUS;
+	}
+	D.release = () => {
+		console.log( 'D release');
+		if ( !A.isDown )
+			turtle.rotationAccelerating = ternaryState.EQUAL;
+	}
+}
+
+function keyboard( which ) {
+	var key = {};
+	key.which = which;
+	key.isDown = false;
+	key.isUp = true;
+	key.press = undefined;
+	key.release = undefined;
+	
+	//The `downHandler`
+	key.downHandler = function( event ) {
+		if ( event.which === key.which ) {
+			if ( key.isUp && key.press ) key.press();
+			key.isDown = true;
+			key.isUp = false;
+		}
+		event.preventDefault();
+	};
+
+	//The `upHandler`
+	key.upHandler = function( event ) {
+		if ( event.which === key.which ) {
+			if ( key.isDown && key.release ) key.release();
+			key.isDown = false;
+			key.isUp = true;
+		}
+		event.preventDefault();
+	};
+
+	//Attach event listeners
+	window.addEventListener( "keydown", key.downHandler.bind( key ), false );
+	window.addEventListener( "keyup", key.upHandler.bind( key ), false );
+	return key;
+}
