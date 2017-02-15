@@ -103,7 +103,9 @@ const Models = {
 		rudder.y = 110;
 
 		root.pivot.x = root.width / 2;
-		root.pivot.y = root.height / 2;
+		root.pivot.y = body.height;
+
+		root.scale.set( .75, .75 );
 
 		return {
 			root: root,
@@ -129,8 +131,8 @@ const Models = {
 			},
 			rotation: 0,
 			rotationVelocity: 0,
-			maxRotationVelocity: 1,
-			rotationVelocityIncrement: .001,
+			maxRotationVelocity: 0.02,
+			rotationVelocityIncrement: 0.001,
 			rotationAcceleration: ternaryState.EQUAL,
 			updatePositionVelocity( delta, limit, reverse ) {
 				if ( reverse )
@@ -155,12 +157,27 @@ const Models = {
 					case ternaryState.EQUAL:
 					default:
 						if ( this.rotationVelocity !== 0 ) {
-							this.updateRotationVelocity( delta, 0, this.rotationVelocity > 0 );
+							this.updateRotationVelocity( delta  / 2, 0, this.rotationVelocity > 0 );
 						}
 						break;
 				}
 
-				this.rotation += this.rotationVelocity * delta;
+				// keep rotation between -2*PI and 2*PI
+				// move out of here.
+				var normalizeAngle = function( angle ) {
+					if ( angle >= 2 * Math.PI )
+						angle -= 2 * Math.PI;
+					else if ( angle <= -2 * Math.PI )
+						angle += 2 * Math.PI;
+
+					return angle;
+				};
+
+				this.rotation = normalizeAngle( this.rotation + this.rotationVelocity * delta);
+
+				// console.log( this.rotation );
+
+				rudder.rotation = -this.rotationVelocity * 10;
 
 				switch ( this.positionAcceleration ) {
 					case ternaryState.MINUS:
@@ -176,9 +193,8 @@ const Models = {
 						}
 						break;
 				}
-				console.log( this.positionVelocity );
-				let vx = this.positionVelocity * Math.cos( this.rotation ),
-					vy = this.positionVelocity * Math.sin( this.rotation );
+				let vx = this.positionVelocity * Math.sin( this.rotation ),
+					vy = -this.positionVelocity * Math.cos( this.rotation );
 
 				this.position.x += vx * delta;
 				this.position.y += vy * delta;
@@ -194,41 +210,33 @@ function setupInput() {
 		D = keyboard( 68 );
 
 	W.press = () => {
-		console.log( 'press w' );
 		turtle.positionAcceleration = ternaryState.PLUS;
 	}
 	W.release = () => {
-		console.log( 'release w' );
 		if ( !S.isDown )
 			turtle.positionAcceleration = ternaryState.EQUAL;
 	}
 
 	S.press = () => {
-		console.log( 'press s' );
 		turtle.positionAcceleration = ternaryState.MINUS;
 	}
 	S.release = () => {
-		console.log( 'release s' );
 		if ( !W.isDown )
 			turtle.positionAcceleration = ternaryState.EQUAL;
 	}
 
 	A.press = () => {
-		console.log( 'A press');
 		turtle.rotationAcceleration = ternaryState.MINUS;
 	}
 	A.release = () => {
-		console.log( 'A release');
 		if ( !D.isDown )
 			turtle.rotationAcceleration = ternaryState.EQUAL;
 	}
 
 	D.press = () => {
-		console.log( 'D press');
 		turtle.rotationAcceleration = ternaryState.PLUS;
 	}
 	D.release = () => {
-		console.log( 'D release');
 		if ( !A.isDown )
 			turtle.rotationAcceleration = ternaryState.EQUAL;
 	}
