@@ -8,7 +8,8 @@ module.exports = {
 			name: 'turtle',
 			spriteSheet: 'ships.json',
 			options: {
-				startPosition: { x: 200, y: 300 }
+				startPosition: { x: 200, y: 300 },
+				rotationConstraints: { pos: Infinity, neg: Infinity }
 			},
 			init: ( base ) => {
 				base.pivot.x = base.element.width / 2;
@@ -23,20 +24,22 @@ module.exports = {
 					id: 'turtle-cannon-large.png',
 					options: {
 						basePosition: { x: 0, y: 60 },
-						baseRotation: Util.toRadians( 180 )
+						baseRotation: Util.toRadians( 180 ),
+						rotationConstraints: { pos: Util.toRadians( 18 ), neg: Util.toRadians( 18 ) }
 					},
 					init: ( child , parent ) => {
 						child.pivot.y = child.element.height / 2;
 						child.basePosition.x = child.element.width;
 						child.currentPosition.x = child.element.width;
-					} 
+					}
 				},
 				{
 					name: 'cannon-left-bow',
 					id: 'turtle-cannon-small.png',
 					options: {
 						basePosition: { x: 41, y: 27 },
-						baseRotation: Util.toRadians( -157 )
+						baseRotation: Util.toRadians( -157 ),
+						rotationConstraints: { pos: Util.toRadians( 18 ), neg: Util.toRadians( 18 ) }
 					},
 					init: ( child , parent ) => {
 						child.pivot.y = child.element.height / 2;
@@ -47,7 +50,8 @@ module.exports = {
 					id: 'turtle-cannon-small.png',
 					options: {
 						basePosition: { x: 41, y: 93 },
-						baseRotation: Util.toRadians( 157 )
+						baseRotation: Util.toRadians( 157 ),
+						rotationConstraints: { pos: Util.toRadians( 18 ), neg: Util.toRadians( 18 ) }
 					},
 					init: ( child , parent ) => {
 						child.pivot.y = child.element.height / 2;
@@ -58,7 +62,8 @@ module.exports = {
 					name: 'cannon-right-mid',
 					id: 'turtle-cannon-large.png',
 					options: {
-						basePosition: { x: 79, y: 60 }
+						basePosition: { x: 79, y: 60 },
+						rotationConstraints: { pos: Util.toRadians( 18 ), neg: Util.toRadians( 18 ) }
 					},
 					init: ( child , parent ) => {
 						child.pivot.y = child.element.height / 2;
@@ -71,7 +76,8 @@ module.exports = {
 					id: 'turtle-cannon-small.png',
 					options: {
 						basePosition: { x: 75, y: 27 },
-						baseRotation: Util.toRadians( -23 )
+						baseRotation: Util.toRadians( -23 ),
+						rotationConstraints: { pos: Util.toRadians( 18 ), neg: Util.toRadians( 18 ) }
 					},
 					init: ( child , parent ) => {
 						child.pivot.y = child.element.height / 2;
@@ -82,7 +88,8 @@ module.exports = {
 					id: 'turtle-cannon-small.png',
 					options: {
 						basePosition: { x: 75, y: 93 },
-						baseRotation: Util.toRadians( 23 )
+						baseRotation: Util.toRadians( 23 ),
+						rotationConstraints: { pos: Util.toRadians( 18 ), neg: Util.toRadians( 18 ) }
 					},
 					init: ( child , parent ) => {
 						child.pivot.y = child.element.height / 2;

@@ -2,6 +2,7 @@
 const PIXI = require( 'pixi.js' );
 const Sprite = PIXI.Sprite;
 const Container = PIXI.Container;
+const Util = require( './util.js' );
 
 module.exports = {
 	/**
@@ -123,6 +124,7 @@ module.exports = {
 			// current settings, updated each render
 			currentRotation: options.startRotation || options.baseRotation || 0,
 			currentPosition: options.startPosition || options.basePosition || { x: 0, y: 0 },
+			rotationConstraints: options.rotationConstraints || { pos: 0, neg: 0 },
 			// position velocity/acceleration settings
 			positionVelocity: 0,
 			maxPositionVelocity: options.maxPositionVelocity || 2,
@@ -166,7 +168,13 @@ module.exports = {
 						this.maxRotationVelocity
 					);
 
-				this.currentRotation = this.normalizeAngle( this.currentRotation + this.rotationVelocity * delta);
+				this.currentRotation = this.normalizeAngle( this.currentRotation + this.rotationVelocity * delta );
+
+				// check constraints, @TODO break this out too
+				if ( this.currentRotation > this.baseRotation + this.rotationConstraints.pos )
+					this.currentRotation = this.baseRotation + this.rotationConstraints.pos;
+				if ( this.currentRotation < this.baseRotation - this.rotationConstraints.neg )
+					this.currentRotation = this.baseRotation - this.rotationConstraints.neg;
 
 				this.positionVelocity = this.calculateVelocity(
 						delta,

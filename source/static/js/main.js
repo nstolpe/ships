@@ -30,19 +30,16 @@ window.gameModels = [];
 
 function setup() {
 	var id = PIXI.loader.resources[ Config.spriteSheetPath + "ships.json" ].textures;
-	window.turtle = Models.turtle();
 	gameModels = loadGameModels();
 	for ( let i = 0, l = gameModels.length; i < l; i++ ) {
 		app.stage.addChild( gameModels[ i ].base.element );
 	}
-	turtle.position = { x: viewWidth * scale / 2, y: viewHeight * scale / 2 };
-	app.stage.addChild( turtle.root );
+	window.turtle = gameModels[ 0 ].base;
 	setupInput();
 	app.ticker.add( animate );
 }
 
 function animate( delta ) {
-	turtle.update( delta ); 
 	for ( let i = 0, l = gameModels.length; i < l; i++ ) {
 		gameModels[ i ].base.update( delta );
 	}
