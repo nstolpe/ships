@@ -1,4 +1,7 @@
 'use strict'
+const Config = require( './config.js' );
+const Util = require( './util.js' );
+const GameModels = require( './game-models.js' );
 
 const PIXI = require( 'pixi.js' ),
 	TextureCache = PIXI.utils.TextureCache,
@@ -10,14 +13,6 @@ const PIXI = require( 'pixi.js' ),
 	viewHeight = 800,
 	scale = window.devicePixelRatio,
 	app = new PIXI.Application( viewWidth * scale, viewHeight * scale, { view: view, backgroundColor : 0x000000 } ),
-	Helper = {
-		toDegrees( angle ) {
-			return angle * ( 180 / Math.PI );
-		},
-		toRadians( angle ) {
-			return angle * ( Math.PI / 180 );
-		}
-	},
 	ternaryState = Object.freeze( { 
 		MINUS: -1,
 		EQUAL: 0,
@@ -31,227 +26,51 @@ loader
 	.add( "../assets/spritesheets/ships.json" )
 	.load( setup );
 
+window.gameModels = [];
+
 function setup() {
-	var id = PIXI.loader.resources["../assets/spritesheets/ships.json"].textures;
+	var id = PIXI.loader.resources[ Config.spriteSheetPath + "ships.json" ].textures;
 	window.turtle = Models.turtle();
-	window.ooh = TransformableRenderable( {
-		sprite: new Sprite( id[ "turtle-body.png" ] ),
-		basePosition: { x: viewWidth * scale / 2, y: viewHeight * scale / 2 }
-	} );
-	// window.urt = Models.root( '../assets/spritesheets/ships.json', { x: viewWidth * scale / 2, y: viewHeight * scale / 2 } );
+	gameModels = loadGameModels();
+	for ( let i = 0, l = gameModels.length; i < l; i++ ) {
+		app.stage.addChild( gameModels[ i ].base.element );
+	}
 	turtle.position = { x: viewWidth * scale / 2, y: viewHeight * scale / 2 };
 	app.stage.addChild( turtle.root );
-	app.stage.addChild( ooh.sprite );
 	setupInput();
 	app.ticker.add( animate );
 }
 
 function animate( delta ) {
 	turtle.update( delta ); 
-	ooh.update( delta );
-	// turtle.root.position.set( turtle.position.x, turtle.position.y );
-	// turtle.root.rotation = turtle.rotation;
-}
-
-
-/**
- * Factory for TransformableRenderables. See documentation for Renderable and Transformable
- *
- * @param Object options  See Renderable and Transformable
- */
-function TransformableRenderable( options ) {
-	if ( !options || !options.sprite ) throw new Error( 'No Sprite provided to renderable' );
-	const transformable = Transformable( options );
-	const renderable = Renderable( options );
-	let o = {
-		updateTransform: transformable.update,
-		update( delta ) {
-			this.updateTransform( delta );
-			this.sprite.position.set( this.currentPosition.x, this.currentPosition.y );
-			this.sprite.rotation = this.currentRotation;
-		}
+	for ( let i = 0, l = gameModels.length; i < l; i++ ) {
+		gameModels[ i ].base.update( delta );
 	}
-	return Object.assign( {}, transformable, renderable, o );
-}
-/**
- * Factory for renderables (options has a Sprite)
- *
- * @param Object options
- *
- * @param Object options.pivot     The pivot that will be assigned to the `Sprite` on each update.
- * @param number options.pivot.x   The x coordinate of pivot
- * @param number options.pivot.y   The y coordinate of pivot
- *
- * @param Object options.anchor    The anchor that will be assigned to the `Sprite` on each update.
- * @param number options.ahcnor.x  The x coordinate of pivot
- * @param number options.ahcnor.y  The y coordinate of pivot
- */
-function Renderable( options, o = {} ) {
-	if ( !options || !options.sprite ) throw new Error( 'No Sprite provided to renderable' );
-
-	return Object.assign( o, {
-		sprite: options.sprite,
-		pivot: options.pivot || { x: options.sprite.pivot.x, y: options.sprite.pivot.y },
-		anchor: options.anchor || { x: options.sprite.anchor.x, y: options.sprite.anchor.y }
-	} );
 }
 
-/**
- * Factory for groups (options has a Container)
- *
- * @param Object options
- * @param Object options.pivot     The pivot that will be assigned to the `Sprite` on each update.
- * @param number options.pivot.x   The x coordinate of pivot
- * @param number options.pivot.y   The y coordinate of pivot
- */
-function Group( options, o = {} ) {
-	let container = new Container();
-
-	return Object.assign( o, {
-		container: container,
-		pivot: options.pivot || { x: container.pivot.x, y: container.pivot.y }
-	} );
+function loadGameModels() {
+	let gameModels = [];
+	for ( let i = Config.gameModels.length - 1; i >= 0; i-- ) {
+		gameModels.push( loadGameModel( Config.gameModels[ i ] ) );
+	}
+	return gameModels;
 }
 
-/**
- * Factory for transformables
- * 
- * @param Object options
- *
- * @param number options.baseRotation  The rotation that will be considered 'zeroed' for the `transformable`
- *
- * @param Object options.basePosition    The position that will be considered 'zeroed' for the `transformable`
- * @param number options.basePosition.x  The position's x coordinate
- * @param number options.basePosition.y  The position's y coordinate
- *
- * @param number options.maxPositionVelocity        The maximum scalar velocity the transformable can move. Converted to x/y when used.
- * @param number options.positionVelocityIncrement  The rate at which positionVelocity will increment or decrement.
- * @param number options.maxRotationVelocity        The maximum velocity the transformable can rotate at.
- * @param number options.rotationVelocityIncrement  The rate at which rotationVelocity will increment or decrement.
- */
-function Transformable( options, o = {} ) {
-	/**
-	 * Enum-like immutable object with 3 states.
-	 */
-	const TernaryState = Object.freeze( {
-		MINUS: -1,
-		EQUAL: 0,
-		PLUS: 1
-	} );
+function loadGameModel( model ) {
+	const base = GameModels.TransformableGroup( model.options );
 
-	return Object.assign( o, {
-		// "zeroed" settings
-		baseRotation: options.baseRotation || 0,
-		basePosition: options.basePosition || { x: 0, y: 0 },
-		// current settings, updated each render
-		currentRotation: options.baseRotation || 0,
-		currentPosition: options.basePosition || { x: 0, y: 0 },
-		// position velocity/acceleration settings
-		positionVelocity: 0,
-		maxPositionVelocity: options.maxPositionVelocity || 2,
-		positionVelocityIncrement: options.positionVelocityIncrement || .01,
-		positionAcceleration: TernaryState.EQUAL,
-		// rotation velocity/acceleration settings
-		rotationVelocity: 0,
-		maxRotationVelocity: options.maxRotationVelocity || 0.02,
-		rotationVelocityIncrement: options.rotationVelocityIncrement || 0.001,
-		rotationAcceleration: TernaryState.EQUAL,
-		/**
-		 * Updates the position velocity to limit or -limit
-		 */
-		updatePositionVelocity( delta, limit, reverse ) {
-			if ( reverse )
-				this.positionVelocity = Math.max( this.positionVelocity - ( delta * this.positionVelocityIncrement ), limit );
-			else
-				this.positionVelocity = Math.min( this.positionVelocity + ( delta * this.positionVelocityIncrement ), limit );
-		},
-		/**
-		 * Updates the rotation velocity to limit or -limit
-		 */
-		updateRotationVelocity( delta, acceleration, velocity, increment, limit ) {
-			let target;
+	for ( let i = 0, l = model.children.length; i < l; i++ ) {
+		let child = model.children[ i ];
+		let texture = PIXI.loader.resources[ Config.spriteSheetPath + model.spriteSheet ].textures[ child.id ];
+		let sprite = new Sprite( texture );
+		let tr = GameModels.TransformableRenderable( Object.assign( { element: sprite }, child.options ) );
 
-			if ( acceleration !== TernaryState.EQUAL ) {
-				target = velocity + ( delta * increment * acceleration );
-				return Math.min( Math.abs( target ), limit ) * acceleration
-			} else {
-				// velocity is returning to 0
-				if ( velocity > 0 ) {
-					target = velocity + ( delta * -increment ); 
-					return Math.max( target , 0 );
-				}
-				if ( velocity < 0 ) {
-					target = velocity + ( delta * increment ); 
-					return Math.min( target, 0 );
-				}
-				return velocity;
-			}
-		},
-		calculateVelocity( delta, acceleration, velocity, increment, limit ) {
-			let calculated = velocity;
-			switch ( acceleration ) {
-				case TernaryState.MINUS:
-					calculated = Math.max( velocity - ( delta * increment ), -limit );
-					break;
-				case TernaryState.PLUS:
-					calculated = Math.min( velocity + ( delta * increment ), limit );
-					break;
-				case TernaryState.EQUAL:
-				default:
-					if ( velocity > 0 ) {
-						calculated = Math.max( velocity - ( delta * increment ), 0 );
-					} else if ( velocity < 0 ) {
-						calculated = Math.min( velocity + ( delta * increment ), limit );
+		base.addChild( child.name, tr, child.init );
+	}
 
-					} else {
-						calculated = velocity;
-					}
-					break;
-			}
-
-			return calculated;
-		},
-		update( delta ) {
-			this.rotationVelocity = this.calculateVelocity(
-					delta,
-					this.rotationAcceleration,
-					this.rotationVelocity,
-					this.rotationVelocityIncrement,
-					this.maxRotationVelocity
-				);
-
-			this.currentRotation = this.normalizeAngle( this.currentRotation + this.rotationVelocity * delta);
-
-			this.positionVelocity = this.calculateVelocity(
-					delta,
-					this.positionAcceleration,
-					this.positionVelocity,
-					this.positionVelocityIncrement,
-					this.maxPositionVelocity
-				);
-			// convert scalar velocity to x/y velocities
-			let vx = this.positionVelocity * Math.sin( this.currentRotation ),
-				vy = -this.positionVelocity * Math.cos( this.currentRotation );
-
-			this.currentPosition.x += vx * delta;
-			this.currentPosition.y += vy * delta;
-		},
-		/**
-		 * Normalizes a radian angle to keep it between -2PI and 2PI
-		 *
-		 * @param number angle  The angle that may need normalization. 
-		 */
-		normalizeAngle( angle ) {
-			const limit = 2 * Math.PI;
-			let normalized = angle;
-			if ( angle >= limit )
-				normalized -= limit * Math.floor( normalized / limit );
-			else if ( angle <= -limit )
-				normalized += limit * Math.floor( normalized / -limit );
-
-			return normalized;
-		}
-	} );
+	base.update( 0 );
+	model.init( base );
+	return { base: base }
 }
 
 const Models = {
@@ -289,27 +108,27 @@ const Models = {
 		cannonMidRight.y = 59;
 
 		cannonForeRight.pivot.y = cannonForeRight.height / 2
-		cannonForeRight.rotation = Helper.toRadians( -23 );
+		cannonForeRight.rotation = Util.toRadians( -23 );
 		cannonForeRight.x = 75;
 		cannonForeRight.y = 27;
 
 		cannonAftRight.pivot.y = cannonAftRight.height / 2
-		cannonAftRight.rotation = Helper.toRadians( 23 );
+		cannonAftRight.rotation = Util.toRadians( 23 );
 		cannonAftRight.x = 75;
 		cannonAftRight.y = 93;
 
 		cannonMidLeft.pivot.y = cannonMidRight.height / 2;
-		cannonMidLeft.rotation = Helper.toRadians( 180 );
+		cannonMidLeft.rotation = Util.toRadians( 180 );
 		cannonMidLeft.x = cannonMidLeft.width;
 		cannonMidLeft.y = 59;
 
 		cannonForeLeft.pivot.y = cannonForeRight.height / 2
-		cannonForeLeft.rotation = Helper.toRadians( -157 );
+		cannonForeLeft.rotation = Util.toRadians( -157 );
 		cannonForeLeft.x = 41; // width of cannonMidLeft + 4 (diff of cannonMidRight.x and cannon)
 		cannonForeLeft.y = 27;
 
 		cannonAftLeft.pivot.y = cannonAftRight.height / 2
-		cannonAftLeft.rotation = Helper.toRadians( 157 );
+		cannonAftLeft.rotation = Util.toRadians( 157 );
 		cannonAftLeft.x = 41;
 		cannonAftLeft.y = 93;
 		
