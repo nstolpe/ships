@@ -297,11 +297,55 @@ function setupInput() {
 	}
 
 	H.press = () => {
-		turtle.cannonMidLeft.rotation += .1;
+		turtle.children[ 'cannon-left-mid' ].rotationAcceleration = ternaryState.PLUS;
+		turtle.children[ 'cannon-left-bow' ].rotationAcceleration = ternaryState.PLUS;
+		turtle.children[ 'cannon-left-aft' ].rotationAcceleration = ternaryState.PLUS;
 	}
 	H.release = () => {
-		// if ( !A.isDown )
-		// 	turtle.rotationAcceleration = ternaryState.EQUAL;
+		if ( !J.isDown ) {
+			turtle.children[ 'cannon-left-mid' ].rotationAcceleration = ternaryState.EQUAL;
+			turtle.children[ 'cannon-left-bow' ].rotationAcceleration = ternaryState.EQUAL;
+			turtle.children[ 'cannon-left-aft' ].rotationAcceleration = ternaryState.EQUAL;
+		}
+	}
+
+	J.press = () => {
+		turtle.children[ 'cannon-left-mid' ].rotationAcceleration = ternaryState.MINUS;
+		turtle.children[ 'cannon-left-bow' ].rotationAcceleration = ternaryState.MINUS;
+		turtle.children[ 'cannon-left-aft' ].rotationAcceleration = ternaryState.MINUS;
+	}
+	J.release = () => {
+		if ( !H.isDown ) {
+			turtle.children[ 'cannon-left-mid' ].rotationAcceleration = ternaryState.EQUAL;
+			turtle.children[ 'cannon-left-bow' ].rotationAcceleration = ternaryState.EQUAL;
+			turtle.children[ 'cannon-left-aft' ].rotationAcceleration = ternaryState.EQUAL;
+		}
+	}
+
+	K.press = () => {
+		turtle.children[ 'cannon-right-mid' ].rotationAcceleration = ternaryState.PLUS;
+		turtle.children[ 'cannon-right-bow' ].rotationAcceleration = ternaryState.PLUS;
+		turtle.children[ 'cannon-right-aft' ].rotationAcceleration = ternaryState.PLUS;
+	}
+	K.release = () => {
+		if ( !L.isDown ) {
+			turtle.children[ 'cannon-right-mid' ].rotationAcceleration = ternaryState.EQUAL;
+			turtle.children[ 'cannon-right-bow' ].rotationAcceleration = ternaryState.EQUAL;
+			turtle.children[ 'cannon-right-aft' ].rotationAcceleration = ternaryState.EQUAL;
+		}
+	}
+
+	L.press = () => {
+		turtle.children[ 'cannon-right-mid' ].rotationAcceleration = ternaryState.MINUS;
+		turtle.children[ 'cannon-right-bow' ].rotationAcceleration = ternaryState.MINUS;
+		turtle.children[ 'cannon-right-aft' ].rotationAcceleration = ternaryState.MINUS;
+	}
+	L.release = () => {
+		if ( !K.isDown ) {
+			turtle.children[ 'cannon-right-mid' ].rotationAcceleration = ternaryState.EQUAL;
+			turtle.children[ 'cannon-right-bow' ].rotationAcceleration = ternaryState.EQUAL;
+			turtle.children[ 'cannon-right-aft' ].rotationAcceleration = ternaryState.EQUAL;
+		}
 	}
 }
 

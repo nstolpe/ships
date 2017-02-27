@@ -25,7 +25,9 @@ module.exports = {
 					options: {
 						basePosition: { x: 0, y: 60 },
 						baseRotation: Util.toRadians( 180 ),
-						rotationConstraints: { pos: Util.toRadians( 18 ), neg: Util.toRadians( 18 ) }
+						rotationConstraints: { pos: Util.toRadians( 16 ), neg: Util.toRadians( 16 ) },
+						maxRotationVelocity: 0.04,
+						rotationVelocityIncrement: 0.004
 					},
 					init: ( child , parent ) => {
 						child.pivot.y = child.element.height / 2;
@@ -39,7 +41,9 @@ module.exports = {
 					options: {
 						basePosition: { x: 41, y: 27 },
 						baseRotation: Util.toRadians( -157 ),
-						rotationConstraints: { pos: Util.toRadians( 18 ), neg: Util.toRadians( 18 ) }
+						rotationConstraints: { pos: Util.toRadians( 16 ), neg: Util.toRadians( 16 ) },
+						maxRotationVelocity: 0.04,
+						rotationVelocityIncrement: 0.004
 					},
 					init: ( child , parent ) => {
 						child.pivot.y = child.element.height / 2;
@@ -51,7 +55,9 @@ module.exports = {
 					options: {
 						basePosition: { x: 41, y: 93 },
 						baseRotation: Util.toRadians( 157 ),
-						rotationConstraints: { pos: Util.toRadians( 18 ), neg: Util.toRadians( 18 ) }
+						rotationConstraints: { pos: Util.toRadians( 16 ), neg: Util.toRadians( 16 ) },
+						maxRotationVelocity: 0.04,
+						rotationVelocityIncrement: 0.004
 					},
 					init: ( child , parent ) => {
 						child.pivot.y = child.element.height / 2;
@@ -63,7 +69,9 @@ module.exports = {
 					id: 'turtle-cannon-large.png',
 					options: {
 						basePosition: { x: 79, y: 60 },
-						rotationConstraints: { pos: Util.toRadians( 18 ), neg: Util.toRadians( 18 ) }
+						rotationConstraints: { pos: Util.toRadians( 16 ), neg: Util.toRadians( 16 ) },
+						maxRotationVelocity: 0.04,
+						rotationVelocityIncrement: 0.004
 					},
 					init: ( child , parent ) => {
 						child.pivot.y = child.element.height / 2;
@@ -77,7 +85,9 @@ module.exports = {
 					options: {
 						basePosition: { x: 75, y: 27 },
 						baseRotation: Util.toRadians( -23 ),
-						rotationConstraints: { pos: Util.toRadians( 18 ), neg: Util.toRadians( 18 ) }
+						rotationConstraints: { pos: Util.toRadians( 16 ), neg: Util.toRadians( 16 ) },
+						maxRotationVelocity: 0.04,
+						rotationVelocityIncrement: 0.004
 					},
 					init: ( child , parent ) => {
 						child.pivot.y = child.element.height / 2;
@@ -89,7 +99,9 @@ module.exports = {
 					options: {
 						basePosition: { x: 75, y: 93 },
 						baseRotation: Util.toRadians( 23 ),
-						rotationConstraints: { pos: Util.toRadians( 18 ), neg: Util.toRadians( 18 ) }
+						rotationConstraints: { pos: Util.toRadians( 16 ), neg: Util.toRadians( 16 ) },
+						maxRotationVelocity: 0.04,
+						rotationVelocityIncrement: 0.004
 					},
 					init: ( child , parent ) => {
 						child.pivot.y = child.element.height / 2;
