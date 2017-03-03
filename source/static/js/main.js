@@ -266,34 +266,47 @@ function setupInput() {
 
 	W.press = () => {
 		turtle.positionAcceleration = ternaryState.PLUS;
+		turtle.activePositionAcceleration = true;
 	}
 	W.release = () => {
-		if ( !S.isDown )
+		if ( !S.isDown ) {
 			turtle.positionAcceleration = ternaryState.EQUAL;
+			turtle.activePositionAcceleration = false;
+		}
 	}
 
 	S.press = () => {
 		turtle.positionAcceleration = ternaryState.MINUS;
+		turtle.activePositionAcceleration = true;
 	}
 	S.release = () => {
-		if ( !W.isDown )
+		if ( !W.isDown ) {
 			turtle.positionAcceleration = ternaryState.EQUAL;
+			turtle.activePositionAcceleration = false;
+		}
 	}
 
 	A.press = () => {
 		turtle.rotationAcceleration = ternaryState.MINUS;
+		turtle.children[ 'rudder' ].rotationAcceleration = ternaryState.PLUS;
 	}
 	A.release = () => {
-		if ( !D.isDown )
+		if ( !D.isDown ) {
 			turtle.rotationAcceleration = ternaryState.EQUAL;
+			turtle.children[ 'rudder' ].rotationAcceleration = ternaryState.EQUAL;
+		}
 	}
 
 	D.press = () => {
 		turtle.rotationAcceleration = ternaryState.PLUS;
+		turtle.children[ 'rudder' ].rotationAcceleration = ternaryState.MINUS;
+		turtle.children[ 'rudder' ].stabilizingRotation = false;
 	}
 	D.release = () => {
-		if ( !A.isDown )
+		if ( !A.isDown ) {
 			turtle.rotationAcceleration = ternaryState.EQUAL;
+			turtle.children[ 'rudder' ].rotationAcceleration = ternaryState.EQUAL;
+		}
 	}
 
 	H.press = () => {
