@@ -135,6 +135,11 @@ module.exports = {
 			maxRotationVelocity: options.maxRotationVelocity || 0.02,
 			rotationVelocityIncrement: options.rotationVelocityIncrement || 0.001,
 			rotationAcceleration: TernaryState.EQUAL,
+			postUpdates: options.postUpdates || [],
+			stabilizeRotation: options.stabilizeRotation || false,
+			stabilizePosition: options.stabilizePosition || false,
+			targetRotation: options.startRotation || options.baseRotation || 0,
+			targetPosition: options.startPosition || options.basePosition || 0,
 			calculateVelocity( delta, acceleration, velocity, increment, limit ) {
 				let calculated = velocity;
 				switch ( acceleration ) {
@@ -146,20 +151,30 @@ module.exports = {
 						break;
 					case TernaryState.EQUAL:
 					default:
-						if ( velocity > 0 ) {
-							calculated = Math.max( velocity - ( delta * increment ), 0 );
-						} else if ( velocity < 0 ) {
-							calculated = Math.min( velocity + ( delta * increment ), limit );
-
-						} else {
-							calculated = velocity;
-						}
-						break;
+						// if ( velocity > 0 ) {
+						// 	calculated = Math.max( velocity - ( delta * increment ), 0 );
+						// } else if ( velocity < 0 ) {
+						// 	calculated = Math.min( velocity + ( delta * increment ), 0 );
+						// }
+						calculated = Math.max( Math.abs( velocity ) - ( delta * increment ), 0 ) * Math.sign( velocity );
 				}
 
 				return calculated;
 			},
+			// setRotation
 			update( delta ) {
+				// if ( this.stabilizeRotation && this.rotationAcceleration === TernaryState.EQUAL && this.currentRotation !== this.baseRotation ) {
+				// 	if ( this.currentRotation > this.baseRotation ) {
+				// 		this.rotationAcceleration = TernaryState.MINUS;
+				// 		this.stabilizingRotation = true;
+				// 	}
+				// 	if ( this.currentRotation > this.baseRotation ) {
+				// 		this.rotationAcceleration = TernaryState.PLUS;
+				// 		this.stabilizingRotation = true;
+				// 	}
+				// }
+
+				// set rotation velocity
 				this.rotationVelocity = this.calculateVelocity(
 						delta,
 						this.rotationAcceleration,
@@ -190,6 +205,9 @@ module.exports = {
 
 				this.currentPosition.x += vx * delta;
 				this.currentPosition.y += vy * delta;
+
+				for ( let i = 0, l = this.postUpdates.length; i < l; i++ )
+					this.postUpdates[ i ].call( this, delta );
 			},
 			/**
 			 * Normalizes a radian angle to keep it between -2PI and 2PI
