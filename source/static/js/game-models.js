@@ -111,10 +111,10 @@ module.exports = {
 		/**
 		 * Enum-like immutable object with 3 states.
 		 */
-		const TernaryState = Object.freeze( {
-			MINUS: -1,
-			EQUAL: 0,
-			PLUS: 1
+		const TrinaryState = Object.freeze( {
+			NEGATIVE: -1,
+			NEUTRAL: 0,
+			POSITIVE: 1
 		} );
 
 		return Object.assign( o, {
@@ -129,27 +129,31 @@ module.exports = {
 			positionVelocity: 0,
 			maxPositionVelocity: options.maxPositionVelocity || 2,
 			positionVelocityIncrement: options.positionVelocityIncrement || .01,
-			positionAcceleration: TernaryState.EQUAL,
+			positionAcceleration: TrinaryState.NEUTRAL,
 			// rotation velocity/acceleration settings
 			rotationVelocity: 0,
 			maxRotationVelocity: options.maxRotationVelocity || 0.02,
 			rotationVelocityIncrement: options.rotationVelocityIncrement || 0.001,
-			rotationAcceleration: TernaryState.EQUAL,
+			rotationAcceleration: TrinaryState.NEUTRAL,
 			postUpdates: options.postUpdates || [],
 			stabilizeRotation: options.stabilizeRotation || false,
 			stabilizePosition: options.stabilizePosition || false,
 			targetRotation: options.startRotation || options.baseRotation || 0,
 			targetPosition: options.startPosition || options.basePosition || 0,
+			// activePositionAcceleration: TrinaryState.NEUTRAL,
+			// activeRotationAcceleration: TrinaryState.NEUTRAL,
+			debug: options.debug || false,
 			calculateVelocity( delta, acceleration, velocity, increment, limit ) {
 				let calculated = velocity;
+
 				switch ( acceleration ) {
-					case TernaryState.MINUS:
+					case TrinaryState.NEGATIVE:
 						calculated = Math.max( velocity - ( delta * increment ), -limit );
 						break;
-					case TernaryState.PLUS:
+					case TrinaryState.POSITIVE:
 						calculated = Math.min( velocity + ( delta * increment ), limit );
 						break;
-					case TernaryState.EQUAL:
+					case TrinaryState.NEUTRAL:
 					default:
 						// if ( velocity > 0 ) {
 						// 	calculated = Math.max( velocity - ( delta * increment ), 0 );
@@ -163,33 +167,55 @@ module.exports = {
 			},
 			// setRotation
 			update( delta ) {
-				// if ( this.stabilizeRotation && this.rotationAcceleration === TernaryState.EQUAL && this.currentRotation !== this.baseRotation ) {
-				// 	if ( this.currentRotation > this.baseRotation ) {
-				// 		this.rotationAcceleration = TernaryState.MINUS;
-				// 		this.stabilizingRotation = true;
-				// 	}
-				// 	if ( this.currentRotation > this.baseRotation ) {
-				// 		this.rotationAcceleration = TernaryState.PLUS;
-				// 		this.stabilizingRotation = true;
-				// 	}
-				// }
+				if ( this.stabilizeRotation && this.rotationAcceleration === TrinaryState.NEUTRAL ) {
+					// set rotation velocity
+					if ( this.debug  && this.currentRotation !== 0 ) {
+						console.log(Math.sign( this.currentRotation - this.baseRotation ))
+						console.log(this.currentRotation)
+					}
 
-				// set rotation velocity
-				this.rotationVelocity = this.calculateVelocity(
-						delta,
-						this.rotationAcceleration,
-						this.rotationVelocity,
-						this.rotationVelocityIncrement,
-						this.maxRotationVelocity
-					);
+					if ( this.currentRotation > this.baseRotation && this.rotationVelocity > 0 ) {
+						this.rotationVelocity = 0;
+					}
+					if ( this.currentRotation < this.baseRotation && this.rotationVelocity < 0 ) {
+						this.rotationVelocity = 0;
+					}
 
-				this.currentRotation = this.normalizeAngle( this.currentRotation + this.rotationVelocity * delta );
+					this.rotationVelocity = this.calculateVelocity(
+							delta,
+							Math.sign( this.baseRotation - this.currentRotation ),
+							this.rotationVelocity,
+							this.rotationVelocityIncrement,
+							this.maxRotationVelocity
+						);
+				} else {
+					// set rotation velocity
+					this.rotationVelocity = this.calculateVelocity(
+							delta,
+							this.rotationAcceleration,
+							this.rotationVelocity,
+							this.rotationVelocityIncrement,
+							this.maxRotationVelocity
+						);
+				}
 
-				// check constraints, @TODO break this out too
-				if ( this.currentRotation > this.baseRotation + this.rotationConstraints.pos )
-					this.currentRotation = this.baseRotation + this.rotationConstraints.pos;
-				if ( this.currentRotation < this.baseRotation - this.rotationConstraints.neg )
-					this.currentRotation = this.baseRotation - this.rotationConstraints.neg;
+
+				if ( this.stabilizeRotation && this.rotationAcceleration === TrinaryState.NEUTRAL ) {
+					let targetRotation = this.normalizeAngle( this.currentRotation + this.rotationVelocity * delta );
+
+					if ( this.currentRotation > this.baseRotation )
+						this.currentRotation = Math.max( this.currentRotation + this.rotationVelocity * delta, this.baseRotation );
+					if ( this.currentRotation < this.baseRotation )
+						this.currentRotation = Math.min( this.currentRotation + this.rotationVelocity * delta, this.baseRotation );
+				} else {
+					this.currentRotation = this.normalizeAngle( this.currentRotation + this.rotationVelocity * delta );
+
+					// check constraints, @TODO break this out too
+					if ( this.currentRotation > this.baseRotation + this.rotationConstraints.pos )
+						this.currentRotation = this.baseRotation + this.rotationConstraints.pos;
+					if ( this.currentRotation < this.baseRotation - this.rotationConstraints.neg )
+						this.currentRotation = this.baseRotation - this.rotationConstraints.neg;
+				}
 
 				this.positionVelocity = this.calculateVelocity(
 						delta,
