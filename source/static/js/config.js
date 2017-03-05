@@ -134,7 +134,10 @@ module.exports = {
 					options: {
 						basePosition: { x: 46.23439168930054, y: 110 },
 						rotationConstraints: { pos: Util.toRadians( 20 ), neg: Util.toRadians( 20 ) },
-						stabilizeRotation: true
+						maxRotationVelocity: 0.02,
+						rotationVelocityIncrement: 0.01,
+						stabilizeRotation: true,
+						debug: true
 					},
 					init: ( child , parent ) => {
 						child.pivot.x = child.element.width / 2;
