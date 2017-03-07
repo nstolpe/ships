@@ -8,8 +8,9 @@ module.exports = {
 			name: 'turtle',
 			spriteSheet: 'ships.json',
 			options: {
-				startPosition: { x: 200, y: 300 },
-				rotationConstraints: { pos: Infinity, neg: Infinity },
+				currentPosition: { x: 200, y: 300 },
+				// rotationConstraints: { pos: Infinity, neg: Infinity },
+				// positionConstraints: { pos: { x: Infinity, y: Infinity }, neg: { x: Infinity, y: Infinity } },
 				maxPositionVelocity: 4,
 				positionVelocityIncrement: .05,
 				postUpdates: [
@@ -37,8 +38,9 @@ module.exports = {
 						basePosition: { x: 0, y: 60 },
 						baseRotation: Util.toRadians( 180 ),
 						rotationConstraints: { pos: Util.toRadians( 16 ), neg: Util.toRadians( 16 ) },
+						positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
 						maxRotationVelocity: 0.04,
-						rotationVelocityIncrement: 0.004
+						rotationVelocityIncrement: 0.004,
 					},
 					init: ( child , parent ) => {
 						child.pivot.y = child.element.height / 2;
@@ -53,6 +55,7 @@ module.exports = {
 						basePosition: { x: 41, y: 27 },
 						baseRotation: Util.toRadians( -157 ),
 						rotationConstraints: { pos: Util.toRadians( 16 ), neg: Util.toRadians( 16 ) },
+						positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
 						maxRotationVelocity: 0.04,
 						rotationVelocityIncrement: 0.004
 					},
@@ -67,6 +70,7 @@ module.exports = {
 						basePosition: { x: 41, y: 93 },
 						baseRotation: Util.toRadians( 157 ),
 						rotationConstraints: { pos: Util.toRadians( 16 ), neg: Util.toRadians( 16 ) },
+						positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
 						maxRotationVelocity: 0.04,
 						rotationVelocityIncrement: 0.004
 					},
@@ -81,6 +85,7 @@ module.exports = {
 					options: {
 						basePosition: { x: 79, y: 60 },
 						rotationConstraints: { pos: Util.toRadians( 16 ), neg: Util.toRadians( 16 ) },
+						positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
 						maxRotationVelocity: 0.04,
 						rotationVelocityIncrement: 0.004
 					},
@@ -97,6 +102,7 @@ module.exports = {
 						basePosition: { x: 75, y: 27 },
 						baseRotation: Util.toRadians( -23 ),
 						rotationConstraints: { pos: Util.toRadians( 16 ), neg: Util.toRadians( 16 ) },
+						positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
 						maxRotationVelocity: 0.04,
 						rotationVelocityIncrement: 0.004
 					},
@@ -111,6 +117,7 @@ module.exports = {
 						basePosition: { x: 75, y: 93 },
 						baseRotation: Util.toRadians( 23 ),
 						rotationConstraints: { pos: Util.toRadians( 16 ), neg: Util.toRadians( 16 ) },
+						positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
 						maxRotationVelocity: 0.04,
 						rotationVelocityIncrement: 0.004
 					},
@@ -122,7 +129,9 @@ module.exports = {
 					name: 'body',
 					id: 'turtle-body.png',
 					options: {
-						basePosition: { x: 15, y: 0 }
+						basePosition: { x: 15, y: 0 },
+						rotationConstraints: { pos: 0, neg: 0 },
+						positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } }
 					},
 					init: ( child, parent) => {
 						// child.pivot.x = parent.width / 2;
@@ -134,6 +143,7 @@ module.exports = {
 					options: {
 						basePosition: { x: 46.23439168930054, y: 110 },
 						rotationConstraints: { pos: Util.toRadians( 20 ), neg: Util.toRadians( 20 ) },
+						positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
 						maxRotationVelocity: 0.02,
 						rotationVelocityIncrement: 0.01,
 						stabilizeRotation: true,

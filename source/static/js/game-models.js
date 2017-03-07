@@ -122,9 +122,10 @@ module.exports = {
 			baseRotation: options.baseRotation || 0,
 			basePosition: options.basePosition || { x: 0, y: 0 },
 			// current settings, updated each render
-			currentRotation: options.startRotation || options.baseRotation || 0,
-			currentPosition: options.startPosition || options.basePosition || { x: 0, y: 0 },
-			rotationConstraints: options.rotationConstraints || { pos: 0, neg: 0 },
+			currentRotation: options.currentRotation || options.baseRotation || 0,
+			currentPosition: options.currentPosition || options.basePosition || { x: 0, y: 0 },
+			rotationConstraints: options.rotationConstraints || { pos: Infinity, neg: Infinity },
+			positionConstraints: options.positionConstraints || { pos: { x: Infinity, y: Infinity }, neg: { x: Infinity, y: Infinity } },
 			// position velocity/acceleration settings
 			positionVelocity: 0,
 			maxPositionVelocity: options.maxPositionVelocity || 2,
@@ -162,18 +163,22 @@ module.exports = {
 						// }
 						calculated = Math.max( Math.abs( velocity ) - ( delta * increment ), 0 ) * Math.sign( velocity );
 				}
-
 				return calculated;
+			},
+			stabilizing() {
+				return this.stabilizeRotation && this.rotationAcceleration === TrinaryState.NEUTRAL;
 			},
 			// setRotation
 			update( delta ) {
-				if ( this.stabilizeRotation && this.rotationAcceleration === TrinaryState.NEUTRAL ) {
+				// if the Transformable will rotate back to its baseRotation and no rotationAcceleration is being applied
+				if ( this.stabilizing() ) {
 					// set rotation velocity
 					if ( this.debug  && this.currentRotation !== 0 ) {
-						console.log(Math.sign( this.currentRotation - this.baseRotation ))
-						console.log(this.currentRotation)
+						// console.log(Math.sign( this.currentRotation - this.baseRotation ))
+						// console.log(this.currentRotation)
 					}
 
+					// don't pass baseRotation 
 					if ( this.currentRotation > this.baseRotation && this.rotationVelocity > 0 ) {
 						this.rotationVelocity = 0;
 					}
@@ -181,6 +186,7 @@ module.exports = {
 						this.rotationVelocity = 0;
 					}
 
+					// set rotation velocity
 					this.rotationVelocity = this.calculateVelocity(
 							delta,
 							Math.sign( this.baseRotation - this.currentRotation ),
@@ -188,6 +194,15 @@ module.exports = {
 							this.rotationVelocityIncrement,
 							this.maxRotationVelocity
 						);
+
+					let targetRotation = this.normalizeAngle( this.currentRotation + this.rotationVelocity * delta );
+
+					if ( this.currentRotation > this.baseRotation )
+						this.currentRotation = Math.max( this.currentRotation + this.rotationVelocity * delta, this.baseRotation );
+					if ( this.currentRotation < this.baseRotation )
+						this.currentRotation = Math.min( this.currentRotation + this.rotationVelocity * delta, this.baseRotation );
+				// if the transformable is not stabilizing (returning to a base rotation when in neutral acceleration).
+				// positive acceleration, negative acceleration, and deceleration
 				} else {
 					// set rotation velocity
 					this.rotationVelocity = this.calculateVelocity(
@@ -197,25 +212,17 @@ module.exports = {
 							this.rotationVelocityIncrement,
 							this.maxRotationVelocity
 						);
-				}
 
-
-				if ( this.stabilizeRotation && this.rotationAcceleration === TrinaryState.NEUTRAL ) {
-					let targetRotation = this.normalizeAngle( this.currentRotation + this.rotationVelocity * delta );
-
-					if ( this.currentRotation > this.baseRotation )
-						this.currentRotation = Math.max( this.currentRotation + this.rotationVelocity * delta, this.baseRotation );
-					if ( this.currentRotation < this.baseRotation )
-						this.currentRotation = Math.min( this.currentRotation + this.rotationVelocity * delta, this.baseRotation );
-				} else {
 					this.currentRotation = this.normalizeAngle( this.currentRotation + this.rotationVelocity * delta );
 
 					// check constraints, @TODO break this out too
 					if ( this.currentRotation > this.baseRotation + this.rotationConstraints.pos )
 						this.currentRotation = this.baseRotation + this.rotationConstraints.pos;
+
 					if ( this.currentRotation < this.baseRotation - this.rotationConstraints.neg )
 						this.currentRotation = this.baseRotation - this.rotationConstraints.neg;
 				}
+
 
 				this.positionVelocity = this.calculateVelocity(
 						delta,
@@ -231,6 +238,18 @@ module.exports = {
 
 				this.currentPosition.x += vx * delta;
 				this.currentPosition.y += vy * delta;
+
+				if ( this.currentPosition.x > this.basePosition.x + this.positionConstraints.pos.x )
+					this.currentPosition.x = this.basePosition.x + this.positionConstraints.pos.x;
+
+				if ( this.currentPosition.y > this.basePosition.y + this.positionConstraints.pos.y )
+					this.currentPosition.y = this.basePosition.y + this.positionConstraints.pos.y;
+
+				if ( this.currentPosition.x < this.basePosition.x - this.positionConstraints.neg.x )
+					this.currentPosition.x = this.basePosition.x - this.positionConstraints.neg.x;
+
+				if ( this.currentPosition.y < this.basePosition.y - this.positionConstraints.neg.y )
+					this.currentPosition.y = this.basePosition.y - this.positionConstraints.neg.y;
 
 				for ( let i = 0, l = this.postUpdates.length; i < l; i++ )
 					this.postUpdates[ i ].call( this, delta );
