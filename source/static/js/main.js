@@ -2,7 +2,7 @@
 const Config = require( './config.js' );
 const Util = require( './util.js' );
 const GameModels = require( './game-models.js' );
-
+window.math = require( 'mathjs' );
 const PIXI = require( 'pixi.js' ),
 	TextureCache = PIXI.utils.TextureCache,
 	Sprite = PIXI.Sprite,
@@ -31,7 +31,7 @@ function setup() {
 	var id = PIXI.loader.resources[ Config.spriteSheetPath + "ships.json" ].textures;
 	gameModels = loadGameModels();
 	for ( let i = 0, l = gameModels.length; i < l; i++ ) {
-		app.stage.addChild( gameModels[ i ].base.element );
+		app.stage.addChild( gameModels[ i ].base.sprite );
 	}
 	window.turtle = gameModels[ 0 ].base;
 	setupInput();
@@ -59,7 +59,7 @@ function loadGameModel( model ) {
 		let child = model.children[ i ];
 		let texture = PIXI.loader.resources[ Config.spriteSheetPath + model.spriteSheet ].textures[ child.id ];
 		let sprite = new Sprite( texture );
-		let tr = GameModels.TransformableRenderable( Object.assign( { element: sprite }, child.options ) );
+		let tr = GameModels.TransformableRenderable( Object.assign( { sprite: sprite }, child.options ) );
 
 		base.addChild( child.name, tr, child.init );
 	}
