@@ -11,16 +11,16 @@ module.exports = {
 	 * @param Object options  See Renderable and Transformable
 	 */
 	TransformableRenderable( options ) {
-		if ( !options || !options.element ) throw new Error( 'No Sprite provided to renderable' );
+		if ( !options || !options.sprite ) throw new Error( 'No Sprite provided to renderable' );
 		const transformable = this.Transformable( options );
 		const renderable = this.Renderable( options );
 		let o = {
 			updateTransform: transformable.update,
 			update( delta ) {
-				this.element.pivot.set( this.pivot.x, this.pivot.y );
+				this.sprite.pivot.set( this.pivot.x, this.pivot.y );
 				this.updateTransform( delta );
-				this.element.position.set( this.currentPosition.x, this.currentPosition.y );
-				this.element.rotation = this.currentRotation;
+				this.sprite.position.set( this.currentPosition.x, this.currentPosition.y );
+				this.sprite.rotation = this.currentRotation;
 			}
 		}
 		return Object.assign( {}, transformable, renderable, o );
@@ -37,10 +37,10 @@ module.exports = {
 		let o = {
 			updateTransform: transformable.update,
 			update( delta ) {
-				this.element.pivot.set( this.pivot.x, this.pivot.y );
+				this.sprite.pivot.set( this.pivot.x, this.pivot.y );
 				this.updateTransform( delta );
-				this.element.position.set( this.currentPosition.x, this.currentPosition.y );
-				this.element.rotation = this.currentRotation;
+				this.sprite.position.set( this.currentPosition.x, this.currentPosition.y );
+				this.sprite.rotation = this.currentRotation;
 				for ( let key in this.children )
 					this.children[ key ].update( delta );
 			}
@@ -57,14 +57,14 @@ module.exports = {
 	 * @param number options.pivot.y   The y coordinate of pivot
 	 *
 	 * @param Object options.anchor    The anchor that will be assigned to the `Sprite` on each update.
-	 * @param number options.ahcnor.x  The x coordinate of pivot
-	 * @param number options.ahcnor.y  The y coordinate of pivot
+	 * @param number options.anchor.x  The x coordinate of pivot
+	 * @param number options.anchor.y  The y coordinate of pivot
 	 */
 	Renderable( options, o = {} ) {
-		if ( !options || !options.element ) throw new Error( 'No Sprite provided to renderable' );
+		if ( !options || !options.sprite ) throw new Error( 'No Sprite provided to renderable' );
 
 		return Object.assign( this.Group( options ), {
-			anchor: options.anchor || { x: options.element.anchor.x, y: options.element.anchor.y }
+			anchor: options.anchor || { x: options.sprite.anchor.x, y: options.sprite.anchor.y }
 		} );
 	},
 	/**
@@ -76,19 +76,19 @@ module.exports = {
 	 * @param number options.pivot.y   The y coordinate of pivot
 	 */
 	Group( options, o = {} ) {
-		let element = options.element || new Container();
+		let sprite = options.sprite || new Container();
 
 		return Object.assign( o, {
 			parent: null,
 			children: Object.create( null ),
 			addChild( key, child, init ) {
 				this.children[ key ] = child;
-				this.element.addChild( child.element );
+				this.sprite.addChild( child.sprite );
 				child.parent = this;
 				if ( typeof init === 'function' ) init( child, this );
 			},
-			element: element,
-			pivot: options.pivot || { x: element.pivot.x, y: element.pivot.y }
+			sprite: sprite,
+			pivot: options.pivot || { x: sprite.pivot.x, y: sprite.pivot.y }
 		} );
 	},
 	/**
@@ -118,6 +118,7 @@ module.exports = {
 		} );
 
 		return Object.assign( o, {
+			name: options.name || '',
 			// "zeroed" settings
 			baseRotation: options.baseRotation || 0,
 			basePosition: options.basePosition || { x: 0, y: 0 },
