@@ -24,10 +24,10 @@ module.exports = {
 			},
 
 			init: ( base ) => {
-				base.pivot.x = base.element.width / 2;
-				base.pivot.y = base.element.height;
-				base.children.rudder.currentPosition.x = base.element.width / 2;
-				base.children.rudder.basePosition.x = base.element.width / 2;
+				base.pivot.x = base.sprite.width / 2;
+				base.pivot.y = base.sprite.height;
+				base.children.rudder.currentPosition.x = base.sprite.width / 2;
+				base.children.rudder.basePosition.x = base.sprite.width / 2;
 			},
 			children: [
 				// left cannons
@@ -43,9 +43,9 @@ module.exports = {
 						rotationVelocityIncrement: 0.004,
 					},
 					init: ( child , parent ) => {
-						child.pivot.y = child.element.height / 2;
-						child.basePosition.x = child.element.width;
-						child.currentPosition.x = child.element.width;
+						child.pivot.y = child.sprite.height / 2;
+						child.basePosition.x = child.sprite.width;
+						child.currentPosition.x = child.sprite.width;
 					}
 				},
 				{
@@ -60,7 +60,7 @@ module.exports = {
 						rotationVelocityIncrement: 0.004
 					},
 					init: ( child , parent ) => {
-						child.pivot.y = child.element.height / 2;
+						child.pivot.y = child.sprite.height / 2;
 					} 
 				},
 				{
@@ -75,7 +75,7 @@ module.exports = {
 						rotationVelocityIncrement: 0.004
 					},
 					init: ( child , parent ) => {
-						child.pivot.y = child.element.height / 2;
+						child.pivot.y = child.sprite.height / 2;
 					} 
 				},
 				// right cannons
@@ -90,9 +90,9 @@ module.exports = {
 						rotationVelocityIncrement: 0.004
 					},
 					init: ( child , parent ) => {
-						child.pivot.y = child.element.height / 2;
-						// child.basePosition.x = child.element.width;
-						// child.currentPosition.x = child.element.width;
+						child.pivot.y = child.sprite.height / 2;
+						// child.basePosition.x = child.sprite.width;
+						// child.currentPosition.x = child.sprite.width;
 					} 
 				},
 				{
@@ -107,7 +107,7 @@ module.exports = {
 						rotationVelocityIncrement: 0.004
 					},
 					init: ( child , parent ) => {
-						child.pivot.y = child.element.height / 2;
+						child.pivot.y = child.sprite.height / 2;
 					} 
 				},
 				{
@@ -122,7 +122,7 @@ module.exports = {
 						rotationVelocityIncrement: 0.004
 					},
 					init: ( child , parent ) => {
-						child.pivot.y = child.element.height / 2;
+						child.pivot.y = child.sprite.height / 2;
 					} 
 				},
 				{
@@ -150,9 +150,9 @@ module.exports = {
 						debug: true
 					},
 					init: ( child , parent ) => {
-						child.pivot.x = child.element.width / 2;
+						child.pivot.x = child.sprite.width / 2;
 
-						child.currentPosition.x = parent.element.width / 2;
+						child.currentPosition.x = parent.sprite.width / 2;
 						child.basePosition.x = child.currentPosition.x;
 					}
 				}
