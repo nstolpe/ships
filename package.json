@@ -4,12 +4,10 @@
   "description": "A canvas ship game",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build-static-js": "browserify source/static/js/main.js -o source/server/static/assets/js/main.js",
-    "watch-static-js": "nodemon -e js -w source/static/js -x 'npm run build-static-js'",
-    "build-static-spritesheets": "cp source/static/spritesheets/* source/server/static/assets/spritesheets/",
+    "build-static-spritesheets": "cp source/static/spritesheets/* source/server/.static/assets/spritesheets/",
     "watch-static-spritesheets": "nodemon -e json,png -w source/static/spritesheets -x 'npm run build-static-spritesheets'",
     "watch-server": "cd source/server && nodemon -e js -w ./ server.js",
-    "start": "npm run watch-server & node bin/watch.js & npm run watch-static-spritesheets"
+    "start": "./bin/setup.sh && npm run watch-server & node bin/watch.js & npm run watch-static-spritesheets"
   },
   "author": "nils",
   "license": "ISC",
