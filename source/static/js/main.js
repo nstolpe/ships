@@ -1,7 +1,11 @@
 'use strict'
-const Config = require( './config.js' );
-const Util = require( './util.js' );
-const GameModels = require( './game-models.js' );
+
+//{INCLUDES}
+const Config = require( './inc/config.js' );
+const Util = require( './inc/util.js' );
+const GameModels = require( './inc/game-models.js' );
+//{\INCLUDES}
+
 window.math = require( 'mathjs' );
 const PIXI = require( 'pixi.js' ),
 	TextureCache = PIXI.utils.TextureCache,

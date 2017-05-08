@@ -1,6 +1,9 @@
 const math = require( 'mathjs' );
-const Util = require( './util.js' );
 const PIXI = require( 'pixi.js' );
+
+const Util = require( './inc/util.js' );
+const GameModels = require( './inc/game-models.js' );
+
 console.log( 'Loading gravity simulation' );
 
 const view = document.getElementById('view');
@@ -9,7 +12,6 @@ const viewHeight = 400;
 const scale = window.devicePixelRatio;
 const app = new PIXI.Application( viewWidth * scale, viewHeight * scale, { view: view, backgroundColor : 0x000000 } );
 
-const GameModels = require( './game-models.js' );
 const loader = PIXI.loader;
 const imagePath = '../assets/images/';
 const config  = [
