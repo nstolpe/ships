@@ -7,7 +7,7 @@
     "build-static-spritesheets": "cp source/static/spritesheets/* source/server/.static/assets/spritesheets/",
     "watch-static-spritesheets": "nodemon -e json,png -w source/static/spritesheets -x 'npm run build-static-spritesheets'",
     "watch-server": "cd source/server && nodemon -e js -w ./ server.js",
-    "start": "./bin/setup.sh && npm run watch-server & node bin/watch.js & npm run watch-static-spritesheets"
+    "start": "bin/setup.sh && npm run watch-server & node bin/watch.js & npm run watch-static-spritesheets"
   },
   "author": "nils",
   "license": "ISC",
