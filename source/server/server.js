@@ -7,7 +7,7 @@ const exphbs = require('express-handlebars');
 const port = 2400;
 
 //for when static assets are used, if they are
-app.use(express.static('static'));
+app.use(express.static('.static'));
 
 app.engine('.hbs', exphbs({
 	extname: '.hbs',
