@@ -4,7 +4,7 @@
 const Config = require( './inc/config.js' );
 const Util = require( './inc/util.js' );
 const GameModels = require( './inc/game-models.js' );
-//{\INCLUDES}
+//{/INCLUDES}
 
 window.math = require( 'mathjs' );
 const PIXI = require( 'pixi.js' ),
