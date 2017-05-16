@@ -24,6 +24,10 @@ app.get('/gravity', function(req, res) {
 	res.render('gravity', { data: 'data', config: 'config' });
 });
 
+app.get('/current', function(req, res) {
+	res.render('current', { data: 'data', config: 'config' });
+});
+
 http.listen(port, function() {
 	console.log('listening on port %s', port);
 });
