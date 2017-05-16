@@ -14,7 +14,7 @@ chokidar.watch( jsPath + '*.js', {
 		const segments = path.split( '/' );
 		const fileName = segments[ segments.length - 1 ];
 
-		console.log( 'hi' );
+		console.log( `recompiling \`${ buildPath + fileName }\` due to changes to \`${ path }\`` );
 
 		const proc = spawn( 'browserify', [ path, '-o', buildPath + fileName ], {
 			stdio: 'inherit'
@@ -42,19 +42,21 @@ chokidar.watch( jsPath + 'inc/*.js', {
 		// ignores directories, like `inc`
 		const scripts = fs.readdirSync( jsPath ).filter( ( s ) => /\.js$/i.test( s ) );
 
-		// loop through the javascript files, cache each as fileName
+		// loop through the javascript files
 		for ( let i = 0, l = scripts.length; i < l; i++ ) {
 			// contents of one of the javascript files under `jsPath`
 			let fileText = fs.readFileSync( jsPath + scripts[ i ], 'utf8' );
 
-			// match each block of INCLUDES
+			// match each block of INCLUDES, there should really be only one
 			while ( includeMatch = incRx.exec( fileText ) ) {
 				let includeText = includeMatch[ 1 ];
 
+				// match each included js file from `inc/`
 				while ( jsMatch = jsRx.exec( includeText ) ) {
 
+					// if `fileName` is one of the includes, compile
 					if ( jsMatch[ 1 ] === fileName ) {
-						let proc = spawn( 'browserify', [ path, '-o', jsPath + fileName ], {
+						let proc = spawn( 'browserify', [ jsPath + scripts[ i ], '-o', buildPath + scripts[ i ] ], {
 							stdio: 'inherit'
 						} );
 
@@ -66,6 +68,10 @@ chokidar.watch( jsPath + 'inc/*.js', {
 							else
 								console.log('watching...');
 						} );
+
+						// no need to keep looking after one has been matched, recompiling the top level will 
+						// pull in changes of included files
+						break;
 					}
 				}
 			}
