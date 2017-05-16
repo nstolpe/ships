@@ -145,6 +145,17 @@ module.exports = {
 			// activePositionAcceleration: TrinaryState.NEUTRAL,
 			// activeRotationAcceleration: TrinaryState.NEUTRAL,
 			debug: options.debug || false,
+			/**
+			 * Calculates a new velocity based on a delta, a rate of acceleration, a current velocity, and increment multiplier and a velocity limit. 
+			 *
+			 * @param delta         Delta time from last frame or other increment
+			 * @param acceleration  Value of TernaryState.NEGAVITE, TrinaryState.POSITIVE or TrinaryState.NEUTRAL
+			 * @param velocity      Current velocity
+			 * @param increment     Increment multiplier. Multiplied by delta, then added or subtracted to velocity.
+			 * @param limit         The velocity limit. Controls above and below 0
+			 *
+			 * @TODO make limit take and upper and lower limit. { u: 0.02, l: 0.03 }
+			 */
 			calculateVelocity( delta, acceleration, velocity, increment, limit ) {
 				let calculated = velocity;
 
