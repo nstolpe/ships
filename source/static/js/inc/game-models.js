@@ -3,6 +3,7 @@ const PIXI = require( 'pixi.js' );
 const Sprite = PIXI.Sprite;
 const Container = PIXI.Container;
 const Util = require( './util.js' );
+const math = require( 'mathjs' );
 
 module.exports = {
 	/**
@@ -16,9 +17,9 @@ module.exports = {
 		const renderable = this.Renderable( options );
 		let o = {
 			updateTransform: transformable.update,
-			update( delta ) {
+			update( delta, influencers ) {
 				this.sprite.pivot.set( this.pivot.x, this.pivot.y );
-				this.updateTransform( delta );
+				this.updateTransform( delta, influencers );
 				this.sprite.position.set( this.currentPosition.x, this.currentPosition.y );
 				this.sprite.rotation = this.currentRotation;
 			}
@@ -36,13 +37,13 @@ module.exports = {
 
 		let o = {
 			updateTransform: transformable.update,
-			update( delta ) {
+			update( delta, influencers ) {
 				this.sprite.pivot.set( this.pivot.x, this.pivot.y );
-				this.updateTransform( delta );
+				this.updateTransform( delta, influencers );
 				this.sprite.position.set( this.currentPosition.x, this.currentPosition.y );
 				this.sprite.rotation = this.currentRotation;
 				for ( let key in this.children )
-					this.children[ key ].update( delta );
+					this.children[ key ].update( delta, influencers );
 			}
 		}
 		return Object.assign( {}, transformable, group, o );
@@ -181,7 +182,7 @@ module.exports = {
 				return this.stabilizeRotation && this.rotationAcceleration === TrinaryState.NEUTRAL;
 			},
 			// setRotation
-			update( delta ) {
+			update( delta, influencers ) {
 				// if the Transformable will rotate back to its baseRotation and no rotationAcceleration is being applied
 				if ( this.stabilizing() ) {
 					// set rotation velocity
@@ -235,11 +236,21 @@ module.exports = {
 						this.currentRotation = this.baseRotation - this.rotationConstraints.neg;
 				}
 
-				this.updateVelocity( delta );
+				this.updateForwardVelocity( delta );
 
+				// convert scalar velocity to x/y velocities
 				// @TODO break this out
 				let vx = this.forwardVelocity * Math.sin( this.currentRotation ),
 					vy = -this.forwardVelocity * Math.cos( this.currentRotation );
+
+				// apply outside influencers (current) to velocity
+				if ( influencers && influencers.velocities ) {
+					for ( let i = 0, l = influencers.velocities.length; i < l; i++ ) {
+						let e = influencers.velocities[ i ];
+						vx += e.x;
+						vy += e.y
+					}
+				}
 
 				this.currentPosition.x += vx * delta;
 				this.currentPosition.y += vy * delta;
@@ -259,7 +270,7 @@ module.exports = {
 				for ( let i = 0, l = this.postUpdates.length; i < l; i++ )
 					this.postUpdates[ i ].call( this, delta );
 			},
-			updateVelocity( delta ) {
+			updateForwardVelocity( delta ) {
 				this.forwardVelocity = this.calculateVelocity(
 						delta,
 						this.positionAcceleration,

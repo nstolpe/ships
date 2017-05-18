@@ -129,9 +129,14 @@ function setup() {
 function animate( delta ) {
 	for ( let i = 0, l = gameModels.length; i < l; i++ ) {
 		// convert current.force to directional compoents and apply to boat position
-		gameModels[ i ].base.currentPosition.y += current.force * math.sin(math.unit(current.direction, 'deg'));
-		gameModels[ i ].base.currentPosition.x += current.force * math.cos(math.unit(current.direction, 'deg'));
-		gameModels[ i ].base.update( delta );
+		// gameModels[ i ].base.currentPosition.y += current.force * math.sin(math.unit(current.direction, 'deg'));
+		// gameModels[ i ].base.currentPosition.x += current.force * math.cos(math.unit(current.direction, 'deg'));
+		gameModels[ i ].base.update( delta, {
+			velocities: [ {
+				x: current.force * math.cos( math.unit( current.direction, 'deg' ) ),
+				y: current.force * math.sin( math.unit( current.direction, 'deg' ) )
+			} ]
+		} );
 	}
 }
 
