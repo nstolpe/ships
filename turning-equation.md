@@ -6,6 +6,8 @@
 
 	* F = force applied to rudder, in Newtons
 
+		* `current.force` in `current.js`
+
 	* d = distance from turning point (z-axis, where the rudder is attached) to end. Length of rudder?
 
 * L/2: distance of rudder from turning axis
@@ -13,8 +15,9 @@
 * v: current linear velocity of the ship to water, so includes velocity offset by current.
 
 	* meters per second?
+	* ship.forwardVelocity
 
-* w: rotational velocity of ship around z axis, radians per second (CCW)
+* w: rotational velocity of ship around z axis, radians per second (CCW) (rotationVelocity)
 
 * p0, p1, p2 coefficients of angular friction for water
 
