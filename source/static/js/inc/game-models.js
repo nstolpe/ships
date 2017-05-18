@@ -102,8 +102,8 @@ module.exports = {
 	 * @param number options.basePosition.x  The position's x coordinate
 	 * @param number options.basePosition.y  The position's y coordinate
 	 *
-	 * @param number options.maxPositionVelocity        The maximum scalar velocity the transformable can move. Converted to x/y when used.
-	 * @param number options.positionVelocityIncrement  The rate at which positionVelocity will increment or decrement.
+	 * @param number options.maxEngineVelocity        The maximum scalar velocity the transformable can move. Converted to x/y when used.
+	 * @param number options.engineVelocityIncrement  The rate at which engineVelocity will increment or decrement.
 	 * @param number options.maxRotationVelocity        The maximum velocity the transformable can rotate at.
 	 * @param number options.rotationVelocityIncrement  The rate at which rotationVelocity will increment or decrement.
 	 */
@@ -128,9 +128,9 @@ module.exports = {
 			rotationConstraints: options.rotationConstraints || { pos: Infinity, neg: Infinity },
 			positionConstraints: options.positionConstraints || { pos: { x: Infinity, y: Infinity }, neg: { x: Infinity, y: Infinity } },
 			// position velocity/acceleration settings
-			positionVelocity: 0,
-			maxPositionVelocity: options.maxPositionVelocity || 2,
-			positionVelocityIncrement: options.positionVelocityIncrement || .01,
+			engineVelocity: 0,
+			maxEngineVelocity: options.maxEngineVelocity || 2,
+			engineVelocityIncrement: options.engineVelocityIncrement || .01,
 			positionAcceleration: TrinaryState.NEUTRAL,
 			// rotation velocity/acceleration settings
 			rotationVelocity: 0,
@@ -200,12 +200,12 @@ module.exports = {
 
 					// set rotation velocity
 					this.rotationVelocity = this.calculateVelocity(
-							delta,
-							Math.sign( this.baseRotation - this.currentRotation ),
-							this.rotationVelocity,
-							this.rotationVelocityIncrement,
-							this.maxRotationVelocity
-						);
+						delta,
+						Math.sign( this.baseRotation - this.currentRotation ),
+						this.rotationVelocity,
+						this.rotationVelocityIncrement,
+						this.maxRotationVelocity
+					);
 
 					let targetRotation = this.normalizeAngle( this.currentRotation + this.rotationVelocity * delta );
 
@@ -235,18 +235,11 @@ module.exports = {
 						this.currentRotation = this.baseRotation - this.rotationConstraints.neg;
 				}
 
+				this.updateVelocity( delta );
 
-				this.positionVelocity = this.calculateVelocity(
-						delta,
-						this.positionAcceleration,
-						this.positionVelocity,
-						this.positionVelocityIncrement,
-						this.maxPositionVelocity
-					);
-				// convert scalar velocity to x/y velocities
 				// @TODO break this out
-				let vx = this.positionVelocity * Math.sin( this.currentRotation ),
-					vy = -this.positionVelocity * Math.cos( this.currentRotation );
+				let vx = this.engineVelocity * Math.sin( this.currentRotation ),
+					vy = -this.engineVelocity * Math.cos( this.currentRotation );
 
 				this.currentPosition.x += vx * delta;
 				this.currentPosition.y += vy * delta;
@@ -265,6 +258,15 @@ module.exports = {
 
 				for ( let i = 0, l = this.postUpdates.length; i < l; i++ )
 					this.postUpdates[ i ].call( this, delta );
+			},
+			updateVelocity( delta ) {
+				this.engineVelocity = this.calculateVelocity(
+						delta,
+						this.positionAcceleration,
+						this.engineVelocity,
+						this.engineVelocityIncrement,
+						this.maxEngineVelocity
+					);
 			},
 			/**
 			 * Normalizes a radian angle to keep it between -2PI and 2PI

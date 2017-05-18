@@ -43,7 +43,7 @@ function setup() {
 		gameModels[ i ] = GameModels.TransformableGroup( {
 			sprite: PIXI.Sprite.fromImage( imagePath + config[ i ].id ),
 			currentPosition: config[ i ].currentPosition,
-			maxPositionVelocity: Infinity
+			maxEngineVelocity: Infinity
 		} );
 	}
 
@@ -55,13 +55,13 @@ function setup() {
 		dropTime += delta;
 		for ( let i = 0, l = gameModels.length; i < l; i++ ) {
 			// gameModels[ i ].currentPosition.y += 0.005 * Settings.gravity * dropTime;
-			gameModels[ i ].positionVelocity -= 0.005 * Settings.gravity * delta;
+			gameModels[ i ].engineVelocity -= 0.005 * Settings.gravity * delta;
 			// gameModels[ i ].currentPosition.y += delta;
 			console.log( delta );
 			gameModels[ i ].update( delta );
 			if ( gameModels[ i ].currentPosition.y >= app.view.height - gameModels[ i ].sprite.height ) {
 				gameModels[ i ].currentPosition.y = app.view.height - gameModels[ i ].sprite.height;
-				gameModels[ i ].positionVelocity = 0;
+				gameModels[ i ].engineVelocity = 0;
 				gameModels[ i ].update( 0 );
 				app.ticker.remove( update );
 			}
