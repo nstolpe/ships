@@ -15,8 +15,8 @@ const Config = {
 				currentPosition: { x: 200, y: 300 },
 				// rotationConstraints: { pos: Infinity, neg: Infinity },
 				// positionConstraints: { pos: { x: Infinity, y: Infinity }, neg: { x: Infinity, y: Infinity } },
-				maxPositionVelocity: 4,
-				positionVelocityIncrement: .05,
+				maxEngineVelocity: 4,
+				engineVelocityIncrement: .05,
 				postUpdates: [
 					function( delta ) {
 						// console.log( this.children[ 'rudder' ].currentRotation );
@@ -42,7 +42,17 @@ const Config = {
 					options: {
 						// basePosition: { x: 15, y: 0 },
 						rotationConstraints: { pos: 0, neg: 0 },
-						positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } }
+						positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
+						postUpdates: [
+							function( delta ) {
+								// this.parent.
+								// console.log(this.parent);
+								// console.log( this.children[ 'rudder' ].currentRotation );
+								// console.log( this.rotationVelocity );
+								// this.children[ 'rudder' ].currentRotation = -this.currentRotation;
+								// this.children[ 'rudder' ].rotationVelocity = -this.rotationVelocity;
+							}
+						]
 					},
 					init: ( child, parent) => {
 						console.log('body');
@@ -118,6 +128,7 @@ function setup() {
 
 function animate( delta ) {
 	for ( let i = 0, l = gameModels.length; i < l; i++ ) {
+		// convert current.force to directional compoents and apply to boat position
 		gameModels[ i ].base.currentPosition.y += current.force * math.sin(math.unit(current.direction, 'deg'));
 		gameModels[ i ].base.currentPosition.x += current.force * math.cos(math.unit(current.direction, 'deg'));
 		gameModels[ i ].base.update( delta );
@@ -182,25 +193,25 @@ function setupInput() {
 	}
 
 	A.press = () => {
-		turtle.rotationAcceleration = ternaryState.MINUS;
-		// turtle.children[ 'rudder' ].rotationAcceleration = ternaryState.PLUS;
+		// turtle.rotationAcceleration = ternaryState.MINUS;
+		turtle.children[ 'rudder' ].rotationAcceleration = ternaryState.PLUS;
 	}
 	A.release = () => {
 		if ( !D.isDown ) {
-			turtle.rotationAcceleration = ternaryState.EQUAL;
-			// turtle.children[ 'rudder' ].rotationAcceleration = ternaryState.EQUAL;
+			// turtle.rotationAcceleration = ternaryState.EQUAL;
+			turtle.children[ 'rudder' ].rotationAcceleration = ternaryState.EQUAL;
 		}
 	}
 
 	D.press = () => {
-		turtle.rotationAcceleration = ternaryState.PLUS;
-		// turtle.children[ 'rudder' ].rotationAcceleration = ternaryState.MINUS;
+		// turtle.rotationAcceleration = ternaryState.PLUS;
+		turtle.children[ 'rudder' ].rotationAcceleration = ternaryState.MINUS;
 		// turtle.children[ 'rudder' ].stabilizingRotation = false;
 	}
 	D.release = () => {
 		if ( !A.isDown ) {
-			turtle.rotationAcceleration = ternaryState.EQUAL;
-			// turtle.children[ 'rudder' ].rotationAcceleration = ternaryState.EQUAL;
+			// turtle.rotationAcceleration = ternaryState.EQUAL;
+			turtle.children[ 'rudder' ].rotationAcceleration = ternaryState.EQUAL;
 		}
 	}
 }
