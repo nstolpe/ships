@@ -102,8 +102,8 @@ module.exports = {
 	 * @param number options.basePosition.x  The position's x coordinate
 	 * @param number options.basePosition.y  The position's y coordinate
 	 *
-	 * @param number options.maxEngineVelocity        The maximum scalar velocity the transformable can move. Converted to x/y when used.
-	 * @param number options.engineVelocityIncrement  The rate at which engineVelocity will increment or decrement.
+	 * @param number options.maxForwardVelocity        The maximum scalar velocity the transformable can move. Converted to x/y when used.
+	 * @param number options.forwardVelocityIncrement  The rate at which forwardVelocity will increment or decrement.
 	 * @param number options.maxRotationVelocity        The maximum velocity the transformable can rotate at.
 	 * @param number options.rotationVelocityIncrement  The rate at which rotationVelocity will increment or decrement.
 	 */
@@ -128,9 +128,9 @@ module.exports = {
 			rotationConstraints: options.rotationConstraints || { pos: Infinity, neg: Infinity },
 			positionConstraints: options.positionConstraints || { pos: { x: Infinity, y: Infinity }, neg: { x: Infinity, y: Infinity } },
 			// position velocity/acceleration settings
-			engineVelocity: 0,
-			maxEngineVelocity: options.maxEngineVelocity || 2,
-			engineVelocityIncrement: options.engineVelocityIncrement || .01,
+			forwardVelocity: 0,
+			maxForwardVelocity: options.maxForwardVelocity || 2,
+			forwardVelocityIncrement: options.forwardVelocityIncrement || .01,
 			positionAcceleration: TrinaryState.NEUTRAL,
 			// rotation velocity/acceleration settings
 			rotationVelocity: 0,
@@ -238,8 +238,8 @@ module.exports = {
 				this.updateVelocity( delta );
 
 				// @TODO break this out
-				let vx = this.engineVelocity * Math.sin( this.currentRotation ),
-					vy = -this.engineVelocity * Math.cos( this.currentRotation );
+				let vx = this.forwardVelocity * Math.sin( this.currentRotation ),
+					vy = -this.forwardVelocity * Math.cos( this.currentRotation );
 
 				this.currentPosition.x += vx * delta;
 				this.currentPosition.y += vy * delta;
@@ -260,12 +260,12 @@ module.exports = {
 					this.postUpdates[ i ].call( this, delta );
 			},
 			updateVelocity( delta ) {
-				this.engineVelocity = this.calculateVelocity(
+				this.forwardVelocity = this.calculateVelocity(
 						delta,
 						this.positionAcceleration,
-						this.engineVelocity,
-						this.engineVelocityIncrement,
-						this.maxEngineVelocity
+						this.forwardVelocity,
+						this.forwardVelocityIncrement,
+						this.maxForwardVelocity
 					);
 			},
 			/**

@@ -11,8 +11,8 @@ module.exports = {
 				currentPosition: { x: 200, y: 300 },
 				// rotationConstraints: { pos: Infinity, neg: Infinity },
 				// positionConstraints: { pos: { x: Infinity, y: Infinity }, neg: { x: Infinity, y: Infinity } },
-				maxEngineVelocity: 4,
-				engineVelocityIncrement: .05,
+				maxForwardVelocity: 4,
+				forwardVelocityIncrement: .05,
 				postUpdates: [
 					function( delta ) {
 						// console.log( this.children[ 'rudder' ].currentRotation );
