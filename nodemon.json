@@ -1,5 +1,5 @@
 {
 	"events": {
-		"restart": "echo 'this is the restart event in nodemon.json'"
+		"restart": "echo 'nodemon.json restart event'"
 	}
 }
