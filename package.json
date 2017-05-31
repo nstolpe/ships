@@ -9,7 +9,9 @@
     "watch-static-spritesheets": "nodemon -e json,png -w source/static/spritesheets -x 'npm run build-static-spritesheets'",
     "watch-static-images": "nodemon -e jpg,gif,png -w source/static/images -x 'npm run build-static-images'",
     "watch-server": "cd source/server && nodemon -e js -w ./ server.js",
-    "start": "bin/setup.sh && npm run watch-server & node bin/watch.js & npm run watch-static-spritesheets & npm run watch-static-images"
+    "compile-scripts": "for js in source/static/js/*.js; do browserify \"$js\" -o source/server/.static/assets/js/$(basename \"$js\"); done",
+    "start": "bin/setup.sh && npm run build-static-images && npm run compile-scripts && node bin/watch.js & npm run watch-server",
+    "stop": "echo \"Thus just stopped\""
   },
   "author": "nils",
   "license": "ISC",
@@ -19,6 +21,7 @@
     "pixi.js": "^4.3.5"
   },
   "devDependencies": {
-    "chokidar": "^1.6.1"
+    "chokidar": "^1.6.1",
+    "mathjs": "^3.13.3"
   }
 }
