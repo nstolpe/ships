@@ -5,9 +5,11 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build-static-spritesheets": "cp source/static/spritesheets/* source/server/.static/assets/spritesheets/",
+    "build-static-images": "cp source/static/images/* source/server/.static/assets/images/",
     "watch-static-spritesheets": "nodemon -e json,png -w source/static/spritesheets -x 'npm run build-static-spritesheets'",
+    "watch-static-images": "nodemon -e jpg,gif,png -w source/static/images -x 'npm run build-static-images'",
     "watch-server": "cd source/server && nodemon -e js -w ./ server.js",
-    "start": "bin/setup.sh && npm run watch-server & node bin/watch.js & npm run watch-static-spritesheets"
+    "start": "bin/setup.sh && npm run watch-server & node bin/watch.js & npm run watch-static-spritesheets & npm run watch-static-images"
   },
   "author": "nils",
   "license": "ISC",
