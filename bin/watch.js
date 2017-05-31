@@ -5,6 +5,7 @@ const fs = require( 'fs' );
 const jsPath = 'source/static/js/';
 const buildPath = 'source/server/.static/assets/js/';
 const imagePath = 'source/server/.static/assets/images/';
+const spritesheetsPath = 'source/server/.static/assets/spritesheets/';
 
 // watches the js files in source/static for changes and recompiles with browserify when they're made.
 chokidar.watch( jsPath + '*.js', {
@@ -15,7 +16,8 @@ chokidar.watch( jsPath + '*.js', {
 		const fileName = segments[ segments.length - 1 ];
 
 		console.log( `recompiling \`${ buildPath + fileName }\` due to changes to \`${ path }\`` );
-
+						console.log(path);
+						console.log(buildPath + fileName);
 		const proc = spawn( 'browserify', [ path, '-o', buildPath + fileName ], {
 			stdio: 'inherit'
 		} );
@@ -24,7 +26,7 @@ chokidar.watch( jsPath + '*.js', {
 			if ( code === 1) 
 				console.error( `✖ "browserify ${ path } -o ${ buildPath + fileName }" failed`);
 			else
-				console.log('watching...');
+				console.log('watching scripts...');
 		} );
 	} );
 
@@ -56,9 +58,12 @@ chokidar.watch( jsPath + 'inc/*.js', {
 
 					// if `fileName` is one of the includes, compile
 					if ( jsMatch[ 1 ] === fileName ) {
+						console.log(jsPath + scripts[ i ]);
+						console.log(buildPath + scripts[ i ]);
 						let proc = spawn( 'browserify', [ jsPath + scripts[ i ], '-o', buildPath + scripts[ i ] ], {
 							stdio: 'inherit'
 						} );
+
 
 						console.log( `recompiling \`${ buildPath + scripts[ i ] }\` due to changes to \`${ path }\`` );
 
@@ -66,7 +71,7 @@ chokidar.watch( jsPath + 'inc/*.js', {
 							if ( code === 1) 
 								console.error( `✖ "browserify ${ path } -o ${ buildPath + fileName }" failed`);
 							else
-								console.log('watching...');
+								console.log('Watching srcipts...');
 						} );
 
 						// no need to keep looking after one has been matched, recompiling the top level will 
@@ -88,11 +93,29 @@ chokidar.watch( 'source/static/images', {
 		} );
 
 		proc.on( 'close', code => {
-			if ( code === 1) 
+			if ( code === 1)
 				console.error( `✖ "failed"`);
 			else
-				console.log('watching image...');
+				console.log(`Copied ${path} to ${imagePath}`);
+				console.log('Watching images...');
 		} );
 	} );
 
-console.log( 'watching...' );
+chokidar.watch( 'source/static/spritesheets', {
+		ignored: /(^|[\/\\])\../
+	} )
+	.on( 'change', function( path ) {
+		const proc = spawn( 'cp', [ path, spritesheetsPath ], {
+			stdio: 'inherit'
+		} );
+
+		proc.on( 'close', code => {
+			if ( code === 1)
+				console.error( `✖ "failed"`);
+			else
+				console.log(`Copied ${path} to ${spritesheetsPath}`);
+				console.log('Watching spritesheets...');
+		} );
+	} );
+
+console.log( 'Watching...' );
