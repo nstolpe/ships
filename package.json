@@ -4,14 +4,13 @@
   "description": "A canvas ship game",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build-static-spritesheets": "cp source/static/spritesheets/* source/server/.static/assets/spritesheets/",
-    "build-static-images": "cp source/static/images/* source/server/.static/assets/images/",
-    "watch-static-spritesheets": "nodemon -e json,png -w source/static/spritesheets -x 'npm run build-static-spritesheets'",
-    "watch-static-images": "nodemon -e jpg,gif,png -w source/static/images -x 'npm run build-static-images'",
-    "watch-server": "cd source/server && nodemon -e js -w ./ server.js",
-    "compile-scripts": "for js in source/static/js/*.js; do browserify \"$js\" -o source/server/.static/assets/js/$(basename \"$js\"); done",
-    "start": "bin/setup.sh && npm run build-static-images && npm run compile-scripts && node bin/watch.js & npm run watch-server",
-    "stop": "echo \"Thus just stopped\""
+    "build-static-spritesheets": "cp source/static/spritesheets/* .static/assets/spritesheets/",
+    "build-static-images": "cp source/static/images/* .static/assets/images/",
+    "watch-server": "cd server && nodemon -e js -w ./ server.js",
+    "compile-scripts": "for js in source/static/js/*.js; do browserify \"$js\" -o .static/assets/js/$(basename \"$js\"); done",
+    "start": "npm run setup && npm run build-static-images && npm run build-static-spritesheets && npm run compile-scripts && node bin/watch.js & npm run watch-server",
+    "setup": "mkdir -p .static/assets/spritesheets && mkdir -p .static/assets/images && mkdir -p .static/assets/js",
+    "stop": "echo \"This just stopped\""
   },
   "author": "nils",
   "license": "ISC",

@@ -1,22 +1,22 @@
 'use strict'
 
-const express = require('express');
+const express = require( 'express' );
 const app = express();
-const http = require('http').Server(app);
-const exphbs = require('express-handlebars');
+const http = require('http').Server( app );
+const exphbs = require( 'express-handlebars' );
 const port = 2400;
 
 //for when static assets are used, if they are
-app.use(express.static('.static'));
+app.use( express.static( '../.static' ) );
 
-app.engine('.hbs', exphbs({
+app.engine( '.hbs', exphbs( {
 	extname: '.hbs',
 	defaultLayout: false
-}));
+} ) );
 
-app.set('view engine', '.hbs');
+app.set( 'view engine', '.hbs' );
 
-app.get('/*', function(req, res) {
+app.get( '/*', function( req, res ) {
 	res.render(
 		req.params[0] || 'index',
 		{
@@ -41,7 +41,7 @@ app.get('/*', function(req, res) {
 					`
 				);
 			} else {
-				res.send(html);
+				res.send( html );
 			}
 		}
 	);
@@ -65,6 +65,6 @@ app.get('/*', function(req, res) {
 // 	res.render('current', { data: 'data', config: 'config' });
 // });
 
-http.listen(port, function() {
-	console.log('listening on port %s', port);
-});
+http.listen( port, function() {
+	console.log( 'listening on port %s', port );
+} );

@@ -3,9 +3,13 @@ const spawn = require( 'child_process' ).spawn;
 const fs = require( 'fs' );
 
 const jsPath = 'source/static/js/';
-const buildPath = 'source/server/.static/assets/js/';
-const imagePath = 'source/server/.static/assets/images/';
-const spritesheetsPath = 'source/server/.static/assets/spritesheets/';
+const imagePath = 'source/static/images';
+const spritesheetPath = 'source/static/spritesheets';
+
+
+const jsBuildPath = '.static/assets/js/';
+const imageBuildPath = '.static/assets/images/';
+const spritesheetBuildPath = '.static/assets/spritesheets/';
 
 // watches the js files in source/static for changes and recompiles with browserify when they're made.
 chokidar.watch( jsPath + '*.js', {
@@ -15,16 +19,16 @@ chokidar.watch( jsPath + '*.js', {
 		const segments = path.split( '/' );
 		const fileName = segments[ segments.length - 1 ];
 
-		console.log( `recompiling \`${ buildPath + fileName }\` due to changes to \`${ path }\`` );
+		console.log( `recompiling \`${ jsBuildPath + fileName }\` due to changes to \`${ path }\`` );
 						console.log(path);
-						console.log(buildPath + fileName);
-		const proc = spawn( 'browserify', [ path, '-o', buildPath + fileName ], {
+						console.log(jsBuildPath + fileName);
+		const proc = spawn( 'browserify', [ path, '-o', jsBuildPath + fileName ], {
 			stdio: 'inherit'
 		} );
 
 		proc.on( 'close', code => {
 			if ( code === 1) 
-				console.error( `✖ "browserify ${ path } -o ${ buildPath + fileName }" failed`);
+				console.error( `✖ "browserify ${ path } -o ${ jsBuildPath + fileName }" failed`);
 			else
 				console.log('watching scripts...');
 		} );
@@ -59,17 +63,17 @@ chokidar.watch( jsPath + 'inc/*.js', {
 					// if `fileName` is one of the includes, compile
 					if ( jsMatch[ 1 ] === fileName ) {
 						console.log(jsPath + scripts[ i ]);
-						console.log(buildPath + scripts[ i ]);
-						let proc = spawn( 'browserify', [ jsPath + scripts[ i ], '-o', buildPath + scripts[ i ] ], {
+						console.log(jsBuildPath + scripts[ i ]);
+						let proc = spawn( 'browserify', [ jsPath + scripts[ i ], '-o', jsBuildPath + scripts[ i ] ], {
 							stdio: 'inherit'
 						} );
 
 
-						console.log( `recompiling \`${ buildPath + scripts[ i ] }\` due to changes to \`${ path }\`` );
+						console.log( `recompiling \`${ jsBuildPath + scripts[ i ] }\` due to changes to \`${ path }\`` );
 
 						proc.on( 'close', code => {
 							if ( code === 1) 
-								console.error( `✖ "browserify ${ path } -o ${ buildPath + fileName }" failed`);
+								console.error( `✖ "browserify ${ path } -o ${ jsBuildPath + fileName }" failed`);
 							else
 								console.log('Watching srcipts...');
 						} );
@@ -83,12 +87,12 @@ chokidar.watch( jsPath + 'inc/*.js', {
 		}
 	} );
 
-// watches source/static/images for changes and copies them to imagePath
-chokidar.watch( 'source/static/images', {
+// watches source/static/images for changes and copies them to imageBuildPath
+chokidar.watch( imagePath, {
 		ignored: /(^|[\/\\])\../
 	} )
 	.on( 'change', function( path ) {
-		const proc = spawn( 'cp', [ path, imagePath ], {
+		const proc = spawn( 'cp', [ path, imageBuildPath ], {
 			stdio: 'inherit'
 		} );
 
@@ -96,16 +100,16 @@ chokidar.watch( 'source/static/images', {
 			if ( code === 1)
 				console.error( `✖ "failed"`);
 			else
-				console.log(`Copied ${path} to ${imagePath}`);
+				console.log(`Copied ${path} to ${imageBuildPath}`);
 				console.log('Watching images...');
 		} );
 	} );
 
-chokidar.watch( 'source/static/spritesheets', {
+chokidar.watch( spritesheetPath, {
 		ignored: /(^|[\/\\])\../
 	} )
 	.on( 'change', function( path ) {
-		const proc = spawn( 'cp', [ path, spritesheetsPath ], {
+		const proc = spawn( 'cp', [ path, spritesheetBuildPath ], {
 			stdio: 'inherit'
 		} );
 
@@ -113,7 +117,7 @@ chokidar.watch( 'source/static/spritesheets', {
 			if ( code === 1)
 				console.error( `✖ "failed"`);
 			else
-				console.log(`Copied ${path} to ${spritesheetsPath}`);
+				console.log(`Copied ${path} to ${spritesheetBuildPath}`);
 				console.log('Watching spritesheets...');
 		} );
 	} );

@@ -1,4 +1,4 @@
 .directory
 node_modules
-source/server/.static/*
-source/server/.static/.gitignore
+.static
+
