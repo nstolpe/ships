@@ -4,10 +4,10 @@
   "description": "A canvas ship game",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build-static-spritesheets": "cp source/static/spritesheets/* .static/assets/spritesheets/",
-    "build-static-images": "cp source/static/images/* .static/assets/images/",
+    "build-static-spritesheets": "cp source/spritesheets/* .static/assets/spritesheets/",
+    "build-static-images": "cp source/images/* .static/assets/images/",
     "watch-server": "cd server && nodemon -e js -w ./ server.js",
-    "compile-scripts": "for js in source/static/js/*.js; do browserify \"$js\" -o .static/assets/js/$(basename \"$js\"); done",
+    "compile-scripts": "for js in source/js/*.js; do browserify \"$js\" -o .static/assets/js/$(basename \"$js\"); done",
     "start": "npm run setup && npm run build-static-images && npm run build-static-spritesheets && npm run compile-scripts && node bin/watch.js & npm run watch-server",
     "setup": "mkdir -p .static/assets/spritesheets && mkdir -p .static/assets/images && mkdir -p .static/assets/js",
     "stop": "echo \"This just stopped\""

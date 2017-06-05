@@ -2,16 +2,16 @@ const chokidar = require( 'chokidar' );
 const spawn = require( 'child_process' ).spawn;
 const fs = require( 'fs' );
 
-const jsPath = 'source/static/js/';
-const imagePath = 'source/static/images';
-const spritesheetPath = 'source/static/spritesheets';
+const jsPath = 'source/js/';
+const imagePath = 'source/images';
+const spritesheetPath = 'source/spritesheets';
 
 
 const jsBuildPath = '.static/assets/js/';
 const imageBuildPath = '.static/assets/images/';
 const spritesheetBuildPath = '.static/assets/spritesheets/';
 
-// watches the js files in source/static for changes and recompiles with browserify when they're made.
+// watches the js files in source for changes and recompiles with browserify when they're made.
 chokidar.watch( jsPath + '*.js', {
 		ignored: /(^|[\/\\])\../
 	} )
@@ -87,7 +87,7 @@ chokidar.watch( jsPath + 'inc/*.js', {
 		}
 	} );
 
-// watches source/static/images for changes and copies them to imageBuildPath
+// watches source/images for changes and copies them to imageBuildPath
 chokidar.watch( imagePath, {
 		ignored: /(^|[\/\\])\../
 	} )
