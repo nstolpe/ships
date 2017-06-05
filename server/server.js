@@ -17,34 +17,57 @@ app.engine( '.hbs', exphbs( {
 app.set( 'view engine', '.hbs' );
 
 app.get( '/*', function( req, res ) {
-	res.render(
-		req.params[0] || 'index',
-		{
-			data: 'data', config: 'config'
-		},
-		function( err, html ) {
-			if ( err ) {
-				res.status( 404 ).send(
-					`<style>
-						* { margin: 0; }
-						.message {
-							position: relative;
-							top: 50%;
-							transform: translateY(-50%);
-							text-align: center;
-						}
-					</style>
-					<div id="message" class="message">
-						<h3>404</h3>
-						<p><em>/${ req.params[0] }</em> does not exist</p>
-					</div>
-					`
-				);
-			} else {
-				res.send( html );
+	let template = req.params[0] || 'index';
+
+	try {
+		res.render(
+			template,
+			{
+				data: 'data', config: 'config'
+			},
+			function( err, html ) {
+				if ( err ) {
+					console.log(err.code); 
+					res.status( 404 ).send(
+						`<style>
+							* { margin: 0; }
+							.message {
+								position: relative;
+								top: 50%;
+								transform: translateY(-50%);
+								text-align: center;
+							}
+						</style>
+						<div id="message" class="message">
+							<h3>404</h3>
+							<p><em>/${ req.params[0] }</em> does not exist</p>
+						</div>
+						`
+					);
+				} else {
+					res.send( html );
+				}
 			}
-		}
-	);
+		);
+	} catch( e ) {
+		// mostly catches missing template errors (MODULE_NOT_FOUND).
+		res.status( 500 ).send(
+			`<style>
+				* { margin: 0; }
+				.message {
+					position: relative;
+					top: 50%;
+					transform: translateY(-50%);
+					text-align: center;
+				}
+			</style>
+			<div id="message" class="message">
+				<h3>500</h3>
+				<p><em>/${ req.params[0] }</em> might exist, or it might not. Something went wrong somewhere.</p>
+			</div>
+			`
+		);
+	}
 } );
 
 // app.get('/', function(req, res) {
