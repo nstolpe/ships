@@ -1,4 +1,4 @@
 .directory
 node_modules
 .static
-
+*.sublime-workspace
