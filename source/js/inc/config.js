@@ -2,7 +2,7 @@
 const Util = require( './util.js' );
 
 module.exports = {
-	spriteSheetPath: '../assets/spritesheets/',
+	spriteSheetPath: 'assets/spritesheets/',
 	gameModels: [
 		{
 			name: 'turtle',

@@ -26,7 +26,7 @@ view.style.width = viewWidth + 'px';
 view.style.height = viewHeight + 'px';
 
 loader
-	.add( "../assets/spritesheets/ships.json" )
+	.add( "assets/spritesheets/ships.json" )
 	.load( setup );
 
 window.gameModels = [];
