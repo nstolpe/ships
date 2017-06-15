@@ -1,5 +1,0 @@
-{
-	"events": {
-		"restart": "echo 'nodemon.json restart event'"
-	}
-}
