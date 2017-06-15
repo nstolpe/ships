@@ -2,3 +2,4 @@
 node_modules
 .static
 *.sublime-workspace
+gh-pages
