@@ -6,7 +6,7 @@ const GameModels = require( './inc/game-models.js' );
 //{/INCLUDES}
 
 const Config = {
-	spriteSheetPath: '../assets/spritesheets/',
+	spriteSheetPath: 'assets/spritesheets/',
 	gameModels: [
 		{
 			name: 'turtle',
