@@ -36965,7 +36965,7 @@ document.body.appendChild( renderer.view );
 var stage = new PIXI.Container();
 
 // Load an image and create an object
-var source = PIXI.Sprite.fromImage( "/assets/images/boxes-blue-red.png" );
+var source = PIXI.Sprite.fromImage( "assets/images/boxes-blue-red.png" );
 // Set it at the center of the screen
 source.x = width / 2;
 source.y = height / 2;
