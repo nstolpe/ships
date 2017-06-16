@@ -62,7 +62,7 @@ for filename in server/views/*.hbs; do
 done;
 
 while true; do
-	if [ page_errors -gt  0 ]; then
+	if [ $page_errors -gt 0 ]; then
 		read -p $'\e[36mCompilation has completed, \e[33mbut not all page templates were successfully compiled. Do you want to push the pages repository? (Y/n)\e[39m\n' yn
 	else
 		read -p $'\e[36mCompilation has completed. Do you want to push the pages repository? (Y/n)\e[39m\n' yn
