@@ -15,7 +15,7 @@ const scale = window.devicePixelRatio;
 const app = new PIXI.Application( viewWidth * scale, viewHeight * scale, { view: view, backgroundColor : 0x000000 } );
 
 const loader = PIXI.loader;
-const imagePath = '../assets/images/';
+const imagePath = 'assets/images/';
 const config  = [
 	{
 		id: 'turtle-rudder.png',
