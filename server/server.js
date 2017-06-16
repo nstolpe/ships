@@ -2,9 +2,10 @@
 
 const express = require( 'express' );
 const app = express();
-const http = require('http').Server( app );
+const http = require( 'http' ).Server( app );
 const exphbs = require( 'express-handlebars' );
 const port = 2400;
+const fs = require( 'fs' );
 
 //for when static assets are used, if they are
 app.use( express.static( '../.static' ) );
@@ -18,12 +19,22 @@ app.set( 'view engine', '.hbs' );
 
 app.get( '/*', function( req, res ) {
 	let template = req.params[0] || 'index';
+	let data = {}
+
+	if ( template === 'index' ) {
+		data.pages = [];
+		fs.readdirSync( './views' ).forEach( file => {
+			if ( file !== 'index.hbs' ) {
+				data.pages.push( file.replace( '.hbs', '' ) );
+			}
+		} );
+	}
 
 	try {
 		res.render(
 			template,
 			{
-				data: 'data', config: 'config'
+				data: data, config: 'config'
 			},
 			function( err, html ) {
 				if ( err ) {

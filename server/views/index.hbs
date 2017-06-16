@@ -7,9 +7,11 @@
 	</head>
 	<body>
 		<ul>
+			{{#each data.pages}}
 			<li>
-				<a href="steering"></a>
+				<a href="{{this}}">{{this}}</a>
 			</li>
+			{{/each}}
 		</ul>
 	</body>
 </html>
