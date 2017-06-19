@@ -30,6 +30,10 @@ loader
 	.load( setup );
 
 window.gameModels = [];
+window.current = {
+	direction: 90,
+	force: .3
+}
 
 function setup() {
 	var id = PIXI.loader.resources[ Config.spriteSheetPath + "ships.json" ].textures;
@@ -44,7 +48,12 @@ function setup() {
 
 function animate( delta ) {
 	for ( let i = 0, l = gameModels.length; i < l; i++ ) {
-		gameModels[ i ].base.update( delta );
+		gameModels[ i ].base.update( delta, {
+			velocities: [ {
+				x: window.current.force * math.cos( math.unit( window.current.direction, 'deg' ) ),
+				y: window.current.force * math.sin( math.unit( window.current.direction, 'deg' ) )
+			} ]
+		} );
 	}
 }
 
