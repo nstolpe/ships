@@ -91670,71 +91670,24 @@ const Config = {
 			spriteSheet: 'ships.json',
 			options: {
 				currentPosition: { x: 200, y: 300 },
-				// rotationConstraints: { pos: Infinity, neg: Infinity },
-				// positionConstraints: { pos: { x: Infinity, y: Infinity }, neg: { x: Infinity, y: Infinity } },
 				maxForwardVelocity: 4,
-				forwardVelocityIncrement: .05,
-				postUpdates: [
-					function( delta ) {
-						// console.log( this.children[ 'rudder' ].currentRotation );
-						// console.log( this.rotationVelocity );
-						// this.children[ 'rudder' ].currentRotation = -this.currentRotation;
-						// this.children[ 'rudder' ].rotationVelocity = -this.rotationVelocity;
-					}
-				]
+				forwardVelocityIncrement: .05
 			},
 
 			init: ( base ) => {
-				console.log( 'turtle' );
 				base.pivot.x = base.sprite.width / 2;
 				base.pivot.y = base.sprite.height;
-				base.children.rudder.currentPosition.x = base.sprite.width / 2;
-				base.children.rudder.basePosition.x = base.sprite.width / 2;
-				base.children.rudder.basePosition.y = 110;
 			},
 			children: [
 				{
 					name: 'body',
 					id: 'turtle-body.png',
 					options: {
-						// basePosition: { x: 15, y: 0 },
-						rotationConstraints: { pos: 0, neg: 0 },
-						positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
 						postUpdates: [
-							function( delta ) {
-								// this.parent.
-								// console.log(this.parent);
-								// console.log( this.children[ 'rudder' ].currentRotation );
-								// console.log( this.rotationVelocity );
-								// this.children[ 'rudder' ].currentRotation = -this.currentRotation;
-								// this.children[ 'rudder' ].rotationVelocity = -this.rotationVelocity;
-							}
+							( delta ) => {}
 						]
 					},
-					init: ( child, parent) => {
-						console.log('body');
-						// child.pivot.x = parent.width / 2;
-					}
-				},
-				{
-					name: 'rudder',
-					id: 'turtle-rudder.png',
-					options: {
-						// basePosition: { x: 46.23439168930054, y: 110 },
-						rotationConstraints: { pos: Util.toRadians( 20 ), neg: Util.toRadians( 20 ) },
-						positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
-						maxRotationVelocity: 0.02,
-						rotationVelocityIncrement: 0.01,
-						stabilizeRotation: true,
-						debug: true
-					},
-					init: ( child , parent ) => {
-						console.log('rudder');
-						child.pivot.x = child.sprite.width / 2;
-
-						child.currentPosition.x = parent.sprite.width / 2;
-						child.basePosition.x = child.currentPosition.x;
-					}
+					init: ( child, parent) => {}
 				}
 			]
 		}
@@ -91855,25 +91808,20 @@ function setupInput() {
 	}
 
 	A.press = () => {
-		// turtle.rotationAcceleration = ternaryState.MINUS;
-		turtle.children[ 'rudder' ].rotationAcceleration = ternaryState.PLUS;
+		turtle.rotationAcceleration = ternaryState.MINUS;
 	}
 	A.release = () => {
 		if ( !D.isDown ) {
-			// turtle.rotationAcceleration = ternaryState.EQUAL;
-			turtle.children[ 'rudder' ].rotationAcceleration = ternaryState.EQUAL;
+			turtle.rotationAcceleration = ternaryState.EQUAL;
 		}
 	}
 
 	D.press = () => {
-		// turtle.rotationAcceleration = ternaryState.PLUS;
-		turtle.children[ 'rudder' ].rotationAcceleration = ternaryState.MINUS;
-		// turtle.children[ 'rudder' ].stabilizingRotation = false;
+		turtle.rotationAcceleration = ternaryState.PLUS;
 	}
 	D.release = () => {
 		if ( !A.isDown ) {
-			// turtle.rotationAcceleration = ternaryState.EQUAL;
-			turtle.children[ 'rudder' ].rotationAcceleration = ternaryState.EQUAL;
+			turtle.rotationAcceleration = ternaryState.EQUAL;
 		}
 	}
 }

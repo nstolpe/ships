@@ -91801,7 +91801,10 @@ module.exports = {
 				this.sprite.position.set( this.currentPosition.x, this.currentPosition.y );
 				this.sprite.rotation = this.currentRotation;
 				for ( let key in this.children )
-					this.children[ key ].update( delta, influencers );
+					// @TODO only the main object gets influencers, at least for now
+					// allow influencers to pass through. Some should cascade, like gravity on
+					//       arms or something. Adding a bounce option for that would be good too.
+					this.children[ key ].update( delta, {} );
 			}
 		}
 		return Object.assign( {}, transformable, group, o );
@@ -91905,7 +91908,7 @@ module.exports = {
 			// activeRotationAcceleration: TrinaryState.NEUTRAL,
 			debug: options.debug || false,
 			/**
-			 * Calculates a new velocity based on a delta, a rate of acceleration, a current velocity, and increment multiplier and a velocity limit. 
+			 * Calculates a new velocity based on a delta, a rate of acceleration, a current velocity, an increment multiplier and a velocity limit. 
 			 *
 			 * @param delta         Delta time from last frame or other increment
 			 * @param acceleration  Value of TernaryState.NEGAVITE, TrinaryState.POSITIVE or TrinaryState.NEUTRAL
@@ -92006,12 +92009,13 @@ module.exports = {
 					for ( let i = 0, l = influencers.velocities.length; i < l; i++ ) {
 						let e = influencers.velocities[ i ];
 						vx += e.x;
-						vy += e.y
+						vy += e.y;
 					}
 				}
 
 				this.currentPosition.x += vx * delta;
 				this.currentPosition.y += vy * delta;
+
 
 				if ( this.currentPosition.x > this.basePosition.x + this.positionConstraints.pos.x )
 					this.currentPosition.x = this.basePosition.x + this.positionConstraints.pos.x;
