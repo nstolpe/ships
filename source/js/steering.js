@@ -15,7 +15,8 @@ const PIXI = require( 'pixi.js' ),
 	viewWidth = 1000,
 	viewHeight = 800,
 	scale = window.devicePixelRatio,
-	app = new PIXI.Application( viewWidth * scale, viewHeight * scale, { view: view, backgroundColor : 0x000000 } ),
+	app = new PIXI.Application( viewWidth, viewHeight, { view: view, backgroundColor : 0x000000 } ),
+	// app = new PIXI.Application( viewWidth * scale, viewHeight * scale, { view: view, backgroundColor : 0x000000 } ),
 	ternaryState = Object.freeze( { 
 		MINUS: -1,
 		EQUAL: 0,
@@ -35,6 +36,8 @@ window.current = {
 	force: .3
 }
 
+window.friction = 0.98;
+
 function setup() {
 	var id = PIXI.loader.resources[ Config.spriteSheetPath + "ships.json" ].textures;
 	gameModels = loadGameModels();
@@ -42,6 +45,8 @@ function setup() {
 		app.stage.addChild( gameModels[ i ].base.sprite );
 	}
 	window.turtle = gameModels[ 0 ].base;
+	turtle.sprite.width *= .75;
+	turtle.sprite.height *= .75;
 	setupInput();
 	app.ticker.add( animate );
 }
@@ -52,7 +57,8 @@ function animate( delta ) {
 			velocities: [ {
 				x: window.current.force * math.cos( math.unit( window.current.direction, 'deg' ) ),
 				y: window.current.force * math.sin( math.unit( window.current.direction, 'deg' ) )
-			} ]
+			} ],
+			frictions: [ window.friction ]
 		} );
 	}
 }
