@@ -91998,7 +91998,7 @@ module.exports = {
 						// } else if ( velocity < 0 ) {
 						// 	calculated = Math.min( velocity + ( delta * increment ), 0 );
 						// }
-						calculated = Math.max( Math.abs( velocity ) - ( delta * increment ), 0 ) * Math.sign( velocity );
+						// calculated = Math.max( Math.abs( velocity ) - ( delta * increment ), 0 ) * Math.sign( velocity );
 				}
 				return calculated;
 			},
@@ -92050,6 +92050,12 @@ module.exports = {
 							this.maxRotationVelocity
 						);
 
+					if ( influencers && influencers.frictions ) {
+						for ( let i = 0, l = influencers.frictions.length; i < l; i++ ) {
+							this.rotationVelocity *= influencers.frictions[ i ];
+						}
+					}
+
 					this.currentRotation = this.normalizeAngle( this.currentRotation + this.rotationVelocity * delta );
 
 					// check constraints, @TODO break this out too
@@ -92062,6 +92068,11 @@ module.exports = {
 
 				this.updateForwardVelocity( delta );
 
+				if ( influencers && influencers.frictions ) {
+					for ( let i = 0, l = influencers.frictions.length; i < l; i++ ) {
+						this.forwardVelocity *= influencers.frictions[ i ];
+					}
+				}
 				// convert scalar velocity to x/y velocities
 				// @TODO break this out
 				let vx = this.forwardVelocity * Math.sin( this.currentRotation ),
@@ -92153,7 +92164,8 @@ const PIXI = require( 'pixi.js' ),
 	viewWidth = 1000,
 	viewHeight = 800,
 	scale = window.devicePixelRatio,
-	app = new PIXI.Application( viewWidth * scale, viewHeight * scale, { view: view, backgroundColor : 0x000000 } ),
+	app = new PIXI.Application( viewWidth, viewHeight, { view: view, backgroundColor : 0x000000 } ),
+	// app = new PIXI.Application( viewWidth * scale, viewHeight * scale, { view: view, backgroundColor : 0x000000 } ),
 	ternaryState = Object.freeze( { 
 		MINUS: -1,
 		EQUAL: 0,
@@ -92173,6 +92185,8 @@ window.current = {
 	force: .3
 }
 
+window.friction = 0.98;
+
 function setup() {
 	var id = PIXI.loader.resources[ Config.spriteSheetPath + "ships.json" ].textures;
 	gameModels = loadGameModels();
@@ -92180,6 +92194,8 @@ function setup() {
 		app.stage.addChild( gameModels[ i ].base.sprite );
 	}
 	window.turtle = gameModels[ 0 ].base;
+	turtle.sprite.width *= .75;
+	turtle.sprite.height *= .75;
 	setupInput();
 	app.ticker.add( animate );
 }
@@ -92190,7 +92206,8 @@ function animate( delta ) {
 			velocities: [ {
 				x: window.current.force * math.cos( math.unit( window.current.direction, 'deg' ) ),
 				y: window.current.force * math.sin( math.unit( window.current.direction, 'deg' ) )
-			} ]
+			} ],
+			frictions: [ window.friction ]
 		} );
 	}
 }

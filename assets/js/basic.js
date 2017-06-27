@@ -92040,7 +92040,7 @@ module.exports = {
 						// } else if ( velocity < 0 ) {
 						// 	calculated = Math.min( velocity + ( delta * increment ), 0 );
 						// }
-						calculated = Math.max( Math.abs( velocity ) - ( delta * increment ), 0 ) * Math.sign( velocity );
+						// calculated = Math.max( Math.abs( velocity ) - ( delta * increment ), 0 ) * Math.sign( velocity );
 				}
 				return calculated;
 			},
@@ -92092,6 +92092,12 @@ module.exports = {
 							this.maxRotationVelocity
 						);
 
+					if ( influencers && influencers.frictions ) {
+						for ( let i = 0, l = influencers.frictions.length; i < l; i++ ) {
+							this.rotationVelocity *= influencers.frictions[ i ];
+						}
+					}
+
 					this.currentRotation = this.normalizeAngle( this.currentRotation + this.rotationVelocity * delta );
 
 					// check constraints, @TODO break this out too
@@ -92104,6 +92110,11 @@ module.exports = {
 
 				this.updateForwardVelocity( delta );
 
+				if ( influencers && influencers.frictions ) {
+					for ( let i = 0, l = influencers.frictions.length; i < l; i++ ) {
+						this.forwardVelocity *= influencers.frictions[ i ];
+					}
+				}
 				// convert scalar velocity to x/y velocities
 				// @TODO break this out
 				let vx = this.forwardVelocity * Math.sin( this.currentRotation ),
