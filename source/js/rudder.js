@@ -14,13 +14,8 @@ const PIXI = require( 'pixi.js' ),
 	viewWidth = 1000,
 	viewHeight = 800,
 	scale = window.devicePixelRatio,
-	app = new PIXI.Application( viewWidth, viewHeight, { view: view, backgroundColor : 0x000000 } ),
-	// app = new PIXI.Application( viewWidth * scale, viewHeight * scale, { view: view, backgroundColor : 0x000000 } ),
-	ternaryState = Object.freeze( { 
-		MINUS: -1,
-		EQUAL: 0,
-		PLUS: 1
-	} );
+	app = new PIXI.Application( viewWidth, viewHeight, { view: view, backgroundColor : 0x000000 } );
+	// app = new PIXI.Application( viewWidth * scale, viewHeight * scale, { view: view, backgroundColor : 0x000000 } );
 
 view.style.width = viewWidth + 'px';
 view.style.height = viewHeight + 'px';
@@ -46,6 +41,7 @@ function setup() {
 	window.turtle = gameModels[ 0 ].base;
 	turtle.sprite.width *= .5;
 	turtle.sprite.height *= .5;
+	SteeringKeyboard();
 	app.ticker.add( animate );
 }
 
@@ -85,5 +81,3 @@ function loadGameModel( model ) {
 	model.init( base );
 	return { base: base }
 }
-
-SteeringKeyboard();

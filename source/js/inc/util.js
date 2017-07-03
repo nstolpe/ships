@@ -7,9 +7,12 @@ module.exports = {
 	toRadians( angle ) {
 		return angle * ( Math.PI / 180 );
 	},
-	TernaryState: Object.freeze( { 
-		MINUS: -1,
+	/**
+	 * Enum-like immutable object with 3 states.
+	 */
+	TrinaryState: Object.freeze( { 
+		POSITIVE: 1,
 		EQUAL: 0,
-		PLUS: 1
+		NEGATIVE: -1
 	} )
 }

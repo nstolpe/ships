@@ -112,15 +112,6 @@ module.exports = {
 	 * @param number options.rotationVelocityIncrement  The rate at which rotationVelocity will increment or decrement.
 	 */
 	Transformable( options, o = {} ) {
-		/**
-		 * Enum-like immutable object with 3 states.
-		 */
-		const TrinaryState = Object.freeze( {
-			NEGATIVE: -1,
-			NEUTRAL: 0,
-			POSITIVE: 1
-		} );
-
 		return Object.assign( o, {
 			name: options.name || '',
 			// "zeroed" settings
@@ -135,12 +126,12 @@ module.exports = {
 			forwardVelocity: 0,
 			maxForwardVelocity: options.maxForwardVelocity || 2,
 			forwardVelocityIncrement: options.forwardVelocityIncrement || .01,
-			positionAcceleration: TrinaryState.NEUTRAL,
+			positionAcceleration: Util.TrinaryState.NEUTRAL,
 			// rotation velocity/acceleration settings
 			rotationVelocity: 0,
 			maxRotationVelocity: options.maxRotationVelocity || 0.02,
 			rotationVelocityIncrement: options.rotationVelocityIncrement || 0.001,
-			rotationAcceleration: TrinaryState.NEUTRAL,
+			rotationAcceleration: Util.TrinaryState.NEUTRAL,
 			postUpdates: options.postUpdates || [],
 			stabilizeRotation: options.stabilizeRotation || false,
 			stabilizePosition: options.stabilizePosition || false,
@@ -153,7 +144,7 @@ module.exports = {
 			 * Calculates a new velocity based on a delta, a rate of acceleration, a current velocity, an increment multiplier and a velocity limit. 
 			 *
 			 * @param delta         Delta time from last frame or other increment
-			 * @param acceleration  Value of TernaryState.NEGAVITE, TrinaryState.POSITIVE or TrinaryState.NEUTRAL
+			 * @param acceleration  Value of TrinaryState.NEGAVITE, TrinaryState.POSITIVE or TrinaryState.NEUTRAL
 			 * @param velocity      Current velocity
 			 * @param increment     Increment multiplier. Multiplied by delta, then added or subtracted to velocity.
 			 * @param limit         The velocity limit. Controls above and below 0
@@ -164,13 +155,13 @@ module.exports = {
 				let calculated = velocity;
 
 				switch ( acceleration ) {
-					case TrinaryState.NEGATIVE:
+					case Util.TrinaryState.NEGATIVE:
 						calculated = Math.max( velocity - ( delta * increment ), -limit );
 						break;
-					case TrinaryState.POSITIVE:
+					case Util.TrinaryState.POSITIVE:
 						calculated = Math.min( velocity + ( delta * increment ), limit );
 						break;
-					case TrinaryState.NEUTRAL:
+					case Util.TrinaryState.NEUTRAL:
 					default:
 						// if ( velocity > 0 ) {
 						// 	calculated = Math.max( velocity - ( delta * increment ), 0 );
@@ -182,7 +173,7 @@ module.exports = {
 				return calculated;
 			},
 			stabilizing() {
-				return this.stabilizeRotation && this.rotationAcceleration === TrinaryState.NEUTRAL;
+				return this.stabilizeRotation && this.rotationAcceleration === Util.TrinaryState.NEUTRAL;
 			},
 			// setRotation
 			update( delta, influencers ) {
