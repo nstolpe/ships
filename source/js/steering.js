@@ -1,10 +1,8 @@
 'use strict'
 
-//{INCLUDES}
 const Config = require( './inc/config.js' );
 const Util = require( './inc/util.js' );
 const GameModels = require( './inc/game-models.js' );
-//{/INCLUDES}
 
 window.math = require( 'mathjs' );
 const PIXI = require( 'pixi.js' ),
@@ -45,8 +43,8 @@ function setup() {
 		app.stage.addChild( gameModels[ i ].base.sprite );
 	}
 	window.turtle = gameModels[ 0 ].base;
-	turtle.sprite.width *= .75;
-	turtle.sprite.height *= .75;
+	turtle.sprite.width *= .5;
+	turtle.sprite.height *= .5;
 	setupInput();
 	app.ticker.add( animate );
 }
