@@ -11,7 +11,9 @@ const jsBuildPath = '.static/assets/js/';
 const imageBuildPath = '.static/assets/images/';
 const spritesheetBuildPath = '.static/assets/spritesheets/';
 
-// watches the js files in source for changes and recompiles with browserify when they're made.
+/**
+ * watches the js files in source for changes and recompiles with browserify when they're made.
+ */
 chokidar.watch( jsPath + '*.js', {
 		ignored: /(^|[\/\\])\../
 	} )
@@ -33,7 +35,11 @@ chokidar.watch( jsPath + '*.js', {
 				console.log('watching scripts...');
 		} );
 	} );
-
+/**
+ * Watches all files in the include directory (default: `source/js/inc`) for changes.
+ * On change, parses through all files in `jsPath` directory (default: `source/js`), matches
+ * calls to `require()`, looks for the file name inside them, and recompiles the files under `jsPath`.
+ */
 chokidar.watch( jsPath + 'inc/*.js', {
 		ignored: /(^|[\/\\])\../
 	} )
@@ -42,6 +48,7 @@ chokidar.watch( jsPath + 'inc/*.js', {
 		const fileName = segments[ segments.length - 1 ];
 		const incRx = /{INCLUDES}([\s\S]*){\/INCLUDES}/g;
 		const jsRx = /([\w\-. ]+\.js)/g;
+		// matches require statements
 		const reqRx = /require\(\s*?'([\w\-. \/]*\.js)'\s*?\)/g;
 
 		// get the contents of the `jsPath` dir that are scripts by filtering for `.js` extension.
@@ -52,9 +59,12 @@ chokidar.watch( jsPath + 'inc/*.js', {
 		for ( let i = 0, l = scripts.length; i < l; i++ ) {
 			// contents of one of the javascript files under `jsPath`
 			let fileText = fs.readFileSync( jsPath + scripts[ i ], 'utf8' );
-
+			
 			// match each `require( '...' )` statement
+			// but first this, otherwise the exec doesn't get all matches? @TODO Fix. Text matches in Node CLI and Chrome browser console.
+			fileText.match( reqRx );
 			while ( reqMatch = reqRx.exec( fileText ) ) {
+				// console.log(reqMatch[ 1 ].substring( reqMatch[ 1 ].length - fileName.length ));
 				if ( fileName === reqMatch[ 1 ].substring( reqMatch[ 1 ].length - fileName.length ) ) {
 					let proc = spawn( 'browserify', [ jsPath + scripts[ i ], '-o', jsBuildPath + scripts[ i ] ], {
 						stdio: 'inherit'
@@ -63,10 +73,10 @@ chokidar.watch( jsPath + 'inc/*.js', {
 					console.log( `recompiling \`${ jsBuildPath + scripts[ i ] }\` due to changes to \`${ path }\`` );
 
 					proc.on( 'close', code => {
-						if ( code === 1) 
-							console.error( `✖ "browserify ${ path } -o ${ jsBuildPath + fileName }" failed`);
+						if ( code === 1 ) 
+							console.error( `✖ "browserify ${ path } -o ${ jsBuildPath + fileName }" failed` );
 						else
-							console.log('Watching srcipts...');
+							console.log( 'Watching scripts...' );
 					} );
 
 					// no need to keep looking after one has been matched, recompiling the top level will 
@@ -77,11 +87,14 @@ chokidar.watch( jsPath + 'inc/*.js', {
 		}
 	} );
 
-// watches source/images for changes and copies them to imageBuildPath
+/**
+ * watches source/images for changes and copies them to imageBuildPath
+ */
 chokidar.watch( imagePath, {
 		ignored: /(^|[\/\\])\../
 	} )
 	.on( 'change', function( path ) {
+		console.log( path );
 		const proc = spawn( 'cp', [ path, imageBuildPath ], {
 			stdio: 'inherit'
 		} );
@@ -94,7 +107,9 @@ chokidar.watch( imagePath, {
 				console.log('Watching images...');
 		} );
 	} );
-
+/**
+ * Watches the `spriteSheetPath` (default: 'source/spritesheets') for changes
+ */
 chokidar.watch( spritesheetPath, {
 		ignored: /(^|[\/\\])\../
 	} )
