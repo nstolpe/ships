@@ -81,7 +81,7 @@ function setupInput() {
 
 	D.press = () => {
 		turtle.rotationAcceleration = Util.TrinaryState.POSITIVE;
-		turtle.children[ 'rudder' ].rotationAcceleration = Util.TrinaryState.NEGATIVE;
+		// turtle.children[ 'rudder' ].rotationAcceleration = Util.TrinaryState.NEGATIVE;
 		// turtle.children[ 'rudder' ].stabilizingRotation = false;
 	}
 	D.release = () => {

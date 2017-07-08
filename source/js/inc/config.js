@@ -142,11 +142,11 @@ module.exports = {
 					id: 'turtle-rudder.png',
 					options: {
 						basePosition: { x: 46.23439168930054, y: 110 },
-						rotationConstraints: { pos: Util.toRadians( 20 ), neg: Util.toRadians( 20 ) },
+						// rotationConstraints: { pos: Util.toRadians( 20 ), neg: Util.toRadians( 20 ) },
 						positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
 						maxRotationVelocity: 0.02,
 						rotationVelocityIncrement: 0.01,
-						stabilizeRotation: true,
+						// stabilizeRotation: true,
 						debug: true
 					},
 					init: ( child , parent ) => {
