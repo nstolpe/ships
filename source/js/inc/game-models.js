@@ -119,7 +119,8 @@ module.exports = {
 			basePosition: options.basePosition || { x: 0, y: 0 },
 			// current settings, updated each render
 			currentRotation: options.currentRotation || options.baseRotation || 0,
-			currentPosition: options.currentPosition || options.basePosition || { x: 0, y: 0 },
+			// currentPosition: options.currentPosition || options.basePosition || { x: 0, y: 0 },
+			currentPosition: options.currentPosition ? options.currentPosition : options.basePosition ? Object.assign( {}, options.basePosition ) : { x: 0, y: 0 },
 			rotationConstraints: options.rotationConstraints || { pos: Infinity, neg: Infinity },
 			positionConstraints: options.positionConstraints || { pos: { x: Infinity, y: Infinity }, neg: { x: Infinity, y: Infinity } },
 			// position velocity/acceleration settings
