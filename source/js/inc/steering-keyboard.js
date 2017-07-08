@@ -51,7 +51,9 @@ function setupInput() {
 		turtle.activePositionAcceleration = true;
 	}
 	W.release = () => {
-		if ( !S.isDown ) {
+		if ( S.isDown ) {
+			turtle.positionAcceleration = Util.TrinaryState.NEGATIVE;
+		} else {
 			turtle.positionAcceleration = Util.TrinaryState.NEUTRAL;
 			turtle.activePositionAcceleration = false;
 		}
@@ -62,7 +64,9 @@ function setupInput() {
 		turtle.activePositionAcceleration = true;
 	}
 	S.release = () => {
-		if ( !W.isDown ) {
+		if ( W.isDown ) {
+			turtle.positionAcceleration = Util.TrinaryState.POSITIVE;
+		} else {
 			turtle.positionAcceleration = Util.TrinaryState.NEUTRAL;
 			turtle.activePositionAcceleration = false;
 		}
@@ -70,24 +74,23 @@ function setupInput() {
 
 	A.press = () => {
 		turtle.rotationAcceleration = Util.TrinaryState.NEGATIVE;
-		// turtle.children[ 'rudder' ].rotationAcceleration = Util.TrinaryState.POSITIVE;
 	}
 	A.release = () => {
-		if ( !D.isDown ) {
+		if ( D.isDown ) {
+			turtle.rotationAcceleration = Util.TrinaryState.POSITIVE;
+		} else {
 			turtle.rotationAcceleration = Util.TrinaryState.NEUTRAL;
-			// turtle.children[ 'rudder' ].rotationAcceleration = Util.TrinaryState.NEUTRAL;
 		}
 	}
 
 	D.press = () => {
 		turtle.rotationAcceleration = Util.TrinaryState.POSITIVE;
-		// turtle.children[ 'rudder' ].rotationAcceleration = Util.TrinaryState.NEGATIVE;
-		// turtle.children[ 'rudder' ].stabilizingRotation = false;
 	}
 	D.release = () => {
-		if ( !A.isDown ) {
+		if ( A.isDown ) {
+			turtle.rotationAcceleration = Util.TrinaryState.NEGATIVE;
+		} else {
 			turtle.rotationAcceleration = Util.TrinaryState.NEUTRAL;
-			// turtle.children[ 'rudder' ].rotationAcceleration = Util.TrinaryState.NEUTRAL;
 		}
 	}
 
