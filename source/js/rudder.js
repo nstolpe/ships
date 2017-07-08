@@ -14,8 +14,16 @@ const PIXI = require( 'pixi.js' ),
 	viewWidth = 1000,
 	viewHeight = 800,
 	scale = window.devicePixelRatio,
-	app = new PIXI.Application( viewWidth, viewHeight, { view: view, backgroundColor : 0x000000 } );
-	// app = new PIXI.Application( viewWidth * scale, viewHeight * scale, { view: view, backgroundColor : 0x000000 } );
+	// app = new PIXI.Application( viewWidth, viewHeight, { view: view, backgroundColor : 0x000000 } );
+	app = new PIXI.Application( viewWidth * scale, viewHeight * scale, { view: view, backgroundColor : 0x000000 } );
+
+window.app = app;
+window.PIXI = PIXI;
+
+app.stage.interactive = true;
+app.stage.on( 'mousemove', (e) => {
+	console.log( `x: ${ e.data.global.x }, y: ${ e.data.global.y }` );
+} );
 
 view.style.width = viewWidth + 'px';
 view.style.height = viewHeight + 'px';
@@ -38,11 +46,13 @@ function setup() {
 	for ( let i = 0, l = gameModels.length; i < l; i++ ) {
 		app.stage.addChild( gameModels[ i ].base.sprite );
 	}
-	window.turtle = gameModels[ 0 ].base;
-	turtle.sprite.width *= .5;
-	turtle.sprite.height *= .5;
+
 	SteeringKeyboard();
 	app.ticker.add( animate );
+}
+
+function rudder() {
+
 }
 
 function animate( delta ) {
@@ -60,8 +70,65 @@ function animate( delta ) {
 function loadGameModels() {
 	let gameModels = [];
 	for ( let i = Config.gameModels.length - 1; i >= 0; i-- ) {
-		gameModels.push( loadGameModel( Config.gameModels[ i ] ) );
+		// gameModels.push( loadGameModel( Config.gameModels[ i ] ) );
 	}
+
+	window.rudder = loadGameModel(
+		{
+			name: 'rudder',
+			spriteSheet: 'ships.json',
+			options: {
+				basePosition: { x: 400, y: 400 },
+				// rotationConstraints: { pos: Infinity, neg: Infinity },
+				positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
+				maxForwardVelocity: 4,
+				forwardVelocityIncrement: .05,
+				postUpdates: [
+					function( delta ) {
+						// console.log( this.children[ 'rudder' ].currentRotation );
+						// console.log( this.rotationVelocity );
+						// this.children[ 'rudder' ].currentRotation = -this.currentRotation;
+						// this.children[ 'rudder' ].rotationVelocity = -this.rotationVelocity;
+					}
+				]
+			},
+
+			init: ( base ) => {
+				// size this here for now.
+				// base.sprite.width *= 4;
+				// base.sprite.height *= 4;
+
+				base.pivot.x = base.sprite.width / 2;
+				// base.pivot.y = base.sprite.height;
+				// base.children.rudder.currentPosition.x = base.sprite.width / 2;
+				// base.children.rudder.basePosition.x = base.sprite.width / 2;
+			},
+			children: [
+				{
+					name: 'rudder',
+					id: 'turtle-rudder.png',
+					options: {
+						// basePosition: { x: 46.23439168930054, y: 110 },
+						// rotationConstraints: { pos: Util.toRadians( 20 ), neg: Util.toRadians( 20 ) },
+						// positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
+						// maxRotationVelocity: 0.02,
+						// rotationVelocityIncrement: 0.01,
+						// stabilizeRotation: true,
+						// debug: true
+					},
+					init: ( child , parent ) => {
+						// child.pivot.x = child.sprite.width / 2;
+
+						// child.currentPosition.x = parent.sprite.width / 2;
+						// child.basePosition.x = child.currentPosition.x;
+					}
+				}
+			]
+		}
+	);
+	window.rudder.base.sprite.width *= 2;
+	window.rudder.base.sprite.height *= 2;
+	gameModels.push( window.rudder );
 	return gameModels;
 }
 
