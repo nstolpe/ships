@@ -92298,160 +92298,12 @@ module.exports = {
 }
 
 },{}],698:[function(require,module,exports){
-module.exports = function( uniforms ) {
-	return {
-		init() {
-			this.uniforms.uTime = { type: 'f', value: 0 }
-			this.shader.shader = new PIXI.Filter( this.shader.vertex, this.shader.fragment, this.uniforms );
-			// this.shader.shader.autoFit = false;
-			this.shader.shader.apply = function( filterManager, input, output ) {
-				this.uniforms.uResolution[0] = input.sourceFrame.width * 0.5;
-				this.uniforms.uResolution[1] = input.sourceFrame.height * 0.5;
-				filterManager.applyFilter( this, input, output );
-			};
-			return this;
-		},
-		uniforms: uniforms,
-		update( delta ) {
-			// this.uniforms.time.value = delta;
-			if ( this.uniforms.uTime.value > 400000 )
-				this.uniforms.uTime.value = 0;
-
-			this.uniforms.uTime.value += delta;
-			this.shader.shader.uniforms.uTime = this.uniforms.uTime.value;
-		},
-		shader: {
-			vertex:
-				`//precision highp float;
-				attribute vec2 aVertexPosition;
-				attribute vec2 aTextureCoord;
-				uniform mat3   projectionMatrix;
-				uniform mat3   filterMatrix;
-				varying vec2   vTextureCoord;
-				varying vec2   vFilterCoord;
-
-				void main(void){
-					gl_Position = vec4((projectionMatrix * vec3(aVertexPosition, 1.0)).xy, 0.0, 1.0);
-					vFilterCoord = ( filterMatrix * vec3( aTextureCoord, 1.0) ).xy;
-					vTextureCoord = aTextureCoord;
-				}`,
-			fragment:
-				// `// lava
-				// // https://www.shadertoy.com/view/ldXGz7
-				// precision mediump float;
-				// varying vec2 vTextureCoord;
-				// varying vec2 vFilterCoord;
-				// uniform sampler2D uSampler;
-				// uniform sampler2D filterSampler;
-				// uniform vec4 filterArea;
-				// uniform float uTime;
-				// void main(void) {
-				// 	float fragTime = uTime * 0.02;
-				// 	vec2 uv = vTextureCoord;
-				// 	uv.y += (cos((uv.y + (fragTime * 0.04)) * 45.0) * 0.0019) +
-				// 		(cos((uv.y + (fragTime * 0.1)) * 10.0) * 0.002);
-				// 	uv.x += (sin((uv.y + (fragTime * 0.07)) * 15.0) * 0.0029) +
-				// 		(sin((uv.y + (fragTime * 0.1)) * 15.0) * 0.002);
-				// 	gl_FragColor = texture2D(uSampler, uv);
-				// }`,
-				`// water
-				// https://www.shadertoy.com/view/4slGRM
-				varying vec2 vTextureCoord;
-				varying vec2 vFilterCoord;
-				uniform sampler2D uSampler;
-				uniform sampler2D filterSampler;
-				uniform vec4 filterArea;
-				uniform float uTime;
-				uniform vec2 uDimensions;
-				const float PI = 3.1415926535897932;
-
-				// play with these parameters to custimize the effect
-				// ===================================================
-
-				//speed
-				const float speed = 0.004;
-				const float speed_x = 0.002;
-				const float speed_y = 0.002;
-
-				// refraction
-				const float emboss = 0.50;
-				const float intensity = .8;
-				const int steps = 8;
-				const float frequency = 80.0;
-				const int angle = 13; // better when a prime
-
-				// reflection
-				const float delta = 60.;
-				const float intence = 1300.;
-
-				const float reflectionCutOff = 0.012;
-				const float reflectionIntence = 200000.;
-
-				// ===================================================
-
-
-				float col( vec2 coord, float time ) {
-					float delta_theta = 2.0 * PI / float( angle );
-					float col = 0.0;
-					float theta = 0.0;
-
-					for (int i = 0; i < steps; i++) {
-						vec2 adjc = coord;
-						theta = delta_theta * float( i );
-						adjc.x += cos( theta ) * time * speed + time * speed_x;
-						adjc.y -= sin( theta ) * time * speed - time * speed_y;
-						col = col + cos( (adjc.x * cos( theta ) - adjc.y * sin( theta ) ) * frequency ) * intensity;
-					}
-
-					return cos( col );
-				}
-
-				void main( void ) {
-						float time = uTime * 0.2 * 1.3;
-
-						vec2 p = vTextureCoord, c1 = p, c2 = p;
-						float cc1 = col( c1, time );
-
-						c2.x += filterArea.x / delta;
-						// c2.x += uDimensions.x / delta;
-						float dx = emboss * ( cc1 - col( c2, time ) ) / delta;
-
-						c2.x = p.x;
-						c2.y += filterArea.y / delta;
-						// c2.y += uDimensions.y / delta;
-						float dy = emboss * ( cc1-col( c2, time ) ) / delta;
-
-						c1.x += dx * 0.1;
-						// c1.y += dy * 0.1;
-						c1.y = (c1.y + dy * 0.1 );
-
-						float alpha = 1.0 + dot( dx, dy ) * intence;
-
-						float ddx = dx - reflectionCutOff;
-						float ddy = dy - reflectionCutOff;
-						if ( ddx > 0. && ddy > 0.0 )
-							alpha = pow( alpha, ddx * ddy * reflectionIntence );
-							
-						// gl_FragColor = texture2D( uSampler, c1 ) * ( alpha );
-						vec4 texColor = texture2D( uSampler, c1 );
-						texColor.r = max( texColor.r * 0.5, 0.0 );
-						texColor.g = max( texColor.g * 0.5, 0.0 );
-						texColor.b = max( texColor.b * 0.5, 0.0 );
-						gl_FragColor = texColor * alpha;
-				}`,
-			shader: undefined
-		}
-	}
-}
-
-},{}],699:[function(require,module,exports){
 'use strict'
 
 const Config = require( './inc/config.js' );
 const Util = require( './inc/util.js' );
-const SteeringKeyboard = require( './inc/steering-keyboard.js' );
 const GameModels = require( './inc/game-models.js' );
-const WaterManager = require( './inc/water-manager.js' );
+const SteeringKeyboard = require( './inc/steering-keyboard.js' );
 
 window.math = require( 'mathjs' );
 const PIXI = require( 'pixi.js' ),
@@ -92462,8 +92314,16 @@ const PIXI = require( 'pixi.js' ),
 	viewWidth = 1000,
 	viewHeight = 800,
 	scale = window.devicePixelRatio,
-	app = new PIXI.Application( viewWidth, viewHeight, { view: view, backgroundColor : 0x000000 } );
-	// app = new PIXI.Application( viewWidth * scale, viewHeight * scale, { view: view, backgroundColor : 0x000000 } );
+	// app = new PIXI.Application( viewWidth, viewHeight, { view: view, backgroundColor : 0x000000 } );
+	app = new PIXI.Application( viewWidth * scale, viewHeight * scale, { view: view, backgroundColor : 0x000000 } );
+
+window.app = app;
+window.PIXI = PIXI;
+
+app.stage.interactive = true;
+app.stage.on( 'mousemove', (e) => {
+	console.log( `x: ${ e.data.global.x }, y: ${ e.data.global.y }` );
+} );
 
 view.style.width = viewWidth + 'px';
 view.style.height = viewHeight + 'px';
@@ -92474,28 +92334,11 @@ loader
 
 window.gameModels = [];
 window.current = {
-	direction: 145,
+	direction: 90,
 	force: .3
 }
 
 window.friction = 0.98;
-
-var oceanFloor = PIXI.extras.TilingSprite.fromImage(
-	// "assets/images/tile-1px-black.png",
-	"assets/images/sand.png",
-	viewWidth,
-	viewHeight
-);
-oceanFloor.x = viewWidth / 2;
-oceanFloor.y = viewHeight / 2;
-oceanFloor.anchor.set( 0.5 );
-app.stage.addChild( oceanFloor );
-
-let waterManager = WaterManager( {
-	uResolution: { type: 'v2', value: [ viewWidth, viewHeight ] },
-} ).init();
-
-oceanFloor.filters = [ waterManager.shader.shader ];
 
 function setup() {
 	var id = PIXI.loader.resources[ Config.spriteSheetPath + "ships.json" ].textures;
@@ -92503,16 +92346,16 @@ function setup() {
 	for ( let i = 0, l = gameModels.length; i < l; i++ ) {
 		app.stage.addChild( gameModels[ i ].base.sprite );
 	}
-	window.turtle = gameModels[ 0 ].base;
-	turtle.sprite.width *= .5;
-	turtle.sprite.height *= .5;
+
 	SteeringKeyboard();
 	app.ticker.add( animate );
 }
 
-function animate( delta ) {
-	waterManager.update( delta );
+function rudder() {
 
+}
+
+function animate( delta ) {
 	for ( let i = 0, l = gameModels.length; i < l; i++ ) {
 		gameModels[ i ].base.update( delta, {
 			velocities: [ {
@@ -92527,8 +92370,65 @@ function animate( delta ) {
 function loadGameModels() {
 	let gameModels = [];
 	for ( let i = Config.gameModels.length - 1; i >= 0; i-- ) {
-		gameModels.push( loadGameModel( Config.gameModels[ i ] ) );
+		// gameModels.push( loadGameModel( Config.gameModels[ i ] ) );
 	}
+
+	window.rudder = loadGameModel(
+		{
+			name: 'rudder',
+			spriteSheet: 'ships.json',
+			options: {
+				basePosition: { x: 400, y: 400 },
+				// rotationConstraints: { pos: Infinity, neg: Infinity },
+				positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
+				maxForwardVelocity: 4,
+				forwardVelocityIncrement: .05,
+				postUpdates: [
+					function( delta ) {
+						// console.log( this.children[ 'rudder' ].currentRotation );
+						// console.log( this.rotationVelocity );
+						// this.children[ 'rudder' ].currentRotation = -this.currentRotation;
+						// this.children[ 'rudder' ].rotationVelocity = -this.rotationVelocity;
+					}
+				]
+			},
+
+			init: ( base ) => {
+				// size this here for now.
+				// base.sprite.width *= 4;
+				// base.sprite.height *= 4;
+
+				base.pivot.x = base.sprite.width / 2;
+				// base.pivot.y = base.sprite.height;
+				// base.children.rudder.currentPosition.x = base.sprite.width / 2;
+				// base.children.rudder.basePosition.x = base.sprite.width / 2;
+			},
+			children: [
+				{
+					name: 'rudder',
+					id: 'turtle-rudder.png',
+					options: {
+						// basePosition: { x: 46.23439168930054, y: 110 },
+						// rotationConstraints: { pos: Util.toRadians( 20 ), neg: Util.toRadians( 20 ) },
+						// positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
+						// maxRotationVelocity: 0.02,
+						// rotationVelocityIncrement: 0.01,
+						// stabilizeRotation: true,
+						// debug: true
+					},
+					init: ( child , parent ) => {
+						// child.pivot.x = child.sprite.width / 2;
+
+						// child.currentPosition.x = parent.sprite.width / 2;
+						// child.basePosition.x = child.currentPosition.x;
+					}
+				}
+			]
+		}
+	);
+	window.rudder.base.sprite.width *= 2;
+	window.rudder.base.sprite.height *= 2;
+	gameModels.push( window.rudder );
 	return gameModels;
 }
 
@@ -92549,4 +92449,4 @@ function loadGameModel( model ) {
 	return { base: base }
 }
 
-},{"./inc/config.js":694,"./inc/game-models.js":695,"./inc/steering-keyboard.js":696,"./inc/util.js":697,"./inc/water-manager.js":698,"mathjs":17,"pixi.js":652}]},{},[699]);
+},{"./inc/config.js":694,"./inc/game-models.js":695,"./inc/steering-keyboard.js":696,"./inc/util.js":697,"mathjs":17,"pixi.js":652}]},{},[698]);
