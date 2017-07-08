@@ -4,6 +4,7 @@ const Config = require( './inc/config.js' );
 const Util = require( './inc/util.js' );
 const SteeringKeyboard = require( './inc/steering-keyboard.js' );
 const GameModels = require( './inc/game-models.js' );
+const WaterManager = require( './inc/water-manager.js' );
 
 window.math = require( 'mathjs' );
 const PIXI = require( 'pixi.js' ),
@@ -26,11 +27,28 @@ loader
 
 window.gameModels = [];
 window.current = {
-	direction: 90,
+	direction: 145,
 	force: .3
 }
 
 window.friction = 0.98;
+
+var oceanFloor = PIXI.extras.TilingSprite.fromImage(
+	// "assets/images/tile-1px-black.png",
+	"assets/images/sand.png",
+	viewWidth,
+	viewHeight
+);
+oceanFloor.x = viewWidth / 2;
+oceanFloor.y = viewHeight / 2;
+oceanFloor.anchor.set( 0.5 );
+app.stage.addChild( oceanFloor );
+
+let waterManager = WaterManager( {
+	uResolution: { type: 'v2', value: [ viewWidth, viewHeight ] },
+} ).init();
+
+oceanFloor.filters = [ waterManager.shader.shader ];
 
 function setup() {
 	var id = PIXI.loader.resources[ Config.spriteSheetPath + "ships.json" ].textures;
@@ -46,6 +64,8 @@ function setup() {
 }
 
 function animate( delta ) {
+	waterManager.update( delta );
+
 	for ( let i = 0, l = gameModels.length; i < l; i++ ) {
 		gameModels[ i ].base.update( delta, {
 			velocities: [ {
