@@ -1,10 +1,8 @@
 const math = require( 'mathjs' );
 const PIXI = require( 'pixi.js' );
 
-//{INCLUDES}
 const Util = require( './inc/util.js' );
 const GameModels = require( './inc/game-models.js' );
-//{/INCLUDES}
 
 console.log( 'Loading gravity simulation' );
 
