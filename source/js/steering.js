@@ -8,7 +8,6 @@ const WaterManager = require( './inc/water-manager.js' );
 
 window.math = require( 'mathjs' );
 const PIXI = require( 'pixi.js' ),
-	TextureCache = PIXI.utils.TextureCache,
 	Sprite = PIXI.Sprite,
 	loader = PIXI.loader,
 	view = document.getElementById('view'),
@@ -48,7 +47,7 @@ let waterManager = WaterManager( {
 	uResolution: { type: 'v2', value: [ viewWidth, viewHeight ] },
 } ).init();
 
-oceanFloor.filters = [ waterManager.shader.shader ];
+// oceanFloor.filters = [ waterManager.shader.shader ];
 
 function setup() {
 	var id = PIXI.loader.resources[ Config.spriteSheetPath + "ships.json" ].textures;
