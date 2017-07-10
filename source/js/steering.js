@@ -33,8 +33,9 @@ window.current = {
 window.friction = 0.98;
 
 var oceanFloor = PIXI.extras.TilingSprite.fromImage(
+	"assets/images/boxes-blue-red.png",
 	// "assets/images/tile-1px-black.png",
-	"assets/images/sand.png",
+	// "assets/images/sand.png",
 	viewWidth,
 	viewHeight
 );
@@ -47,7 +48,7 @@ let waterManager = WaterManager( {
 	uResolution: { type: 'v2', value: [ viewWidth, viewHeight ] },
 } ).init();
 
-// oceanFloor.filters = [ waterManager.shader.shader ];
+oceanFloor.filters = [ waterManager.shader.shader ];
 
 function setup() {
 	var id = PIXI.loader.resources[ Config.spriteSheetPath + "ships.json" ].textures;
@@ -63,7 +64,7 @@ function setup() {
 }
 
 function animate( delta ) {
-	// waterManager.update( delta );
+	waterManager.update( delta );
 
 	for ( let i = 0, l = gameModels.length; i < l; i++ ) {
 		gameModels[ i ].base.update( delta, {
