@@ -63,7 +63,7 @@ function setup() {
 }
 
 function animate( delta ) {
-	waterManager.update( delta );
+	// waterManager.update( delta );
 
 	for ( let i = 0, l = gameModels.length; i < l; i++ ) {
 		gameModels[ i ].base.update( delta, {

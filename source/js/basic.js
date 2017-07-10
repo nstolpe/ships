@@ -1,9 +1,7 @@
 'use strict'
 
-//{INCLUDES}
 const Util = require( './inc/util.js' );
 const GameModels = require( './inc/game-models.js' );
-//{/INCLUDES}
 
 const Config = {
 	spriteSheetPath: 'assets/spritesheets/',
