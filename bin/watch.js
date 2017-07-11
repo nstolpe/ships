@@ -95,7 +95,9 @@ chokidar.watch( imagePath, {
 	} )
 	.on( 'change', function( path ) {
 		console.log( path );
-		const proc = spawn( 'cp', [ path, imageBuildPath ], {
+		let subPath = path.replace( imagePath, '' );
+		console.log( imageBuildPath + subPath  );
+		const proc = spawn( 'cp', [ path, imageBuildPath + subPath ], {
 			stdio: 'inherit'
 		} );
 
