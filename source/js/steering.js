@@ -1,6 +1,5 @@
 'use strict'
 
-const Config = require( './inc/config.js' );
 const Util = require( './inc/util.js' );
 const SteeringKeyboard = require( './inc/steering-keyboard.js' );
 const GameModels = require( './inc/game-models.js' );
@@ -15,6 +14,8 @@ const PIXI = require( 'pixi.js' ),
 	viewHeight = 800,
 	scale = window.devicePixelRatio,
 	app = new PIXI.Application( viewWidth, viewHeight, { view: view, backgroundColor : 0x000000, resolution: window.devicePixelRatio } );
+
+const Config = require( './inc/config.js' )( PIXI, app );
 
 window.app = app;
 view.style.width = viewWidth + 'px';
@@ -48,7 +49,22 @@ let waterManager = WaterManager( {
 	uResolution: { type: 'v2', value: [ viewWidth, viewHeight ] },
 } ).init();
 
-oceanFloor.filters = [ waterManager.shader.shader ];
+// oceanFloor.filters = [ waterManager.shader.shader ];
+
+// let graphics = new PIXI.Graphics();
+// window.graphics = graphics;
+// // set a fill and line style
+// graphics.beginFill(0xFF3300);
+// graphics.lineStyle(4, 0xffd900, 1);
+
+// // draw a shape
+// graphics.moveTo(50,50);
+// graphics.lineTo(250, 50);
+// graphics.lineTo(100, 100);
+// graphics.lineTo(50, 50);
+// graphics.endFill();
+
+// app.stage.addChild( graphics );
 
 function setup() {
 	var id = PIXI.loader.resources[ Config.spriteSheetPath + "ships.json" ].textures;
@@ -74,6 +90,26 @@ function animate( delta ) {
 			} ],
 			frictions: [ window.friction ]
 		} );
+	}
+
+	if ( turtle.sprite.getBounds().x < 0 ) {
+		console.log( 'left' );
+		turtle.currentPosition.x = Math.ceil( turtle.sprite.getBounds().width / 2 ) + 1;
+	}
+	
+	if ( turtle.sprite.getBounds().x + turtle.sprite.getBounds().width > app.view.offsetWidth ) {
+		console.log( 'right' );
+		turtle.currentPosition.x = app.view.offsetWidth - Math.ceil( turtle.sprite.getBounds().width / 2 );
+	}
+	
+	if ( turtle.sprite.getBounds().y < 0 ) {
+		console.log( 'top' );
+		turtle.currentPosition.y = Math.ceil( turtle.sprite.getBounds().height / 2 );
+	}
+
+	if ( turtle.sprite.getBounds().y + turtle.sprite.getBounds().height > app.view.offsetHeight ) {
+		console.log( 'bottom' );
+		turtle.currentPosition.y = app.view.offsetHeight - Math.ceil( turtle.sprite.getBounds().height / 2 );
 	}
 }
 
