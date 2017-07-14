@@ -18,7 +18,7 @@ function setup() {
 	let flowNornal1 = new PIXI.Sprite( PIXI.loader.resources[ 'flow-normal1' ].texture );
 	
 	let floor = PIXI.extras.TilingSprite.fromImage(
-		'floor',
+		'water-00',
 		viewWidth,
 		viewHeight
 	);
@@ -28,30 +28,38 @@ function setup() {
 	floor.anchor.set( 0.5 );
 	floor.filters = [ WaterFilter() ];
 
-	app.stage.addChild( floor );
-
-	let animatedWater = new PIXI.extras.AnimatedSprite( [ 
+	floor.textures = [ 
 		PIXI.loader.resources[ 'water-00' ].texture,
 		PIXI.loader.resources[ 'water-01' ].texture,
 		PIXI.loader.resources[ 'water-02' ].texture,
 		PIXI.loader.resources[ 'water-03' ].texture,
 		PIXI.loader.resources[ 'water-04' ].texture
-	] );
-window.animatedWater = animatedWater;
-window.floor = floor;
-	animatedWater.x = viewWidth / 2;
-	animatedWater.y = viewHeight / 2;
-	animatedWater.anchor.set( 0.5 );
-	animatedWater.animationSpeed = 0.2;
-	animatedWater.gotoAndPlay( 0 );
+	];
 
-	app.stage.addChild( animatedWater );
+	let o = 0;
+	let t = 10;
+	let i = 0;
+	let l = floor.textures.length;
+
+	floor.update = function( delta ) {
+		if ( o === t - 1 ) {
+			floor._texture = floor.textures[ i ];
+			i = ( i + 1 ) % l;
+		}
+		o = ( o + 1 ) % t;
+	}
+
+	app.ticker.add( floor.update );
+
+	app.stage.addChild( floor );
+
+	window.floor = floor;
 }
 
 function animate( delta ) {
 	// console.log( 'animating' );
-	floor.tilePosition.x += 4 * .01 / delta;
-	floor.tilePosition.y += 13 * .01 / delta;
+	// floor.tilePosition.x += 4 * .01 / delta;
+	// floor.tilePosition.y += 13 * .01 / delta;
 }
 
 PIXI.loader
