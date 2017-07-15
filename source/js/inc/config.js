@@ -21,10 +21,7 @@ module.exports = function( PIXI, app ) {
 							if ( this.debug ) {
 								let bounds = this.sprite.getBounds();
 
-								if ( this.graphics ) {
-									app.stage.removeChild( this.graphics );
-									this.graphics.destroy();
-								}
+								if ( this.graphics ) this.graphics.clear();
 
 								this.graphics = new PIXI.Graphics();
 
