@@ -93,23 +93,27 @@ function animate( delta ) {
 	}
 
 	if ( turtle.sprite.getBounds().x < 0 ) {
-		console.log( 'left' );
-		turtle.currentPosition.x = Math.ceil( turtle.sprite.getBounds().width / 2 ) + 1;
+		// console.log( 'left' );
+		turtle.currentPosition.x = Math.ceil( turtle.sprite.getBounds().width / 2 ) + 5;
+		turtle.forwardVelocity = 0;
 	}
 	
 	if ( turtle.sprite.getBounds().x + turtle.sprite.getBounds().width > app.view.offsetWidth ) {
-		console.log( 'right' );
-		turtle.currentPosition.x = app.view.offsetWidth - Math.ceil( turtle.sprite.getBounds().width / 2 );
+		// console.log( 'right' );
+		turtle.currentPosition.x = app.view.offsetWidth - ( Math.ceil( turtle.sprite.getBounds().width / 2 ) + 5 );
+		turtle.forwardVelocity = 0;
 	}
 	
 	if ( turtle.sprite.getBounds().y < 0 ) {
-		console.log( 'top' );
-		turtle.currentPosition.y = Math.ceil( turtle.sprite.getBounds().height / 2 );
+		// console.log( 'top' );
+		turtle.currentPosition.y = Math.ceil( turtle.sprite.getBounds().height / 2 ) + 5;
+		turtle.forwardVelocity = 0;
 	}
 
 	if ( turtle.sprite.getBounds().y + turtle.sprite.getBounds().height > app.view.offsetHeight ) {
-		console.log( 'bottom' );
-		turtle.currentPosition.y = app.view.offsetHeight - Math.ceil( turtle.sprite.getBounds().height / 2 );
+		// console.log( 'bottom' );
+		turtle.currentPosition.y = app.view.offsetHeight - ( Math.ceil( turtle.sprite.getBounds().height / 2 ) + 5 );
+		turtle.forwardVelocity = 0;
 	}
 }
 
