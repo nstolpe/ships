@@ -133,3 +133,13 @@ function loadGameModel( model ) {
 	model.init( base );
 	return { base: base }
 }
+
+function setupCoords() {
+	const xValue = document.createElement( 'input' );
+	const yValue = document.createElement( 'input' );
+
+	xValue.type = 'number';
+	xValue.type = 'number';
+	yValue.disabled = true;
+	yValue.disabled = true;
+}
