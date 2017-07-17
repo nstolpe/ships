@@ -92233,7 +92233,7 @@ module.exports = {
 	 */
 	TrinaryState: Object.freeze( { 
 		POSITIVE: 1,
-		EQUAL: 0,
+		NEUTRAL: 0,
 		NEGATIVE: -1
 	} )
 }

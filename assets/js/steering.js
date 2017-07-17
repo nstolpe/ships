@@ -91656,169 +91656,235 @@ module.exports = E;
 
 },{}],694:[function(require,module,exports){
 'use strict'
+
+// module.exports = function() {
+// 	return {
+// 		fromImage() {
+			
+// 		}
+// 	}
+// }
+// temporary until this can be better configured.
+
+const PIXI = require( 'pixi.js' );
+
+module.exports = function( textures, width, height ) {
+	let o = 0;
+	let t = 10;
+	let i = 0;
+	let l = textures.length;
+	let tiled = PIXI.extras.TilingSprite.from(
+		textures[ 0 ],
+		width,
+		height
+	);
+	tiled.x = width / 2;
+	tiled.y = height / 2;
+	tiled.anchor.set( 0.5 );
+
+	tiled.update = function( delta ) {
+		if ( o === t - 1 ) {
+			this._texture = textures[ i ];
+			i = ( i + 1 ) % l;
+		}
+		o = ( o + 1 ) % t;
+	}
+
+	return tiled;
+}
+
+},{"pixi.js":652}],695:[function(require,module,exports){
+'use strict'
 const Util = require( './util.js' );
 
-module.exports = {
-	spriteSheetPath: 'assets/spritesheets/',
-	gameModels: [
-		{
-			name: 'turtle',
-			spriteSheet: 'ships.json',
-			options: {
-				currentPosition: { x: 200, y: 300 },
-				// rotationConstraints: { pos: Infinity, neg: Infinity },
-				// positionConstraints: { pos: { x: Infinity, y: Infinity }, neg: { x: Infinity, y: Infinity } },
-				maxForwardVelocity: 4,
-				forwardVelocityIncrement: .05,
-				postUpdates: [
-					function( delta ) {
-						// console.log( this.children[ 'rudder' ].currentRotation );
-						// console.log( this.rotationVelocity );
-						// this.children[ 'rudder' ].currentRotation = -this.currentRotation;
-						// this.children[ 'rudder' ].rotationVelocity = -this.rotationVelocity;
+module.exports = function( PIXI, app ) {
+
+	return {
+		spriteSheetPath: 'assets/spritesheets/',
+		gameModels: [
+			{
+				name: 'turtle',
+				spriteSheet: 'ships.json',
+				options: {
+					currentPosition: { x: 200, y: 300 },
+					// rotationConstraints: { pos: Infinity, neg: Infinity },
+					// positionConstraints: { pos: { x: Infinity, y: Infinity }, neg: { x: Infinity, y: Infinity } },
+					maxForwardVelocity: 4,
+					forwardVelocityIncrement: .05,
+					// debug: true,
+					postUpdates: [
+						function( delta ) {
+							if ( this.debug ) {
+								let bounds = this.sprite.getBounds();
+
+								if ( this.graphics ) {
+									this.graphics.clear();
+								} else {
+									this.graphics = new PIXI.Graphics();
+								}
+
+								this.graphics.lineStyle( 1, 0xff0000, 1 );
+								this.graphics.moveTo( bounds.x, bounds.y );
+								this.graphics.lineTo( bounds.x, bounds.y + bounds.height );
+								this.graphics.lineTo( bounds.x + bounds.width, bounds.y + bounds.height );
+								this.graphics.lineTo( bounds.x + bounds.width, bounds.y  );
+								this.graphics.lineTo( bounds.x, bounds.y );
+								app.stage.addChild( this.graphics );
+								// graphics.endFill();
+							} else {
+								let graphicsChild = app.stage.children.find( ( child ) => child === this.graphics );
+
+								if ( graphicsChild )
+									app.stage.removeChild( graphicsChild );
+							}
+							// console.log( this.children[ 'rudder' ].currentRotation );
+							// console.log( this.rotationVelocity );
+							// this.children[ 'rudder' ].currentRotation = -this.currentRotation;
+							// this.children[ 'rudder' ].rotationVelocity = -this.rotationVelocity;
+						}
+					]
+				},
+
+				init: ( base ) => {
+					base.pivot.x = base.sprite.width / 2;
+					base.pivot.y = base.sprite.height / 2;
+					base.children.rudder.currentPosition.x = base.sprite.width / 2;
+					base.children.rudder.basePosition.x = base.sprite.width / 2;
+				},
+				children: [
+					// left cannons
+					{
+						name: 'cannon-left-mid',
+						id: 'turtle-cannon-large.png',
+						options: {
+							basePosition: { x: 0, y: 60 },
+							baseRotation: Util.toRadians( 180 ),
+							rotationConstraints: { pos: Util.toRadians( 16 ), neg: Util.toRadians( 16 ) },
+							positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
+							maxRotationVelocity: 0.04,
+							rotationVelocityIncrement: 0.004,
+						},
+						init: ( child , parent ) => {
+							child.pivot.y = child.sprite.height / 2;
+							child.basePosition.x = child.sprite.width;
+							child.currentPosition.x = child.sprite.width;
+						}
+					},
+					{
+						name: 'cannon-left-bow',
+						id: 'turtle-cannon-small.png',
+						options: {
+							basePosition: { x: 41, y: 27 },
+							baseRotation: Util.toRadians( -157 ),
+							rotationConstraints: { pos: Util.toRadians( 16 ), neg: Util.toRadians( 16 ) },
+							positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
+							maxRotationVelocity: 0.04,
+							rotationVelocityIncrement: 0.004
+						},
+						init: ( child , parent ) => {
+							child.pivot.y = child.sprite.height / 2;
+						} 
+					},
+					{
+						name: 'cannon-left-aft',
+						id: 'turtle-cannon-small.png',
+						options: {
+							basePosition: { x: 41, y: 93 },
+							baseRotation: Util.toRadians( 157 ),
+							rotationConstraints: { pos: Util.toRadians( 16 ), neg: Util.toRadians( 16 ) },
+							positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
+							maxRotationVelocity: 0.04,
+							rotationVelocityIncrement: 0.004
+						},
+						init: ( child , parent ) => {
+							child.pivot.y = child.sprite.height / 2;
+						} 
+					},
+					// right cannons
+					{
+						name: 'cannon-right-mid',
+						id: 'turtle-cannon-large.png',
+						options: {
+							basePosition: { x: 79, y: 60 },
+							rotationConstraints: { pos: Util.toRadians( 16 ), neg: Util.toRadians( 16 ) },
+							positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
+							maxRotationVelocity: 0.04,
+							rotationVelocityIncrement: 0.004
+						},
+						init: ( child , parent ) => {
+							child.pivot.y = child.sprite.height / 2;
+							// child.basePosition.x = child.sprite.width;
+							// child.currentPosition.x = child.sprite.width;
+						} 
+					},
+					{
+						name: 'cannon-right-bow',
+						id: 'turtle-cannon-small.png',
+						options: {
+							basePosition: { x: 75, y: 27 },
+							baseRotation: Util.toRadians( -23 ),
+							rotationConstraints: { pos: Util.toRadians( 16 ), neg: Util.toRadians( 16 ) },
+							positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
+							maxRotationVelocity: 0.04,
+							rotationVelocityIncrement: 0.004
+						},
+						init: ( child , parent ) => {
+							child.pivot.y = child.sprite.height / 2;
+						} 
+					},
+					{
+						name: 'cannon-right-aft',
+						id: 'turtle-cannon-small.png',
+						options: {
+							basePosition: { x: 75, y: 93 },
+							baseRotation: Util.toRadians( 23 ),
+							rotationConstraints: { pos: Util.toRadians( 16 ), neg: Util.toRadians( 16 ) },
+							positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
+							maxRotationVelocity: 0.04,
+							rotationVelocityIncrement: 0.004
+						},
+						init: ( child , parent ) => {
+							child.pivot.y = child.sprite.height / 2;
+						} 
+					},
+					{
+						name: 'body',
+						id: 'turtle-body.png',
+						options: {
+							basePosition: { x: 15, y: 0 },
+							rotationConstraints: { pos: 0, neg: 0 },
+							positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } }
+						},
+						init: ( child, parent) => {
+							// child.pivot.x = parent.width / 2;
+						}
+					},
+					{
+						name: 'rudder',
+						id: 'turtle-rudder.png',
+						options: {
+							basePosition: { x: 46.23439168930054, y: 110 },
+							// rotationConstraints: { pos: Util.toRadians( 20 ), neg: Util.toRadians( 20 ) },
+							positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
+							maxRotationVelocity: 0.02,
+							rotationVelocityIncrement: 0.01,
+							// stabilizeRotation: true,
+							debug: true
+						},
+						init: ( child , parent ) => {
+							child.pivot.x = child.sprite.width / 2;
+
+							child.currentPosition.x = parent.sprite.width / 2;
+							child.basePosition.x = child.currentPosition.x;
+						}
 					}
 				]
-			},
-
-			init: ( base ) => {
-				base.pivot.x = base.sprite.width / 2;
-				base.pivot.y = base.sprite.height;
-				base.children.rudder.currentPosition.x = base.sprite.width / 2;
-				base.children.rudder.basePosition.x = base.sprite.width / 2;
-			},
-			children: [
-				// left cannons
-				{
-					name: 'cannon-left-mid',
-					id: 'turtle-cannon-large.png',
-					options: {
-						basePosition: { x: 0, y: 60 },
-						baseRotation: Util.toRadians( 180 ),
-						rotationConstraints: { pos: Util.toRadians( 16 ), neg: Util.toRadians( 16 ) },
-						positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
-						maxRotationVelocity: 0.04,
-						rotationVelocityIncrement: 0.004,
-					},
-					init: ( child , parent ) => {
-						child.pivot.y = child.sprite.height / 2;
-						child.basePosition.x = child.sprite.width;
-						child.currentPosition.x = child.sprite.width;
-					}
-				},
-				{
-					name: 'cannon-left-bow',
-					id: 'turtle-cannon-small.png',
-					options: {
-						basePosition: { x: 41, y: 27 },
-						baseRotation: Util.toRadians( -157 ),
-						rotationConstraints: { pos: Util.toRadians( 16 ), neg: Util.toRadians( 16 ) },
-						positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
-						maxRotationVelocity: 0.04,
-						rotationVelocityIncrement: 0.004
-					},
-					init: ( child , parent ) => {
-						child.pivot.y = child.sprite.height / 2;
-					} 
-				},
-				{
-					name: 'cannon-left-aft',
-					id: 'turtle-cannon-small.png',
-					options: {
-						basePosition: { x: 41, y: 93 },
-						baseRotation: Util.toRadians( 157 ),
-						rotationConstraints: { pos: Util.toRadians( 16 ), neg: Util.toRadians( 16 ) },
-						positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
-						maxRotationVelocity: 0.04,
-						rotationVelocityIncrement: 0.004
-					},
-					init: ( child , parent ) => {
-						child.pivot.y = child.sprite.height / 2;
-					} 
-				},
-				// right cannons
-				{
-					name: 'cannon-right-mid',
-					id: 'turtle-cannon-large.png',
-					options: {
-						basePosition: { x: 79, y: 60 },
-						rotationConstraints: { pos: Util.toRadians( 16 ), neg: Util.toRadians( 16 ) },
-						positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
-						maxRotationVelocity: 0.04,
-						rotationVelocityIncrement: 0.004
-					},
-					init: ( child , parent ) => {
-						child.pivot.y = child.sprite.height / 2;
-						// child.basePosition.x = child.sprite.width;
-						// child.currentPosition.x = child.sprite.width;
-					} 
-				},
-				{
-					name: 'cannon-right-bow',
-					id: 'turtle-cannon-small.png',
-					options: {
-						basePosition: { x: 75, y: 27 },
-						baseRotation: Util.toRadians( -23 ),
-						rotationConstraints: { pos: Util.toRadians( 16 ), neg: Util.toRadians( 16 ) },
-						positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
-						maxRotationVelocity: 0.04,
-						rotationVelocityIncrement: 0.004
-					},
-					init: ( child , parent ) => {
-						child.pivot.y = child.sprite.height / 2;
-					} 
-				},
-				{
-					name: 'cannon-right-aft',
-					id: 'turtle-cannon-small.png',
-					options: {
-						basePosition: { x: 75, y: 93 },
-						baseRotation: Util.toRadians( 23 ),
-						rotationConstraints: { pos: Util.toRadians( 16 ), neg: Util.toRadians( 16 ) },
-						positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
-						maxRotationVelocity: 0.04,
-						rotationVelocityIncrement: 0.004
-					},
-					init: ( child , parent ) => {
-						child.pivot.y = child.sprite.height / 2;
-					} 
-				},
-				{
-					name: 'body',
-					id: 'turtle-body.png',
-					options: {
-						basePosition: { x: 15, y: 0 },
-						rotationConstraints: { pos: 0, neg: 0 },
-						positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } }
-					},
-					init: ( child, parent) => {
-						// child.pivot.x = parent.width / 2;
-					}
-				},
-				{
-					name: 'rudder',
-					id: 'turtle-rudder.png',
-					options: {
-						basePosition: { x: 46.23439168930054, y: 110 },
-						// rotationConstraints: { pos: Util.toRadians( 20 ), neg: Util.toRadians( 20 ) },
-						positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
-						maxRotationVelocity: 0.02,
-						rotationVelocityIncrement: 0.01,
-						// stabilizeRotation: true,
-						debug: true
-					},
-					init: ( child , parent ) => {
-						child.pivot.x = child.sprite.width / 2;
-
-						child.currentPosition.x = parent.sprite.width / 2;
-						child.basePosition.x = child.currentPosition.x;
-					}
-				}
-			]
-		}
-	]
+			}
+		]
+	};
 };
 
-},{"./util.js":697}],695:[function(require,module,exports){
+},{"./util.js":698}],696:[function(require,module,exports){
 'use strict'
 const PIXI = require( 'pixi.js' );
 const Sprite = PIXI.Sprite;
@@ -92126,7 +92192,7 @@ module.exports = {
 	}
 }
 
-},{"./util.js":697,"mathjs":17,"pixi.js":652}],696:[function(require,module,exports){
+},{"./util.js":698,"mathjs":17,"pixi.js":652}],697:[function(require,module,exports){
 'use strict'
 
 const Util = require( './util.js' );
@@ -92280,7 +92346,7 @@ module.exports = function() {
 	setupInput();
 }
 
-},{"./util.js":697}],697:[function(require,module,exports){
+},{"./util.js":698}],698:[function(require,module,exports){
 'use strict'
 
 module.exports = {
@@ -92295,12 +92361,12 @@ module.exports = {
 	 */
 	TrinaryState: Object.freeze( { 
 		POSITIVE: 1,
-		EQUAL: 0,
+		NEUTRAL: 0,
 		NEGATIVE: -1
 	} )
 }
 
-},{}],698:[function(require,module,exports){
+},{}],699:[function(require,module,exports){
 module.exports = function( uniforms ) {
 	return {
 		init() {
@@ -92447,32 +92513,38 @@ module.exports = function( uniforms ) {
 	}
 }
 
-},{}],699:[function(require,module,exports){
+},{}],700:[function(require,module,exports){
 'use strict'
 
-const Config = require( './inc/config.js' );
 const Util = require( './inc/util.js' );
 const SteeringKeyboard = require( './inc/steering-keyboard.js' );
 const GameModels = require( './inc/game-models.js' );
 const WaterManager = require( './inc/water-manager.js' );
+const AnimatedTilingSprite = require( './inc/animated-tiling-sprite.js' );
 
 window.math = require( 'mathjs' );
 const PIXI = require( 'pixi.js' ),
-	TextureCache = PIXI.utils.TextureCache,
 	Sprite = PIXI.Sprite,
 	loader = PIXI.loader,
 	view = document.getElementById('view'),
 	viewWidth = 1000,
 	viewHeight = 800,
 	scale = window.devicePixelRatio,
-	app = new PIXI.Application( viewWidth, viewHeight, { view: view, backgroundColor : 0x000000 } );
-	// app = new PIXI.Application( viewWidth * scale, viewHeight * scale, { view: view, backgroundColor : 0x000000 } );
+	app = new PIXI.Application( viewWidth, viewHeight, { view: view, backgroundColor : 0x000000, resolution: scale } );
 
+const Config = require( './inc/config.js' )( PIXI, app );
+
+window.app = app;
 view.style.width = viewWidth + 'px';
 view.style.height = viewHeight + 'px';
 
 loader
 	.add( "assets/spritesheets/ships.json" )
+	.add( 'water-00', 'assets/images/water-00.png' )
+	.add( 'water-01', 'assets/images/water-01.png' )
+	.add( 'water-02', 'assets/images/water-02.png' )
+	.add( 'water-03', 'assets/images/water-03.png' )
+	.add( 'water-04', 'assets/images/water-04.png' )
 	.load( setup );
 
 window.gameModels = [];
@@ -92483,26 +92555,27 @@ window.current = {
 
 window.friction = 0.98;
 
-var oceanFloor = PIXI.extras.TilingSprite.fromImage(
-	// "assets/images/tile-1px-black.png",
-	"assets/images/sand.png",
-	viewWidth,
-	viewHeight
-);
-oceanFloor.x = viewWidth / 2;
-oceanFloor.y = viewHeight / 2;
-oceanFloor.anchor.set( 0.5 );
-app.stage.addChild( oceanFloor );
-
 let waterManager = WaterManager( {
 	uResolution: { type: 'v2', value: [ viewWidth, viewHeight ] },
 } ).init();
 
-oceanFloor.filters = [ waterManager.shader.shader ];
+var oceanFloor;
 
 function setup() {
 	var id = PIXI.loader.resources[ Config.spriteSheetPath + "ships.json" ].textures;
 	gameModels = loadGameModels();
+	oceanFloor = AnimatedTilingSprite(
+		[
+			PIXI.loader.resources[ 'water-00' ].texture,
+			PIXI.loader.resources[ 'water-01' ].texture,
+			PIXI.loader.resources[ 'water-02' ].texture,
+			PIXI.loader.resources[ 'water-03' ].texture,
+			PIXI.loader.resources[ 'water-04' ].texture
+		],
+		viewWidth,
+		viewHeight
+	);
+	app.stage.addChild( oceanFloor );
 	for ( let i = 0, l = gameModels.length; i < l; i++ ) {
 		app.stage.addChild( gameModels[ i ].base.sprite );
 	}
@@ -92510,12 +92583,13 @@ function setup() {
 	turtle.sprite.width *= .5;
 	turtle.sprite.height *= .5;
 	SteeringKeyboard();
+
 	app.ticker.add( animate );
 }
 
 function animate( delta ) {
 	waterManager.update( delta );
-
+	oceanFloor.update( delta );
 	for ( let i = 0, l = gameModels.length; i < l; i++ ) {
 		gameModels[ i ].base.update( delta, {
 			velocities: [ {
@@ -92524,6 +92598,30 @@ function animate( delta ) {
 			} ],
 			frictions: [ window.friction ]
 		} );
+	}
+// console.log( turtle.currentPosition );
+	if ( turtle.sprite.getBounds().x < 0 ) {
+		// console.log( 'left' );
+		turtle.currentPosition.x = Math.ceil( turtle.sprite.getBounds().width / 2 ) + 5;
+		turtle.forwardVelocity = 0;
+	}
+	
+	if ( turtle.sprite.getBounds().x + turtle.sprite.getBounds().width > app.view.offsetWidth ) {
+		// console.log( 'right' );
+		turtle.currentPosition.x = app.view.offsetWidth - ( Math.ceil( turtle.sprite.getBounds().width / 2 ) + 5 );
+		turtle.forwardVelocity = 0;
+	}
+	
+	if ( turtle.sprite.getBounds().y < 0 ) {
+		// console.log( 'top' );
+		turtle.currentPosition.y = Math.ceil( turtle.sprite.getBounds().height / 2 ) + 5;
+		turtle.forwardVelocity = 0;
+	}
+
+	if ( turtle.sprite.getBounds().y + turtle.sprite.getBounds().height > app.view.offsetHeight ) {
+		// console.log( 'bottom' );
+		turtle.currentPosition.y = app.view.offsetHeight - ( Math.ceil( turtle.sprite.getBounds().height / 2 ) + 5 );
+		turtle.forwardVelocity = 0;
 	}
 }
 
@@ -92552,4 +92650,14 @@ function loadGameModel( model ) {
 	return { base: base }
 }
 
-},{"./inc/config.js":694,"./inc/game-models.js":695,"./inc/steering-keyboard.js":696,"./inc/util.js":697,"./inc/water-manager.js":698,"mathjs":17,"pixi.js":652}]},{},[699]);
+function setupCoords() {
+	const xValue = document.createElement( 'input' );
+	const yValue = document.createElement( 'input' );
+
+	xValue.type = 'number';
+	xValue.type = 'number';
+	yValue.disabled = true;
+	yValue.disabled = true;
+}
+
+},{"./inc/animated-tiling-sprite.js":694,"./inc/config.js":695,"./inc/game-models.js":696,"./inc/steering-keyboard.js":697,"./inc/util.js":698,"./inc/water-manager.js":699,"mathjs":17,"pixi.js":652}]},{},[700]);

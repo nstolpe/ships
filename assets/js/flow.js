@@ -91656,658 +91656,84 @@ module.exports = E;
 
 },{}],694:[function(require,module,exports){
 'use strict'
-const Util = require( './util.js' );
 
-module.exports = function( PIXI, app ) {
-
-	return {
-		spriteSheetPath: 'assets/spritesheets/',
-		gameModels: [
-			{
-				name: 'turtle',
-				spriteSheet: 'ships.json',
-				options: {
-					currentPosition: { x: 200, y: 300 },
-					// rotationConstraints: { pos: Infinity, neg: Infinity },
-					// positionConstraints: { pos: { x: Infinity, y: Infinity }, neg: { x: Infinity, y: Infinity } },
-					maxForwardVelocity: 4,
-					forwardVelocityIncrement: .05,
-					// debug: true,
-					postUpdates: [
-						function( delta ) {
-							if ( this.debug ) {
-								let bounds = this.sprite.getBounds();
-
-								if ( this.graphics ) {
-									this.graphics.clear();
-								} else {
-									this.graphics = new PIXI.Graphics();
-								}
-
-								this.graphics.lineStyle( 1, 0xff0000, 1 );
-								this.graphics.moveTo( bounds.x, bounds.y );
-								this.graphics.lineTo( bounds.x, bounds.y + bounds.height );
-								this.graphics.lineTo( bounds.x + bounds.width, bounds.y + bounds.height );
-								this.graphics.lineTo( bounds.x + bounds.width, bounds.y  );
-								this.graphics.lineTo( bounds.x, bounds.y );
-								app.stage.addChild( this.graphics );
-								// graphics.endFill();
-							} else {
-								let graphicsChild = app.stage.children.find( ( child ) => child === this.graphics );
-
-								if ( graphicsChild )
-									app.stage.removeChild( graphicsChild );
-							}
-							// console.log( this.children[ 'rudder' ].currentRotation );
-							// console.log( this.rotationVelocity );
-							// this.children[ 'rudder' ].currentRotation = -this.currentRotation;
-							// this.children[ 'rudder' ].rotationVelocity = -this.rotationVelocity;
-						}
-					]
-				},
-
-				init: ( base ) => {
-					base.pivot.x = base.sprite.width / 2;
-					base.pivot.y = base.sprite.height / 2;
-					base.children.rudder.currentPosition.x = base.sprite.width / 2;
-					base.children.rudder.basePosition.x = base.sprite.width / 2;
-				},
-				children: [
-					// left cannons
-					{
-						name: 'cannon-left-mid',
-						id: 'turtle-cannon-large.png',
-						options: {
-							basePosition: { x: 0, y: 60 },
-							baseRotation: Util.toRadians( 180 ),
-							rotationConstraints: { pos: Util.toRadians( 16 ), neg: Util.toRadians( 16 ) },
-							positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
-							maxRotationVelocity: 0.04,
-							rotationVelocityIncrement: 0.004,
-						},
-						init: ( child , parent ) => {
-							child.pivot.y = child.sprite.height / 2;
-							child.basePosition.x = child.sprite.width;
-							child.currentPosition.x = child.sprite.width;
-						}
-					},
-					{
-						name: 'cannon-left-bow',
-						id: 'turtle-cannon-small.png',
-						options: {
-							basePosition: { x: 41, y: 27 },
-							baseRotation: Util.toRadians( -157 ),
-							rotationConstraints: { pos: Util.toRadians( 16 ), neg: Util.toRadians( 16 ) },
-							positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
-							maxRotationVelocity: 0.04,
-							rotationVelocityIncrement: 0.004
-						},
-						init: ( child , parent ) => {
-							child.pivot.y = child.sprite.height / 2;
-						} 
-					},
-					{
-						name: 'cannon-left-aft',
-						id: 'turtle-cannon-small.png',
-						options: {
-							basePosition: { x: 41, y: 93 },
-							baseRotation: Util.toRadians( 157 ),
-							rotationConstraints: { pos: Util.toRadians( 16 ), neg: Util.toRadians( 16 ) },
-							positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
-							maxRotationVelocity: 0.04,
-							rotationVelocityIncrement: 0.004
-						},
-						init: ( child , parent ) => {
-							child.pivot.y = child.sprite.height / 2;
-						} 
-					},
-					// right cannons
-					{
-						name: 'cannon-right-mid',
-						id: 'turtle-cannon-large.png',
-						options: {
-							basePosition: { x: 79, y: 60 },
-							rotationConstraints: { pos: Util.toRadians( 16 ), neg: Util.toRadians( 16 ) },
-							positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
-							maxRotationVelocity: 0.04,
-							rotationVelocityIncrement: 0.004
-						},
-						init: ( child , parent ) => {
-							child.pivot.y = child.sprite.height / 2;
-							// child.basePosition.x = child.sprite.width;
-							// child.currentPosition.x = child.sprite.width;
-						} 
-					},
-					{
-						name: 'cannon-right-bow',
-						id: 'turtle-cannon-small.png',
-						options: {
-							basePosition: { x: 75, y: 27 },
-							baseRotation: Util.toRadians( -23 ),
-							rotationConstraints: { pos: Util.toRadians( 16 ), neg: Util.toRadians( 16 ) },
-							positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
-							maxRotationVelocity: 0.04,
-							rotationVelocityIncrement: 0.004
-						},
-						init: ( child , parent ) => {
-							child.pivot.y = child.sprite.height / 2;
-						} 
-					},
-					{
-						name: 'cannon-right-aft',
-						id: 'turtle-cannon-small.png',
-						options: {
-							basePosition: { x: 75, y: 93 },
-							baseRotation: Util.toRadians( 23 ),
-							rotationConstraints: { pos: Util.toRadians( 16 ), neg: Util.toRadians( 16 ) },
-							positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
-							maxRotationVelocity: 0.04,
-							rotationVelocityIncrement: 0.004
-						},
-						init: ( child , parent ) => {
-							child.pivot.y = child.sprite.height / 2;
-						} 
-					},
-					{
-						name: 'body',
-						id: 'turtle-body.png',
-						options: {
-							basePosition: { x: 15, y: 0 },
-							rotationConstraints: { pos: 0, neg: 0 },
-							positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } }
-						},
-						init: ( child, parent) => {
-							// child.pivot.x = parent.width / 2;
-						}
-					},
-					{
-						name: 'rudder',
-						id: 'turtle-rudder.png',
-						options: {
-							basePosition: { x: 46.23439168930054, y: 110 },
-							// rotationConstraints: { pos: Util.toRadians( 20 ), neg: Util.toRadians( 20 ) },
-							positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
-							maxRotationVelocity: 0.02,
-							rotationVelocityIncrement: 0.01,
-							// stabilizeRotation: true,
-							debug: true
-						},
-						init: ( child , parent ) => {
-							child.pivot.x = child.sprite.width / 2;
-
-							child.currentPosition.x = parent.sprite.width / 2;
-							child.basePosition.x = child.currentPosition.x;
-						}
-					}
-				]
-			}
-		]
-	};
-};
-
-},{"./util.js":697}],695:[function(require,module,exports){
-'use strict'
-const PIXI = require( 'pixi.js' );
-const Sprite = PIXI.Sprite;
-const Container = PIXI.Container;
-const Util = require( './util.js' );
+const Util = require( './inc/util.js' );
+const WaterFilter = require( './inc/water-filter.js' );
 const math = require( 'mathjs' );
+const PIXI = require( 'pixi.js' );
+const view = document.getElementById('view');
+const viewWidth = 1000;
+const viewHeight = 800;
+const scale = window.devicePixelRatio;
+const app = new PIXI.Application( viewWidth, viewHeight, { view: view, backgroundColor : 0x555555, resolution: window.devicePixelRatio >= 2 ? 2 : 1 } );
 
-module.exports = {
-	/**
-	 * Factory for TransformableRenderables. See documentation for Renderable and Transformable
-	 *
-	 * @param Object options  See Renderable and Transformable
-	 */
-	TransformableRenderable( options ) {
-		if ( !options || !options.sprite ) throw new Error( 'No Sprite provided to renderable' );
-		const transformable = this.Transformable( options );
-		const renderable = this.Renderable( options );
-		let o = {
-			updateTransform: transformable.update,
-			update( delta, influencers ) {
-				this.sprite.pivot.set( this.pivot.x, this.pivot.y );
-				this.updateTransform( delta, influencers );
-				this.sprite.position.set( this.currentPosition.x, this.currentPosition.y );
-				this.sprite.rotation = this.currentRotation;
-			}
-		}
-		return Object.assign( {}, transformable, renderable, o );
-	},
-	/**
-	 * Factory for TransformableGroups. See documentation for Group and Transformable
-	 *
-	 * @param Object options  See Group and Transformable
-	 */
-	TransformableGroup( options ) {
-		const transformable = this.Transformable( options );
-		const group = this.Group( options );
-
-		let o = {
-			updateTransform: transformable.update,
-			update( delta, influencers ) {
-				this.sprite.pivot.set( this.pivot.x, this.pivot.y );
-				this.updateTransform( delta, influencers );
-				this.sprite.position.set( this.currentPosition.x, this.currentPosition.y );
-				this.sprite.rotation = this.currentRotation;
-				for ( let key in this.children )
-					// @TODO only the main object gets influencers, at least for now
-					// allow influencers to pass through. Some should cascade, like gravity on
-					//       arms or something. Adding a bounce option for that would be good too.
-					this.children[ key ].update( delta, {} );
-			}
-		}
-		return Object.assign( {}, transformable, group, o );
-	},
-	/**
-	 * Factory for renderables (options has a Sprite)
-	 *
-	 * @param Object options
-	 *
-	 * @param Object options.pivot     The pivot that will be assigned to the `Sprite` on each update.
-	 * @param number options.pivot.x   The x coordinate of pivot
-	 * @param number options.pivot.y   The y coordinate of pivot
-	 *
-	 * @param Object options.anchor    The anchor that will be assigned to the `Sprite` on each update.
-	 * @param number options.anchor.x  The x coordinate of pivot
-	 * @param number options.anchor.y  The y coordinate of pivot
-	 */
-	Renderable( options, o = {} ) {
-		if ( !options || !options.sprite ) throw new Error( 'No Sprite provided to renderable' );
-
-		return Object.assign( this.Group( options ), {
-			anchor: options.anchor || { x: options.sprite.anchor.x, y: options.sprite.anchor.y }
-		} );
-	},
-	/**
-	 * Factory for groups (options has a Container)
-	 *
-	 * @param Object options
-	 * @param Object options.pivot     The pivot that will be assigned to the `Sprite` on each update.
-	 * @param number options.pivot.x   The x coordinate of pivot
-	 * @param number options.pivot.y   The y coordinate of pivot
-	 */
-	Group( options, o = {} ) {
-		let sprite = options.sprite || new Container();
-
-		return Object.assign( o, {
-			parent: null,
-			children: Object.create( null ),
-			addChild( key, child, init ) {
-				this.children[ key ] = child;
-				this.sprite.addChild( child.sprite );
-				child.parent = this;
-				if ( typeof init === 'function' ) init( child, this );
-			},
-			sprite: sprite,
-			pivot: options.pivot || { x: sprite.pivot.x, y: sprite.pivot.y }
-		} );
-	},
-	/**
-	 * Factory for transformables
-	 * 
-	 * @param Object options
-	 *
-	 * @param number options.baseRotation  The rotation that will be considered 'zeroed' for the `transformable`
-	 *
-	 * @param Object options.basePosition    The position that will be considered 'zeroed' for the `transformable`
-	 * @param number options.basePosition.x  The position's x coordinate
-	 * @param number options.basePosition.y  The position's y coordinate
-	 *
-	 * @param number options.maxForwardVelocity        The maximum scalar velocity the transformable can move. Converted to x/y when used.
-	 * @param number options.forwardVelocityIncrement  The rate at which forwardVelocity will increment or decrement.
-	 * @param number options.maxRotationVelocity        The maximum velocity the transformable can rotate at.
-	 * @param number options.rotationVelocityIncrement  The rate at which rotationVelocity will increment or decrement.
-	 */
-	Transformable( options, o = {} ) {
-		return Object.assign( o, {
-			name: options.name || '',
-			// "zeroed" settings
-			baseRotation: options.baseRotation || 0,
-			basePosition: options.basePosition || { x: 0, y: 0 },
-			// current settings, updated each render
-			currentRotation: options.currentRotation || options.baseRotation || 0,
-			// currentPosition: options.currentPosition || options.basePosition || { x: 0, y: 0 },
-			currentPosition: options.currentPosition ? options.currentPosition : options.basePosition ? Object.assign( {}, options.basePosition ) : { x: 0, y: 0 },
-			rotationConstraints: options.rotationConstraints || { pos: Infinity, neg: Infinity },
-			positionConstraints: options.positionConstraints || { pos: { x: Infinity, y: Infinity }, neg: { x: Infinity, y: Infinity } },
-			// position velocity/acceleration settings
-			forwardVelocity: 0,
-			maxForwardVelocity: options.maxForwardVelocity || 2,
-			forwardVelocityIncrement: options.forwardVelocityIncrement || .01,
-			positionAcceleration: Util.TrinaryState.NEUTRAL,
-			// rotation velocity/acceleration settings
-			rotationVelocity: 0,
-			maxRotationVelocity: options.maxRotationVelocity || 0.02,
-			rotationVelocityIncrement: options.rotationVelocityIncrement || 0.001,
-			rotationAcceleration: Util.TrinaryState.NEUTRAL,
-			postUpdates: options.postUpdates || [],
-			stabilizeRotation: options.stabilizeRotation || false,
-			stabilizePosition: options.stabilizePosition || false,
-			targetRotation: options.startRotation || options.baseRotation || 0,
-			targetPosition: options.startPosition || options.basePosition || 0,
-			// activePositionAcceleration: TrinaryState.NEUTRAL,
-			// activeRotationAcceleration: TrinaryState.NEUTRAL,
-			debug: options.debug || false,
-			/**
-			 * Calculates a new velocity based on a delta, a rate of acceleration, a current velocity, an increment multiplier and a velocity limit. 
-			 *
-			 * @param delta         Delta time from last frame or other increment
-			 * @param acceleration  Value of TrinaryState.NEGAVITE, TrinaryState.POSITIVE or TrinaryState.NEUTRAL
-			 * @param velocity      Current velocity
-			 * @param increment     Increment multiplier. Multiplied by delta, then added or subtracted to velocity.
-			 * @param limit         The velocity limit. Controls above and below 0
-			 *
-			 * @TODO make limit take and upper and lower limit. { u: 0.02, l: 0.03 }
-			 */
-			calculateVelocity( delta, acceleration, velocity, increment, limit ) {
-				let calculated = velocity;
-
-				switch ( acceleration ) {
-					case Util.TrinaryState.NEGATIVE:
-						calculated = Math.max( velocity - ( delta * increment ), -limit );
-						break;
-					case Util.TrinaryState.POSITIVE:
-						calculated = Math.min( velocity + ( delta * increment ), limit );
-						break;
-					case Util.TrinaryState.NEUTRAL:
-					default:
-						// if ( velocity > 0 ) {
-						// 	calculated = Math.max( velocity - ( delta * increment ), 0 );
-						// } else if ( velocity < 0 ) {
-						// 	calculated = Math.min( velocity + ( delta * increment ), 0 );
-						// }
-						// calculated = Math.max( Math.abs( velocity ) - ( delta * increment ), 0 ) * Math.sign( velocity );
-				}
-				return calculated;
-			},
-			stabilizing() {
-				return this.stabilizeRotation && this.rotationAcceleration === Util.TrinaryState.NEUTRAL;
-			},
-			// setRotation
-			update( delta, influencers ) {
-				// if the Transformable will rotate back to its baseRotation and no rotationAcceleration is being applied
-				if ( this.stabilizing() ) {
-					// set rotation velocity
-					if ( this.debug  && this.currentRotation !== 0 ) {
-						// console.log(Math.sign( this.currentRotation - this.baseRotation ))
-						// console.log(this.currentRotation)
-					}
-
-					// don't pass baseRotation 
-					if ( this.currentRotation > this.baseRotation && this.rotationVelocity > 0 ) {
-						this.rotationVelocity = 0;
-					}
-					if ( this.currentRotation < this.baseRotation && this.rotationVelocity < 0 ) {
-						this.rotationVelocity = 0;
-					}
-
-					// set rotation velocity
-					this.rotationVelocity = this.calculateVelocity(
-						delta,
-						Math.sign( this.baseRotation - this.currentRotation ),
-						this.rotationVelocity,
-						this.rotationVelocityIncrement,
-						this.maxRotationVelocity
-					);
-
-					let targetRotation = this.normalizeAngle( this.currentRotation + this.rotationVelocity * delta );
-
-					if ( this.currentRotation > this.baseRotation )
-						this.currentRotation = Math.max( this.currentRotation + this.rotationVelocity * delta, this.baseRotation );
-					if ( this.currentRotation < this.baseRotation )
-						this.currentRotation = Math.min( this.currentRotation + this.rotationVelocity * delta, this.baseRotation );
-				// if the transformable is not stabilizing (returning to a base rotation when in neutral acceleration).
-				// positive acceleration, negative acceleration, and deceleration
-				} else {
-					// set rotation velocity
-					this.rotationVelocity = this.calculateVelocity(
-							delta,
-							this.rotationAcceleration,
-							this.rotationVelocity,
-							this.rotationVelocityIncrement,
-							this.maxRotationVelocity
-						);
-
-					if ( influencers && influencers.frictions ) {
-						for ( let i = 0, l = influencers.frictions.length; i < l; i++ ) {
-							this.rotationVelocity *= influencers.frictions[ i ];
-						}
-					}
-
-					this.currentRotation = this.normalizeAngle( this.currentRotation + this.rotationVelocity * delta );
-
-					// check constraints, @TODO break this out too
-					if ( this.currentRotation > this.baseRotation + this.rotationConstraints.pos )
-						this.currentRotation = this.baseRotation + this.rotationConstraints.pos;
-
-					if ( this.currentRotation < this.baseRotation - this.rotationConstraints.neg )
-						this.currentRotation = this.baseRotation - this.rotationConstraints.neg;
-				}
-
-				this.updateForwardVelocity( delta );
-
-				if ( influencers && influencers.frictions ) {
-					for ( let i = 0, l = influencers.frictions.length; i < l; i++ ) {
-						this.forwardVelocity *= influencers.frictions[ i ];
-					}
-				}
-				// convert scalar velocity to x/y velocities
-				// @TODO break this out
-				let vx = this.forwardVelocity * Math.sin( this.currentRotation ),
-					vy = -this.forwardVelocity * Math.cos( this.currentRotation );
-
-				// apply outside influencers (current) to velocity
-				if ( influencers && influencers.velocities ) {
-					for ( let i = 0, l = influencers.velocities.length; i < l; i++ ) {
-						let e = influencers.velocities[ i ];
-						vx += e.x;
-						vy += e.y;
-					}
-				}
-
-				this.currentPosition.x += vx * delta;
-				this.currentPosition.y += vy * delta;
-
-
-				if ( this.currentPosition.x > this.basePosition.x + this.positionConstraints.pos.x )
-					this.currentPosition.x = this.basePosition.x + this.positionConstraints.pos.x;
-
-				if ( this.currentPosition.y > this.basePosition.y + this.positionConstraints.pos.y )
-					this.currentPosition.y = this.basePosition.y + this.positionConstraints.pos.y;
-
-				if ( this.currentPosition.x < this.basePosition.x - this.positionConstraints.neg.x )
-					this.currentPosition.x = this.basePosition.x - this.positionConstraints.neg.x;
-
-				if ( this.currentPosition.y < this.basePosition.y - this.positionConstraints.neg.y )
-					this.currentPosition.y = this.basePosition.y - this.positionConstraints.neg.y;
-
-				for ( let i = 0, l = this.postUpdates.length; i < l; i++ )
-					this.postUpdates[ i ].call( this, delta );
-			},
-			updateForwardVelocity( delta ) {
-				this.forwardVelocity = this.calculateVelocity(
-						delta,
-						this.positionAcceleration,
-						this.forwardVelocity,
-						this.forwardVelocityIncrement,
-						this.maxForwardVelocity
-					);
-			},
-			/**
-			 * Normalizes a radian angle to keep it between -2PI and 2PI
-			 *
-			 * @param number angle  The angle that may need normalization. 
-			 */
-			normalizeAngle( angle ) {
-				const limit = 2 * Math.PI;
-				let normalized = angle;
-				if ( angle >= limit )
-					normalized -= limit * Math.floor( normalized / limit );
-				else if ( angle <= -limit )
-					normalized += limit * Math.floor( normalized / -limit );
-
-				return normalized;
-			}
-		} );
-	}
-}
-
-},{"./util.js":697,"mathjs":17,"pixi.js":652}],696:[function(require,module,exports){
-'use strict'
-
-const Util = require( './util.js' );
-
-function keyboard( which ) {
-	var key = {};
-	key.which = which;
-	key.isDown = false;
-	key.isUp = true;
-	key.press = undefined;
-	key.release = undefined;
+function setup() {
+	app.ticker.add( animate );
+	let flowMap = new PIXI.Sprite( PIXI.loader.resources[ 'flow-map' ].texture );
+	let flowNoiseMap = new PIXI.Sprite( PIXI.loader.resources[ 'flow-noise' ].texture );
+	let flowNormal = new PIXI.Sprite( PIXI.loader.resources[ 'flow-normal0' ].texture );
+	let flowNornal1 = new PIXI.Sprite( PIXI.loader.resources[ 'flow-normal1' ].texture );
 	
-	//The `downHandler`
-	key.downHandler = function( event ) {
-		if ( event.which === key.which ) {
-			if ( key.isUp && key.press ) key.press();
-			key.isDown = true;
-			key.isUp = false;
-		}
-		event.preventDefault();
-	};
+	let floor = PIXI.extras.TilingSprite.fromImage(
+		'water-00',
+		viewWidth,
+		viewHeight
+	);
 
-	//The `upHandler`
-	key.upHandler = function( event ) {
-		if ( event.which === key.which ) {
-			if ( key.isDown && key.release ) key.release();
-			key.isDown = false;
-			key.isUp = true;
-		}
-		event.preventDefault();
-	};
+	floor.x = viewWidth / 2;
+	floor.y = viewHeight / 2;
+	floor.anchor.set( 0.5 );
+	floor.filters = [ WaterFilter() ];
 
-	//Attach event listeners
-	window.addEventListener( "keydown", key.downHandler.bind( key ), false );
-	window.addEventListener( "keyup", key.upHandler.bind( key ), false );
-	return key;
+	floor.textures = [ 
+		PIXI.loader.resources[ 'water-00' ].texture,
+		PIXI.loader.resources[ 'water-01' ].texture,
+		PIXI.loader.resources[ 'water-02' ].texture,
+		PIXI.loader.resources[ 'water-03' ].texture,
+		PIXI.loader.resources[ 'water-04' ].texture
+	];
+
+	let o = 0;
+	let t = 10;
+	let i = 0;
+	let l = floor.textures.length;
+
+	floor.update = function( delta ) {
+		if ( o === t - 1 ) {
+			floor._texture = floor.textures[ i ];
+			i = ( i + 1 ) % l;
+		}
+		o = ( o + 1 ) % t;
+	}
+
+	app.ticker.add( floor.update );
+
+	app.stage.addChild( floor );
+
+	window.floor = floor;
 }
 
-function setupInput() {
-	let W = keyboard( 87 ),
-		A = keyboard( 65 ),
-		S = keyboard( 83 ),
-		D = keyboard( 68 ),
-		H = keyboard( 72 ),
-		J = keyboard( 74 ),
-		K = keyboard( 75 ),
-		L = keyboard( 76 );
-
-	W.press = () => {
-		turtle.positionAcceleration = Util.TrinaryState.POSITIVE;
-		turtle.activePositionAcceleration = true;
-	}
-	W.release = () => {
-		if ( S.isDown ) {
-			turtle.positionAcceleration = Util.TrinaryState.NEGATIVE;
-		} else {
-			turtle.positionAcceleration = Util.TrinaryState.NEUTRAL;
-			turtle.activePositionAcceleration = false;
-		}
-	}
-
-	S.press = () => {
-		turtle.positionAcceleration = Util.TrinaryState.NEGATIVE;
-		turtle.activePositionAcceleration = true;
-	}
-	S.release = () => {
-		if ( W.isDown ) {
-			turtle.positionAcceleration = Util.TrinaryState.POSITIVE;
-		} else {
-			turtle.positionAcceleration = Util.TrinaryState.NEUTRAL;
-			turtle.activePositionAcceleration = false;
-		}
-	}
-
-	A.press = () => {
-		turtle.rotationAcceleration = Util.TrinaryState.NEGATIVE;
-	}
-	A.release = () => {
-		if ( D.isDown ) {
-			turtle.rotationAcceleration = Util.TrinaryState.POSITIVE;
-		} else {
-			turtle.rotationAcceleration = Util.TrinaryState.NEUTRAL;
-		}
-	}
-
-	D.press = () => {
-		turtle.rotationAcceleration = Util.TrinaryState.POSITIVE;
-	}
-	D.release = () => {
-		if ( A.isDown ) {
-			turtle.rotationAcceleration = Util.TrinaryState.NEGATIVE;
-		} else {
-			turtle.rotationAcceleration = Util.TrinaryState.NEUTRAL;
-		}
-	}
-
-	H.press = () => {
-		turtle.children[ 'cannon-left-mid' ].rotationAcceleration = Util.TrinaryState.POSITIVE;
-		turtle.children[ 'cannon-left-bow' ].rotationAcceleration = Util.TrinaryState.POSITIVE;
-		turtle.children[ 'cannon-left-aft' ].rotationAcceleration = Util.TrinaryState.POSITIVE;
-	}
-	H.release = () => {
-		if ( !J.isDown ) {
-			turtle.children[ 'cannon-left-mid' ].rotationAcceleration = Util.TrinaryState.NEUTRAL;
-			turtle.children[ 'cannon-left-bow' ].rotationAcceleration = Util.TrinaryState.NEUTRAL;
-			turtle.children[ 'cannon-left-aft' ].rotationAcceleration = Util.TrinaryState.NEUTRAL;
-		}
-	}
-
-	J.press = () => {
-		turtle.children[ 'cannon-left-mid' ].rotationAcceleration = Util.TrinaryState.NEGATIVE;
-		turtle.children[ 'cannon-left-bow' ].rotationAcceleration = Util.TrinaryState.NEGATIVE;
-		turtle.children[ 'cannon-left-aft' ].rotationAcceleration = Util.TrinaryState.NEGATIVE;
-	}
-	J.release = () => {
-		if ( !H.isDown ) {
-			turtle.children[ 'cannon-left-mid' ].rotationAcceleration = Util.TrinaryState.NEUTRAL;
-			turtle.children[ 'cannon-left-bow' ].rotationAcceleration = Util.TrinaryState.NEUTRAL;
-			turtle.children[ 'cannon-left-aft' ].rotationAcceleration = Util.TrinaryState.NEUTRAL;
-		}
-	}
-
-	K.press = () => {
-		turtle.children[ 'cannon-right-mid' ].rotationAcceleration = Util.TrinaryState.POSITIVE;
-		turtle.children[ 'cannon-right-bow' ].rotationAcceleration = Util.TrinaryState.POSITIVE;
-		turtle.children[ 'cannon-right-aft' ].rotationAcceleration = Util.TrinaryState.POSITIVE;
-	}
-	K.release = () => {
-		if ( !L.isDown ) {
-			turtle.children[ 'cannon-right-mid' ].rotationAcceleration = Util.TrinaryState.NEUTRAL;
-			turtle.children[ 'cannon-right-bow' ].rotationAcceleration = Util.TrinaryState.NEUTRAL;
-			turtle.children[ 'cannon-right-aft' ].rotationAcceleration = Util.TrinaryState.NEUTRAL;
-		}
-	}
-
-	L.press = () => {
-		turtle.children[ 'cannon-right-mid' ].rotationAcceleration = Util.TrinaryState.NEGATIVE;
-		turtle.children[ 'cannon-right-bow' ].rotationAcceleration = Util.TrinaryState.NEGATIVE;
-		turtle.children[ 'cannon-right-aft' ].rotationAcceleration = Util.TrinaryState.NEGATIVE;
-	}
-	L.release = () => {
-		if ( !K.isDown ) {
-			turtle.children[ 'cannon-right-mid' ].rotationAcceleration = Util.TrinaryState.NEUTRAL;
-			turtle.children[ 'cannon-right-bow' ].rotationAcceleration = Util.TrinaryState.NEUTRAL;
-			turtle.children[ 'cannon-right-aft' ].rotationAcceleration = Util.TrinaryState.NEUTRAL;
-		}
-	}
+function animate( delta ) {
+	// console.log( 'animating' );
+	// floor.tilePosition.x += 4 * .01 / delta;
+	// floor.tilePosition.y += 13 * .01 / delta;
 }
 
-module.exports = function() {
-	setupInput();
-}
+PIXI.loader
+	.add( 'ships', 'assets/spritesheets/ships.json' )
+	.add( 'flow-map', 'assets/images/flow/flow.jpg' )
+	.add( 'flow-noise', 'assets/images/flow/noise.jpg' )
+	.add( 'flow-normal0', 'assets/images/flow/normal0.jpg' )
+	.add( 'flow-normal1', 'assets/images/flow/normal1.jpg' )
+	.add( 'floor', 'assets/images/boxes-blue-red.png' )
+	.add( 'water-00', 'assets/images/water-00.png' )
+	.add( 'water-01', 'assets/images/water-01.png' )
+	.add( 'water-02', 'assets/images/water-02.png' )
+	.add( 'water-03', 'assets/images/water-03.png' )
+	.add( 'water-04', 'assets/images/water-04.png' )
+	.load( setup );
 
-},{"./util.js":697}],697:[function(require,module,exports){
+},{"./inc/util.js":695,"./inc/water-filter.js":696,"mathjs":17,"pixi.js":652}],695:[function(require,module,exports){
 'use strict'
 
 module.exports = {
@@ -92327,156 +91753,63 @@ module.exports = {
 	} )
 }
 
-},{}],698:[function(require,module,exports){
+},{}],696:[function(require,module,exports){
 'use strict'
 
-const Config = require( './inc/config.js' );
-const Util = require( './inc/util.js' );
-const GameModels = require( './inc/game-models.js' );
-const SteeringKeyboard = require( './inc/steering-keyboard.js' );
+const PIXI = require( 'pixi.js' );
 
-window.math = require( 'mathjs' );
-const PIXI = require( 'pixi.js' ),
-	TextureCache = PIXI.utils.TextureCache,
-	Sprite = PIXI.Sprite,
-	loader = PIXI.loader,
-	view = document.getElementById('view'),
-	viewWidth = 1000,
-	viewHeight = 800,
-	scale = window.devicePixelRatio,
-	// app = new PIXI.Application( viewWidth, viewHeight, { view: view, backgroundColor : 0x000000 } );
-	app = new PIXI.Application( viewWidth * scale, viewHeight * scale, { view: view, backgroundColor : 0x000000 } );
+const ShaderSource = {
+	vertex() {
+		return [
+			'//precision highp float;',
+			'attribute vec2 aVertexPosition;',
+			'attribute vec2 aTextureCoord;',
+			'uniform mat3   projectionMatrix;',
+			// 'uniform mat3   filterMatrix;',
+			'varying vec2   vTextureCoord;',
+			// 'varying vec2   vFilterCoord;',
 
-window.app = app;
-window.PIXI = PIXI;
-
-app.stage.interactive = true;
-app.stage.on( 'mousemove', (e) => {
-	console.log( `x: ${ e.data.global.x }, y: ${ e.data.global.y }` );
-} );
-
-view.style.width = viewWidth + 'px';
-view.style.height = viewHeight + 'px';
-
-loader
-	.add( "assets/spritesheets/ships.json" )
-	.load( setup );
-
-window.gameModels = [];
-window.current = {
-	direction: 90,
-	force: .3
-}
-
-window.friction = 0.98;
-
-function setup() {
-	var id = PIXI.loader.resources[ Config.spriteSheetPath + "ships.json" ].textures;
-	gameModels = loadGameModels();
-	for ( let i = 0, l = gameModels.length; i < l; i++ ) {
-		app.stage.addChild( gameModels[ i ].base.sprite );
-	}
-
-	SteeringKeyboard();
-	app.ticker.add( animate );
-}
-
-function rudder() {
-
-}
-
-function animate( delta ) {
-	for ( let i = 0, l = gameModels.length; i < l; i++ ) {
-		gameModels[ i ].base.update( delta, {
-			velocities: [ {
-				x: window.current.force * math.cos( math.unit( window.current.direction, 'deg' ) ),
-				y: window.current.force * math.sin( math.unit( window.current.direction, 'deg' ) )
-			} ],
-			frictions: [ window.friction ]
-		} );
+			'void main(void){',
+			'	gl_Position = vec4((projectionMatrix * vec3(aVertexPosition, 1.0)).xy, 0.0, 1.0);',
+			// '	vFilterCoord = ( filterMatrix * vec3( aTextureCoord, 1.0) ).xy;',
+			'	vTextureCoord = aTextureCoord;',
+			'}'
+		].join( '\n' )
+	},
+	fragment() {
+		return [
+			'varying vec2 vTextureCoord;',
+			'uniform sampler2D uSampler;',
+			'uniform vec4 filterArea;',
+			'float blurRed( vec2 pos ) {',
+			'	float color = 0.0;',
+			'	for (int i = -1; i <= 1; i++) {',
+			'		for (int j = -1; j <= 1; j++) {',
+			'			color += texture2D( uSampler, pos + vec2( i, j ) / filterArea.xy ).r;',
+			'		}',
+			'	}',
+			'	return color / 9.0;',
+			'}',
+			'void main( void ) {',
+			'	gl_FragColor = texture2D( uSampler, vTextureCoord );',
+			'	gl_FragColor.r = max( 0.0, gl_FragColor.r * 0.8);',
+			'	gl_FragColor.g = max( 0.0, gl_FragColor.g * 0.8);',
+			'	gl_FragColor.b = max( 0.0, gl_FragColor.b * 0.8);',
+			'}'
+		].join( '\n' );
 	}
 }
 
-function loadGameModels() {
-	let gameModels = [];
-	for ( let i = Config.gameModels.length - 1; i >= 0; i-- ) {
-		// gameModels.push( loadGameModel( Config.gameModels[ i ] ) );
-	}
+module.exports = function() {
+	let proto = Object.create( PIXI.Filter.prototype );
 
-	window.rudder = loadGameModel(
-		{
-			name: 'rudder',
-			spriteSheet: 'ships.json',
-			options: {
-				basePosition: { x: 400, y: 400 },
-				// rotationConstraints: { pos: Infinity, neg: Infinity },
-				positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
-				maxForwardVelocity: 4,
-				forwardVelocityIncrement: .05,
-				postUpdates: [
-					function( delta ) {
-						// console.log( this.children[ 'rudder' ].currentRotation );
-						// console.log( this.rotationVelocity );
-						// this.children[ 'rudder' ].currentRotation = -this.currentRotation;
-						// this.children[ 'rudder' ].rotationVelocity = -this.rotationVelocity;
-					}
-				]
-			},
-
-			init: ( base ) => {
-				// size this here for now.
-				// base.sprite.width *= 4;
-				// base.sprite.height *= 4;
-
-				base.pivot.x = base.sprite.width / 2;
-				// base.pivot.y = base.sprite.height;
-				// base.children.rudder.currentPosition.x = base.sprite.width / 2;
-				// base.children.rudder.basePosition.x = base.sprite.width / 2;
-			},
-			children: [
-				{
-					name: 'rudder',
-					id: 'turtle-rudder.png',
-					options: {
-						// basePosition: { x: 46.23439168930054, y: 110 },
-						// rotationConstraints: { pos: Util.toRadians( 20 ), neg: Util.toRadians( 20 ) },
-						// positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
-						// maxRotationVelocity: 0.02,
-						// rotationVelocityIncrement: 0.01,
-						// stabilizeRotation: true,
-						// debug: true
-					},
-					init: ( child , parent ) => {
-						// child.pivot.x = child.sprite.width / 2;
-
-						// child.currentPosition.x = parent.sprite.width / 2;
-						// child.basePosition.x = child.currentPosition.x;
-					}
-				}
-			]
-		}
+	let filter = Object.assign( proto,
+		{ /* assign other custom stuff here*/ }
 	);
-	window.rudder.base.sprite.width *= 2;
-	window.rudder.base.sprite.height *= 2;
-	gameModels.push( window.rudder );
-	return gameModels;
+
+	PIXI.Filter.call( filter, ShaderSource.vertex(), ShaderSource.fragment() );
+
+	return filter;
 }
 
-function loadGameModel( model ) {
-	const base = GameModels.TransformableGroup( model.options );
-
-	for ( let i = 0, l = model.children.length; i < l; i++ ) {
-		let child = model.children[ i ];
-		let texture = PIXI.loader.resources[ Config.spriteSheetPath + model.spriteSheet ].textures[ child.id ];
-		let sprite = new Sprite( texture );
-		let tr = GameModels.TransformableRenderable( Object.assign( { sprite: sprite }, child.options ) );
-
-		base.addChild( child.name, tr, child.init );
-	}
-
-	base.update( 0 );
-	model.init( base );
-	return { base: base }
-}
-
-},{"./inc/config.js":694,"./inc/game-models.js":695,"./inc/steering-keyboard.js":696,"./inc/util.js":697,"mathjs":17,"pixi.js":652}]},{},[698]);
+},{"pixi.js":652}]},{},[694]);

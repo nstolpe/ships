@@ -91657,10 +91657,8 @@ module.exports = E;
 },{}],694:[function(require,module,exports){
 'use strict'
 
-//{INCLUDES}
 const Util = require( './inc/util.js' );
 const GameModels = require( './inc/game-models.js' );
-//{/INCLUDES}
 
 const Config = {
 	spriteSheetPath: 'assets/spritesheets/',
@@ -92183,7 +92181,7 @@ module.exports = {
 	 */
 	TrinaryState: Object.freeze( { 
 		POSITIVE: 1,
-		EQUAL: 0,
+		NEUTRAL: 0,
 		NEGATIVE: -1
 	} )
 }
