@@ -4,6 +4,7 @@ const Util = require( './inc/util.js' );
 const SteeringKeyboard = require( './inc/steering-keyboard.js' );
 const GameModels = require( './inc/game-models.js' );
 const WaterManager = require( './inc/water-manager.js' );
+const AnimatedTilingSprite = require( './inc/animated-tiling-sprite.js' );
 
 window.math = require( 'mathjs' );
 const PIXI = require( 'pixi.js' ),
@@ -13,7 +14,7 @@ const PIXI = require( 'pixi.js' ),
 	viewWidth = 1000,
 	viewHeight = 800,
 	scale = window.devicePixelRatio,
-	app = new PIXI.Application( viewWidth, viewHeight, { view: view, backgroundColor : 0x000000, resolution: window.devicePixelRatio } );
+	app = new PIXI.Application( viewWidth, viewHeight, { view: view, backgroundColor : 0x000000, resolution: scale } );
 
 const Config = require( './inc/config.js' )( PIXI, app );
 
@@ -23,6 +24,11 @@ view.style.height = viewHeight + 'px';
 
 loader
 	.add( "assets/spritesheets/ships.json" )
+	.add( 'water-00', 'assets/images/water-00.png' )
+	.add( 'water-01', 'assets/images/water-01.png' )
+	.add( 'water-02', 'assets/images/water-02.png' )
+	.add( 'water-03', 'assets/images/water-03.png' )
+	.add( 'water-04', 'assets/images/water-04.png' )
 	.load( setup );
 
 window.gameModels = [];
@@ -33,42 +39,27 @@ window.current = {
 
 window.friction = 0.98;
 
-var oceanFloor = PIXI.extras.TilingSprite.fromImage(
-	"assets/images/boxes-blue-red.png",
-	// "assets/images/tile-1px-black.png",
-	// "assets/images/sand.png",
-	viewWidth,
-	viewHeight
-);
-oceanFloor.x = viewWidth / 2;
-oceanFloor.y = viewHeight / 2;
-oceanFloor.anchor.set( 0.5 );
-app.stage.addChild( oceanFloor );
-
 let waterManager = WaterManager( {
 	uResolution: { type: 'v2', value: [ viewWidth, viewHeight ] },
 } ).init();
 
-// oceanFloor.filters = [ waterManager.shader.shader ];
-
-// let graphics = new PIXI.Graphics();
-// window.graphics = graphics;
-// // set a fill and line style
-// graphics.beginFill(0xFF3300);
-// graphics.lineStyle(4, 0xffd900, 1);
-
-// // draw a shape
-// graphics.moveTo(50,50);
-// graphics.lineTo(250, 50);
-// graphics.lineTo(100, 100);
-// graphics.lineTo(50, 50);
-// graphics.endFill();
-
-// app.stage.addChild( graphics );
+var oceanFloor;
 
 function setup() {
 	var id = PIXI.loader.resources[ Config.spriteSheetPath + "ships.json" ].textures;
 	gameModels = loadGameModels();
+	oceanFloor = AnimatedTilingSprite(
+		[
+			PIXI.loader.resources[ 'water-00' ].texture,
+			PIXI.loader.resources[ 'water-01' ].texture,
+			PIXI.loader.resources[ 'water-02' ].texture,
+			PIXI.loader.resources[ 'water-03' ].texture,
+			PIXI.loader.resources[ 'water-04' ].texture
+		],
+		viewWidth,
+		viewHeight
+	);
+	app.stage.addChild( oceanFloor );
 	for ( let i = 0, l = gameModels.length; i < l; i++ ) {
 		app.stage.addChild( gameModels[ i ].base.sprite );
 	}
@@ -76,12 +67,13 @@ function setup() {
 	turtle.sprite.width *= .5;
 	turtle.sprite.height *= .5;
 	SteeringKeyboard();
+
 	app.ticker.add( animate );
 }
 
 function animate( delta ) {
 	waterManager.update( delta );
-
+	oceanFloor.update( delta );
 	for ( let i = 0, l = gameModels.length; i < l; i++ ) {
 		gameModels[ i ].base.update( delta, {
 			velocities: [ {
@@ -91,7 +83,7 @@ function animate( delta ) {
 			frictions: [ window.friction ]
 		} );
 	}
-
+// console.log( turtle.currentPosition );
 	if ( turtle.sprite.getBounds().x < 0 ) {
 		// console.log( 'left' );
 		turtle.currentPosition.x = Math.ceil( turtle.sprite.getBounds().width / 2 ) + 5;
