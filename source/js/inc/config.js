@@ -15,17 +15,19 @@ module.exports = function( PIXI, app ) {
 					// positionConstraints: { pos: { x: Infinity, y: Infinity }, neg: { x: Infinity, y: Infinity } },
 					maxForwardVelocity: 4,
 					forwardVelocityIncrement: .05,
-					debug: true,
+					// debug: true,
 					postUpdates: [
 						function( delta ) {
 							if ( this.debug ) {
 								let bounds = this.sprite.getBounds();
 
-								if ( this.graphics ) this.graphics.clear();
+								if ( this.graphics ) {
+									this.graphics.clear();
+								} else {
+									this.graphics = new PIXI.Graphics();
+								}
 
-								this.graphics = new PIXI.Graphics();
-
-								this.graphics.lineStyle( 1, 0xffd900, 1 );
+								this.graphics.lineStyle( 1, 0xff0000, 1 );
 								this.graphics.moveTo( bounds.x, bounds.y );
 								this.graphics.lineTo( bounds.x, bounds.y + bounds.height );
 								this.graphics.lineTo( bounds.x + bounds.width, bounds.y + bounds.height );
@@ -33,6 +35,11 @@ module.exports = function( PIXI, app ) {
 								this.graphics.lineTo( bounds.x, bounds.y );
 								app.stage.addChild( this.graphics );
 								// graphics.endFill();
+							} else {
+								let graphicsChild = app.stage.children.find( ( child ) => child === this.graphics );
+
+								if ( graphicsChild )
+									app.stage.removeChild( graphicsChild );
 							}
 							// console.log( this.children[ 'rudder' ].currentRotation );
 							// console.log( this.rotationVelocity );

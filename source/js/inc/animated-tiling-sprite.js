@@ -27,7 +27,7 @@ module.exports = function( textures, width, height ) {
 
 	tiled.update = function( delta ) {
 		if ( o === t - 1 ) {
-			this._texture = this.textures[ i ];
+			this._texture = textures[ i ];
 			i = ( i + 1 ) % l;
 		}
 		o = ( o + 1 ) % t;
