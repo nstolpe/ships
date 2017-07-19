@@ -59,6 +59,7 @@ function setup() {
 		viewWidth,
 		viewHeight
 	);
+	window.oceanFloor = oceanFloor;
 	app.stage.addChild( oceanFloor );
 	for ( let i = 0, l = gameModels.length; i < l; i++ ) {
 		app.stage.addChild( gameModels[ i ].base.sprite );
@@ -72,7 +73,7 @@ function setup() {
 }
 
 function animate( delta ) {
-	waterManager.update( delta );
+	// waterManager.update( delta );
 	oceanFloor.update( delta );
 	for ( let i = 0, l = gameModels.length; i < l; i++ ) {
 		gameModels[ i ].base.update( delta, {
@@ -86,25 +87,29 @@ function animate( delta ) {
 // console.log( turtle.currentPosition );
 	if ( turtle.sprite.getBounds().x < 0 ) {
 		// console.log( 'left' );
-		turtle.currentPosition.x = Math.ceil( turtle.sprite.getBounds().width / 2 ) + 5;
+		// turtle.currentPosition.x = Math.ceil( turtle.sprite.getBounds().width / 2 ) + 5;
+		turtle.currentPosition.x = Math.ceil( turtle.sprite.getBounds().width / 2 );
 		turtle.forwardVelocity = 0;
 	}
 	
 	if ( turtle.sprite.getBounds().x + turtle.sprite.getBounds().width > app.view.offsetWidth ) {
 		// console.log( 'right' );
-		turtle.currentPosition.x = app.view.offsetWidth - ( Math.ceil( turtle.sprite.getBounds().width / 2 ) + 5 );
+		// turtle.currentPosition.x = app.view.offsetWidth - ( Math.ceil( turtle.sprite.getBounds().width / 2 ) + 5 );
+		turtle.currentPosition.x = app.view.offsetWidth - ( Math.ceil( turtle.sprite.getBounds().width / 2 ) );
 		turtle.forwardVelocity = 0;
 	}
 	
 	if ( turtle.sprite.getBounds().y < 0 ) {
 		// console.log( 'top' );
-		turtle.currentPosition.y = Math.ceil( turtle.sprite.getBounds().height / 2 ) + 5;
+		// turtle.currentPosition.y = Math.ceil( turtle.sprite.getBounds().height / 2 ) + 5;
+		turtle.currentPosition.y = Math.ceil( turtle.sprite.getBounds().height / 2 );
 		turtle.forwardVelocity = 0;
 	}
 
-	if ( turtle.sprite.getBounds().y + turtle.sprite.getBounds().height > app.view.offsetHeight ) {
+	if ( turtle.sprite.getBounds().y + turtle.sprite.getBounds().height >= app.view.offsetHeight ) {
 		// console.log( 'bottom' );
-		turtle.currentPosition.y = app.view.offsetHeight - ( Math.ceil( turtle.sprite.getBounds().height / 2 ) + 5 );
+		// turtle.currentPosition.y = app.view.offsetHeight - ( Math.ceil( turtle.sprite.getBounds().height / 2 ) + 5 );
+		turtle.currentPosition.y = app.view.offsetHeight - ( Math.floor( turtle.sprite.getBounds().height / 2 ) );
 		turtle.forwardVelocity = 0;
 	}
 }

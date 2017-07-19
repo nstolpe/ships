@@ -15,7 +15,7 @@ module.exports = function( PIXI, app ) {
 					// positionConstraints: { pos: { x: Infinity, y: Infinity }, neg: { x: Infinity, y: Infinity } },
 					maxForwardVelocity: 4,
 					forwardVelocityIncrement: .05,
-					// debug: true,
+					debug: true,
 					postUpdates: [
 						function( delta ) {
 							if ( this.debug ) {
