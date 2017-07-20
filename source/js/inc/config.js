@@ -19,7 +19,7 @@ module.exports = function( PIXI, app ) {
 					postUpdates: [
 						function( delta ) {
 							if ( this.debug ) {
-								let bounds = this.sprite.getBounds();
+								let hitArea = this.sprite.hitArea;
 
 								if ( this.graphics ) {
 									this.graphics.clear();
@@ -27,19 +27,21 @@ module.exports = function( PIXI, app ) {
 									this.graphics = new PIXI.Graphics();
 								}
 
+								if ( !this.sprite.children.find( ( child ) => child === this.graphics ) )
+									this.sprite.addChild( this.graphics );
+
 								this.graphics.lineStyle( 1, 0xff0000, 1 );
-								this.graphics.moveTo( bounds.x, bounds.y );
-								this.graphics.lineTo( bounds.x, bounds.y + bounds.height );
-								this.graphics.lineTo( bounds.x + bounds.width, bounds.y + bounds.height );
-								this.graphics.lineTo( bounds.x + bounds.width, bounds.y  );
-								this.graphics.lineTo( bounds.x, bounds.y );
-								app.stage.addChild( this.graphics );
+								this.graphics.moveTo( hitArea.x, hitArea.y );
+								this.graphics.lineTo( hitArea.x, hitArea.y + hitArea.height );
+								this.graphics.lineTo( hitArea.x + hitArea.width, hitArea.y + hitArea.height );
+								this.graphics.lineTo( hitArea.x + hitArea.width, hitArea.y  );
+								this.graphics.lineTo( hitArea.x, hitArea.y );
 								// graphics.endFill();
 							} else {
-								let graphicsChild = app.stage.children.find( ( child ) => child === this.graphics );
+								let graphicsChild = this.sprite.children.find( ( child ) => child === this.graphics );
 
 								if ( graphicsChild )
-									app.stage.removeChild( graphicsChild );
+									this.sprite.removeChild( graphicsChild );
 							}
 							// console.log( this.children[ 'rudder' ].currentRotation );
 							// console.log( this.rotationVelocity );
@@ -50,6 +52,14 @@ module.exports = function( PIXI, app ) {
 				},
 
 				init: ( base ) => {
+					base.sprite.hitArea = new PIXI.Rectangle(
+						0,
+						0,
+						base.sprite.width,
+						base.sprite.height
+					);
+					base.sprite.interactive = true;
+					base.sprite.on( 'click', ( e ) => console.log( e ) );
 					base.pivot.x = base.sprite.width / 2;
 					base.pivot.y = base.sprite.height / 2;
 					// base.children.rudder.currentPosition.x = base.sprite.width / 2;
@@ -155,7 +165,7 @@ module.exports = function( PIXI, app ) {
 						name: 'body',
 						id: 'turtle-body.png',
 						options: {
-							basePosition: { x: 15, y: 0 },
+							// basePosition: { x: 15, y: 0 },
 							rotationConstraints: { pos: 0, neg: 0 },
 							positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } }
 						},

@@ -84,12 +84,29 @@ function animate( delta ) {
 			frictions: [ window.friction ]
 		} );
 	}
+
+	let lt = turtle.sprite.localTransform.apply( new PIXI.Point( turtle.sprite.hitArea.left, turtle.sprite.hitArea.top ), new PIXI.Point() );
+	let lb = turtle.sprite.localTransform.apply( new PIXI.Point( turtle.sprite.hitArea.left, turtle.sprite.hitArea.bottom ), new PIXI.Point() );
+	let rt = turtle.sprite.localTransform.apply( new PIXI.Point( turtle.sprite.hitArea.right, turtle.sprite.hitArea.top ), new PIXI.Point() );
+	let rb = turtle.sprite.localTransform.apply( new PIXI.Point( turtle.sprite.hitArea.right, turtle.sprite.hitArea.bottom ), new PIXI.Point() );
 // console.log( turtle.currentPosition );
-	if ( turtle.sprite.getBounds().x < 0 ) {
+	if ( lt.x < 0 || rb.x < 0 ) {
+		console.log('sdfasd');
+		let xDistance = Math.abs( lt.x - rb.x );
+		let yDistance = Math.abs( lt.y - rb.y );
+		turtle.currentPosition.x = Math.ceil( xDistance / 2 );
+	// if ( turtle.sprite.getBounds().x < 0 ) {
 		// console.log( 'left' );
 		// turtle.currentPosition.x = Math.ceil( turtle.sprite.getBounds().width / 2 ) + 5;
-		turtle.currentPosition.x = Math.ceil( turtle.sprite.getBounds().width / 2 );
+		// turtle.currentPosition.x = Math.ceil( turtle.sprite.getBounds().width / 2 );
 		turtle.forwardVelocity = 0;
+	}
+
+	if ( lb.x < 0 || rt.x < 0 ) {
+		console.log('two');
+		let xDistance = Math.abs( lb.x - rt.x );
+		let yDistance = Math.abs( lb.y - rt.y );
+		turtle.currentPosition.x = Math.ceil( xDistance / 2 );
 	}
 	
 	if ( turtle.sprite.getBounds().x + turtle.sprite.getBounds().width > app.view.offsetWidth ) {
@@ -134,8 +151,8 @@ function loadGameModel( model ) {
 		base.addChild( child.name, tr, child.init );
 	}
 
-	base.update( 0 );
 	model.init( base );
+	base.update( 0 );
 	return { base: base }
 }
 
