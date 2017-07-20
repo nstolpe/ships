@@ -89,45 +89,53 @@ function animate( delta ) {
 	let lb = turtle.sprite.localTransform.apply( new PIXI.Point( turtle.sprite.hitArea.left, turtle.sprite.hitArea.bottom ), new PIXI.Point() );
 	let rt = turtle.sprite.localTransform.apply( new PIXI.Point( turtle.sprite.hitArea.right, turtle.sprite.hitArea.top ), new PIXI.Point() );
 	let rb = turtle.sprite.localTransform.apply( new PIXI.Point( turtle.sprite.hitArea.right, turtle.sprite.hitArea.bottom ), new PIXI.Point() );
-// console.log( turtle.currentPosition );
-	if ( lt.x < 0 || rb.x < 0 ) {
-		console.log('sdfasd');
+
+	// left
+	if ( lt.x <= 0 || rb.x <= 0 ) {
 		let xDistance = Math.abs( lt.x - rb.x );
-		let yDistance = Math.abs( lt.y - rb.y );
 		turtle.currentPosition.x = Math.ceil( xDistance / 2 );
-	// if ( turtle.sprite.getBounds().x < 0 ) {
-		// console.log( 'left' );
-		// turtle.currentPosition.x = Math.ceil( turtle.sprite.getBounds().width / 2 ) + 5;
-		// turtle.currentPosition.x = Math.ceil( turtle.sprite.getBounds().width / 2 );
 		turtle.forwardVelocity = 0;
 	}
 
-	if ( lb.x < 0 || rt.x < 0 ) {
-		console.log('two');
+	if ( lb.x <= 0 || rt.x <= 0 ) {
 		let xDistance = Math.abs( lb.x - rt.x );
-		let yDistance = Math.abs( lb.y - rt.y );
 		turtle.currentPosition.x = Math.ceil( xDistance / 2 );
 	}
-	
-	if ( turtle.sprite.getBounds().x + turtle.sprite.getBounds().width > app.view.offsetWidth ) {
-		// console.log( 'right' );
-		// turtle.currentPosition.x = app.view.offsetWidth - ( Math.ceil( turtle.sprite.getBounds().width / 2 ) + 5 );
-		turtle.currentPosition.x = app.view.offsetWidth - ( Math.ceil( turtle.sprite.getBounds().width / 2 ) );
-		turtle.forwardVelocity = 0;
-	}
-	
-	if ( turtle.sprite.getBounds().y < 0 ) {
-		// console.log( 'top' );
-		// turtle.currentPosition.y = Math.ceil( turtle.sprite.getBounds().height / 2 ) + 5;
-		turtle.currentPosition.y = Math.ceil( turtle.sprite.getBounds().height / 2 );
+
+	// right
+	if ( lt.x >= app.view.offsetWidth || rb.x >= app.view.offsetWidth ) {
+		let xDistance = Math.abs( lt.x - rb.x );
+		turtle.currentPosition.x = app.view.offsetWidth - Math.ceil( xDistance / 2 );
 		turtle.forwardVelocity = 0;
 	}
 
-	if ( turtle.sprite.getBounds().y + turtle.sprite.getBounds().height >= app.view.offsetHeight ) {
-		// console.log( 'bottom' );
-		// turtle.currentPosition.y = app.view.offsetHeight - ( Math.ceil( turtle.sprite.getBounds().height / 2 ) + 5 );
-		turtle.currentPosition.y = app.view.offsetHeight - ( Math.floor( turtle.sprite.getBounds().height / 2 ) );
+	if ( lb.x >= app.view.offsetWidth || rt.x >= app.view.offsetWidth ) {
+		let xDistance = Math.abs( lb.x - rt.x );
+		turtle.currentPosition.x = app.view.offsetWidth - Math.ceil( xDistance / 2 );
+	}
+
+	// top
+	if ( lt.y <= 0 || rb.y <= 0 ) {
+		let yDistance = Math.abs( lt.y - rb.y );
+		turtle.currentPosition.y = Math.ceil( yDistance / 2 );
 		turtle.forwardVelocity = 0;
+	}
+
+	if ( lb.y <= 0 || rt.y <= 0 ) {
+		let yDistance = Math.abs( lb.y - rt.y );
+		turtle.currentPosition.y = Math.ceil( yDistance / 2 );
+	}
+	
+	// bottom
+	if ( lt.y >= app.view.offsetHeight || rb.y >= app.view.offsetHeight ) {
+		let yDistance = Math.abs( lt.y - rb.y );
+		turtle.currentPosition.y = app.view.offsetHeight - Math.ceil( yDistance / 2 );
+		turtle.forwardVelocity = 0;
+	}
+
+	if ( lb.y >= app.view.offsetHeight || rt.y >= app.view.offsetHeight ) {
+		let yDistance = Math.abs( lb.y - rt.y );
+		turtle.currentPosition.y = app.view.offsetHeight - Math.ceil( yDistance / 2 );
 	}
 }
 
