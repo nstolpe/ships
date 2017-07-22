@@ -18,8 +18,9 @@
   "dependencies": {
     "express": "^4.14.0",
     "express-handlebars": "^3.0.0",
+    "mathjs": "^3.13.3",
     "pixi.js": "^4.3.5",
-    "mathjs": "^3.13.3"
+    "victor": "^1.1.0"
   },
   "devDependencies": {
     "chokidar": "^1.6.1"
