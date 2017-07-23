@@ -85,57 +85,78 @@ function animate( delta ) {
 		} );
 	}
 
-	let lt = turtle.sprite.localTransform.apply( new PIXI.Point( turtle.sprite.hitArea.left, turtle.sprite.hitArea.top ), new PIXI.Point() );
-	let lb = turtle.sprite.localTransform.apply( new PIXI.Point( turtle.sprite.hitArea.left, turtle.sprite.hitArea.bottom ), new PIXI.Point() );
-	let rt = turtle.sprite.localTransform.apply( new PIXI.Point( turtle.sprite.hitArea.right, turtle.sprite.hitArea.top ), new PIXI.Point() );
-	let rb = turtle.sprite.localTransform.apply( new PIXI.Point( turtle.sprite.hitArea.right, turtle.sprite.hitArea.bottom ), new PIXI.Point() );
+	checkScreenBounds( turtle, { left: 0, right: app.view.offsetWidth, top: 0, bottom: app.view.offsetHeight } );
+}
+
+function checkScreenBounds( rigidBody, bounds ) {
+	let lt = rigidBody.sprite.localTransform.apply( new PIXI.Point( rigidBody.sprite.hitArea.left, rigidBody.sprite.hitArea.top ), new PIXI.Point() );
+	let lb = rigidBody.sprite.localTransform.apply( new PIXI.Point( rigidBody.sprite.hitArea.left, rigidBody.sprite.hitArea.bottom ), new PIXI.Point() );
+	let rt = rigidBody.sprite.localTransform.apply( new PIXI.Point( rigidBody.sprite.hitArea.right, rigidBody.sprite.hitArea.top ), new PIXI.Point() );
+	let rb = rigidBody.sprite.localTransform.apply( new PIXI.Point( rigidBody.sprite.hitArea.right, rigidBody.sprite.hitArea.bottom ), new PIXI.Point() );
 
 	// left
-	if ( lt.x <= 0 || rb.x <= 0 ) {
-		let xDistance = Math.abs( lt.x - rb.x );
-		turtle.currentPosition.x = Math.ceil( xDistance / 2 );
-		turtle.forwardVelocity = 0;
-	}
+	if ( rigidBody.sprite.getBounds().x <= bounds.left ) {
+		console.log( 'left' );
+		if ( lt.x <= 0 || rb.x <= 0 ) {
+			console.log( 'lt.x || rb.x' );
+			let distance = Math.abs( lt.x - rb.x );
+			rigidBody.currentPosition.x = Math.ceil( distance / 2 );
+			rigidBody.forwardVelocity = 0;
+		}
 
-	if ( lb.x <= 0 || rt.x <= 0 ) {
-		let xDistance = Math.abs( lb.x - rt.x );
-		turtle.currentPosition.x = Math.ceil( xDistance / 2 );
+		if ( lb.x <= 0 || rt.x <= 0 ) {
+			console.log( 'lb.x || rt.x' );
+			let distance = Math.abs( lb.x - rt.x );
+			rigidBody.currentPosition.x = Math.ceil( distance / 2 );
+		}
 	}
 
 	// right
-	if ( lt.x >= app.view.offsetWidth || rb.x >= app.view.offsetWidth ) {
-		let xDistance = Math.abs( lt.x - rb.x );
-		turtle.currentPosition.x = app.view.offsetWidth - Math.ceil( xDistance / 2 );
-		turtle.forwardVelocity = 0;
-	}
+	if ( rigidBody.sprite.getBounds().x + rigidBody.sprite.getBounds().width >= bounds.right ) {
+		if ( lt.x >= bounds.right || rb.x >= bounds.right ) {
+			let distance = Math.abs( lt.x - rb.x );
+			rigidBody.currentPosition.x = app.view.offsetWidth - Math.ceil( distance / 2 );
+			rigidBody.forwardVelocity = 0;
+		}
 
-	if ( lb.x >= app.view.offsetWidth || rt.x >= app.view.offsetWidth ) {
-		let xDistance = Math.abs( lb.x - rt.x );
-		turtle.currentPosition.x = app.view.offsetWidth - Math.ceil( xDistance / 2 );
+		if ( lb.x >= app.view.offsetWidth || rt.x >= app.view.offsetWidth ) {
+			let distance = Math.abs( lb.x - rt.x );
+			rigidBody.currentPosition.x = app.view.offsetWidth - Math.ceil( distance / 2 );
+		}
 	}
 
 	// top
-	if ( lt.y <= 0 || rb.y <= 0 ) {
-		let yDistance = Math.abs( lt.y - rb.y );
-		turtle.currentPosition.y = Math.ceil( yDistance / 2 );
-		turtle.forwardVelocity = 0;
+	if ( rigidBody.sprite.getBounds().y <= bounds.top ) {
+		console.log( 'top' );
+		if ( lt.y <= bounds.top || rb.y <= bounds.top ) {
+			console.log( 'lt.y || rb.y' );
+			let distance = Math.abs( lt.y - rb.y );
+			rigidBody.currentPosition.y = Math.ceil( distance / 2 );
+			rigidBody.forwardVelocity = 0;
+		}
+
+		if ( lb.y <= bounds.top || rt.y <= bounds.top ) {
+			console.log( 'lb.y || rt.y' );
+			let distance = Math.abs( lb.y - rt.y );
+			rigidBody.currentPosition.y = Math.ceil( distance / 2 );
+		}
 	}
 
-	if ( lb.y <= 0 || rt.y <= 0 ) {
-		let yDistance = Math.abs( lb.y - rt.y );
-		turtle.currentPosition.y = Math.ceil( yDistance / 2 );
-	}
-	
 	// bottom
-	if ( lt.y >= app.view.offsetHeight || rb.y >= app.view.offsetHeight ) {
-		let yDistance = Math.abs( lt.y - rb.y );
-		turtle.currentPosition.y = app.view.offsetHeight - Math.ceil( yDistance / 2 );
-		turtle.forwardVelocity = 0;
-	}
+	if ( rigidBody.sprite.getBounds().y + rigidBody.sprite.getBounds().height >= bounds.bottom ) {
+		console.log( 'top' );
+		if ( lt.y >= bounds.bottom || rb.y >= bounds.bottom ) {
+			console.log( 'rb.y || rb.y' );
+			let distance = Math.abs( lt.y - rb.y );
+			rigidBody.currentPosition.y = app.view.offsetHeight - Math.ceil( distance / 2 );
+			rigidBody.forwardVelocity = 0;
+		}
 
-	if ( lb.y >= app.view.offsetHeight || rt.y >= app.view.offsetHeight ) {
-		let yDistance = Math.abs( lb.y - rt.y );
-		turtle.currentPosition.y = app.view.offsetHeight - Math.ceil( yDistance / 2 );
+		if ( lb.y >= bounds.bottom || rt.y >= bounds.bottom ) {
+			console.log( 'lb.y || rt.y' );
+			let distance = Math.abs( lb.y - rt.y );
+			rigidBody.currentPosition.y = app.view.offsetHeight - Math.ceil( distance / 2 );
+		}
 	}
 }
 
