@@ -95,13 +95,15 @@ let circles = [
 ];
 
 GraphicsManager.shapes.push.apply( GraphicsManager.shapes, circles );
-// let rectangles = [
-// 	Rectangle( {
-// 		color: 0xffffff,
-// 		position: [ 100, 800 ],
-// 		mass: 0
-// 	} );
-// ]
+let rectangles = [
+	// Shapes.Rectangle( {
+	// 	color: 0xffffff,
+	// 	position: [ 100, 800 ],
+	// 	dimensions: [ 400, 80 ],
+	// 	mass: 100,
+	// 	static: true
+	// } );
+]
 /**
  * Ties an oscillator to an object and binds its frequency
  * to the object's position.
@@ -111,7 +113,7 @@ function OscillatorManager( source ) {
 	// create Oscillator node
 	let oscillator = audioCtx.createOscillator();
 
-	oscillator.type = 'sine';
+	oscillator.type = 'sawtooth';
 	oscillator.frequency.value = 200; // value in hertz
 	oscillator.connect( audioCtx.destination );
 
@@ -119,13 +121,13 @@ function OscillatorManager( source ) {
 		source: source,
 		oscillator: oscillator,
 		start() {
-			oscillator.start();
+			this.oscillator.start();
 		},
 		stop() {
-			oscillator.stop();
+			this.oscillator.stop();
 		},
 		update() {
-			oscillator.frequency.value = source.position.y;
+			this.oscillator.frequency.value = Math.sqrt( Math.pow( source.velocity.x, 2 ) + Math.pow( source.velocity.y, 2 ) ) * 10;
 		}
 	};
 }
