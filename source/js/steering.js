@@ -18,6 +18,8 @@ const PIXI = require( 'pixi.js' ),
 
 const Config = require( './inc/config.js' )( PIXI, app );
 
+let graphics;
+
 window.app = app;
 view.style.width = viewWidth + 'px';
 view.style.height = viewHeight + 'px';
@@ -76,18 +78,72 @@ function animate( delta ) {
 	// waterManager.update( delta );
 	oceanFloor.update( delta );
 	for ( let i = 0, l = gameModels.length; i < l; i++ ) {
-		gameModels[ i ].base.update( delta, {
+		let model = gameModels[ i ];
+
+		model.base.update( delta, {
 			velocities: [ {
 				x: window.current.force * math.cos( math.unit( window.current.direction, 'deg' ) ),
 				y: window.current.force * math.sin( math.unit( window.current.direction, 'deg' ) )
 			} ],
 			frictions: [ window.friction ]
 		} );
+
+		// Debug Display Logic
+		// @TODO move this out
+		if ( model.base.debug ) {
+			let stageGraphics = app.stage.children.find( ( c ) => PIXI.Graphics.prototype.isPrototypeOf( c ) );
+			let modelGraphics = model.base.sprite.children.find( ( c ) => PIXI.Graphics.prototype.isPrototypeOf( c ) );
+
+			if ( stageGraphics ) {
+				stageGraphics.clear();
+			} else {
+				stageGraphics = new PIXI.Graphics();
+				app.stage.addChild( stageGraphics );
+			}
+
+			if ( modelGraphics ) {
+				modelGraphics.clear();
+			} else {
+				modelGraphics = new PIXI.Graphics();
+				model.base.sprite.addChild( modelGraphics );
+			}
+
+			if ( model.base.sprite.hitArea ) {
+				modelGraphics.lineStyle( 1, 0xf1ff32, 1 );
+				modelGraphics.moveTo( model.base.sprite.hitArea.x, model.base.sprite.hitArea.y );
+				modelGraphics.lineTo( model.base.sprite.hitArea.x, model.base.sprite.hitArea.y + model.base.sprite.hitArea.height );
+				modelGraphics.lineTo( model.base.sprite.hitArea.x + model.base.sprite.hitArea.width, model.base.sprite.hitArea.y + model.base.sprite.hitArea.height );
+				modelGraphics.lineTo( model.base.sprite.hitArea.x + model.base.sprite.hitArea.width, model.base.sprite.hitArea.y  );
+				modelGraphics.lineTo( model.base.sprite.hitArea.x, model.base.sprite.hitArea.y );
+			}
+
+			let bounds = model.base.sprite.getBounds();
+
+			stageGraphics.lineStyle( 1, 0xff4cc7, 1 );
+			stageGraphics.moveTo( bounds.x, bounds.y );
+			stageGraphics.lineTo( bounds.x, bounds.y + bounds.height );
+			stageGraphics.lineTo( bounds.x + bounds.width, bounds.y + bounds.height );
+			stageGraphics.lineTo( bounds.x + bounds.width, bounds.y );
+			stageGraphics.lineTo( bounds.x, bounds.y );
+		} else {
+			let stageGraphics = app.stage.children.find( ( c ) => PIXI.Graphics.prototype.isPrototypeOf( c ) );
+			let modelGraphics = model.base.sprite.children.find( ( c ) => PIXI.Graphics.prototype.isPrototypeOf( c ) );
+
+			if ( stageGraphics )
+				app.stage.removeChild( stageGraphics );
+
+			if ( modelGraphics )
+				model.base.sprite.removeChild( modelGraphics );
+		}
+		// END Debug Display Logic
 	}
 
 	checkScreenBounds( turtle, { left: 0, right: app.view.offsetWidth, top: 0, bottom: app.view.offsetHeight } );
 }
 
+/**
+ * Checks if an object is withing the screen bounds. Could have a better name.
+ */
 function checkScreenBounds( rigidBody, bounds ) {
 	let lt = rigidBody.sprite.localTransform.apply( new PIXI.Point( rigidBody.sprite.hitArea.left, rigidBody.sprite.hitArea.top ), new PIXI.Point() );
 	let lb = rigidBody.sprite.localTransform.apply( new PIXI.Point( rigidBody.sprite.hitArea.left, rigidBody.sprite.hitArea.bottom ), new PIXI.Point() );
