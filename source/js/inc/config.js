@@ -18,31 +18,6 @@ module.exports = function( PIXI, app ) {
 					debug: true,
 					postUpdates: [
 						function( delta ) {
-							if ( this.debug ) {
-								let hitArea = this.sprite.hitArea;
-
-								if ( this.graphics ) {
-									this.graphics.clear();
-								} else {
-									this.graphics = new PIXI.Graphics();
-								}
-
-								if ( !this.sprite.children.find( ( child ) => child === this.graphics ) )
-									this.sprite.addChild( this.graphics );
-
-								this.graphics.lineStyle( 1, 0xff0000, 1 );
-								this.graphics.moveTo( hitArea.x, hitArea.y );
-								this.graphics.lineTo( hitArea.x, hitArea.y + hitArea.height );
-								this.graphics.lineTo( hitArea.x + hitArea.width, hitArea.y + hitArea.height );
-								this.graphics.lineTo( hitArea.x + hitArea.width, hitArea.y  );
-								this.graphics.lineTo( hitArea.x, hitArea.y );
-								// graphics.endFill();
-							} else {
-								let graphicsChild = this.sprite.children.find( ( child ) => child === this.graphics );
-
-								if ( graphicsChild )
-									this.sprite.removeChild( graphicsChild );
-							}
 							// console.log( this.children[ 'rudder' ].currentRotation );
 							// console.log( this.rotationVelocity );
 							// this.children[ 'rudder' ].currentRotation = -this.currentRotation;
