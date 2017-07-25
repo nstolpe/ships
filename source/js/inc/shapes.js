@@ -141,7 +141,27 @@ module.exports = {
 		const base = Shape( options );
 
 		return Object.assign( base, {
-			dimensions: 0
+			dimensions: 0,
+			drawMethod: {
+				value: 'drawRectangle'
+			},
+			drawArgs: {
+				value: function() {
+					return [
+						this.position.x,
+						this.position.y,
+						this.dimensions.w,
+						this.dimensions.h
+					];
+				}
+			},
+			update: {
+				value: function( options, delta ) {
+					this.preUpdate( delta );
+					Object.getPrototypeOf( this ).update( options, delta );
+					this.postUpdate( delta );
+				}
+			}
 		} );
 	}
 };
