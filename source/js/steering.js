@@ -71,8 +71,28 @@ function setup() {
 	turtle.sprite.height *= .5;
 	SteeringKeyboard();
 
+	app.stage.addChild( polyGraphics );
 	app.ticker.add( animate );
 }
+
+const poly = new PIXI.Polygon(
+	48,   0,
+	71,   7,
+	83,  33,
+	86,  58,
+	83,  87,
+	71, 113,
+	48, 120,
+	38, 120,
+	15, 113,
+	 3,  87,
+	 0,  58,
+	 3,  33,
+	15,   7,
+	38,   0
+);
+
+const polyGraphics = new PIXI.Graphics();
 
 function animate( delta ) {
 	// waterManager.update( delta );
@@ -138,6 +158,20 @@ function animate( delta ) {
 		// END Debug Display Logic
 	}
 
+	polyGraphics.clear();
+	polyGraphics.lineStyle( 1, 0x000000, 1 );
+	polyGraphics.beginFill( 0x000000 );
+
+	polyGraphics.moveTo( poly.points[ 0 ] + 100, poly.points[ 1 ] + 100 );
+
+	for ( let i = 2, l = poly.points.length; i < l; i += 2 ) {
+		polyGraphics.lineTo( poly.points[ i ] + 100, poly.points[ i + 1 ] + 100 );
+	}
+
+	polyGraphics.lineTo( poly.points[ 0 ] + 100, poly.points[ 1 ] + 100 );
+
+	polyGraphics.endFill();
+
 	checkScreenBounds( turtle, { left: 0, right: app.view.offsetWidth, top: 0, bottom: app.view.offsetHeight } );
 }
 
@@ -152,16 +186,13 @@ function checkScreenBounds( rigidBody, bounds ) {
 
 	// left
 	if ( rigidBody.sprite.getBounds().x <= bounds.left ) {
-		console.log( 'left' );
 		if ( lt.x <= 0 || rb.x <= 0 ) {
-			console.log( 'lt.x || rb.x' );
 			let distance = Math.abs( lt.x - rb.x );
 			rigidBody.currentPosition.x = Math.ceil( distance / 2 );
 			rigidBody.forwardVelocity = 0;
 		}
 
 		if ( lb.x <= 0 || rt.x <= 0 ) {
-			console.log( 'lb.x || rt.x' );
 			let distance = Math.abs( lb.x - rt.x );
 			rigidBody.currentPosition.x = Math.ceil( distance / 2 );
 		}
@@ -183,16 +214,13 @@ function checkScreenBounds( rigidBody, bounds ) {
 
 	// top
 	if ( rigidBody.sprite.getBounds().y <= bounds.top ) {
-		console.log( 'top' );
 		if ( lt.y <= bounds.top || rb.y <= bounds.top ) {
-			console.log( 'lt.y || rb.y' );
 			let distance = Math.abs( lt.y - rb.y );
 			rigidBody.currentPosition.y = Math.ceil( distance / 2 );
 			rigidBody.forwardVelocity = 0;
 		}
 
 		if ( lb.y <= bounds.top || rt.y <= bounds.top ) {
-			console.log( 'lb.y || rt.y' );
 			let distance = Math.abs( lb.y - rt.y );
 			rigidBody.currentPosition.y = Math.ceil( distance / 2 );
 		}
@@ -200,16 +228,13 @@ function checkScreenBounds( rigidBody, bounds ) {
 
 	// bottom
 	if ( rigidBody.sprite.getBounds().y + rigidBody.sprite.getBounds().height >= bounds.bottom ) {
-		console.log( 'top' );
 		if ( lt.y >= bounds.bottom || rb.y >= bounds.bottom ) {
-			console.log( 'rb.y || rb.y' );
 			let distance = Math.abs( lt.y - rb.y );
 			rigidBody.currentPosition.y = app.view.offsetHeight - Math.ceil( distance / 2 );
 			rigidBody.forwardVelocity = 0;
 		}
 
 		if ( lb.y >= bounds.bottom || rt.y >= bounds.bottom ) {
-			console.log( 'lb.y || rt.y' );
 			let distance = Math.abs( lb.y - rt.y );
 			rigidBody.currentPosition.y = app.view.offsetHeight - Math.ceil( distance / 2 );
 		}
