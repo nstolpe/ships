@@ -24,9 +24,6 @@ chokidar.watch( jsPath + '*.js', {
 		const fileName = segments[ segments.length - 1 ];
 
 		console.log( `recompiling \`${ jsBuildPath + fileName }\` due to changes to \`${ filePath }\`` );
-						console.log( `--noparse=${ __dirname }/../node_modules/pixi-particles/dist/pixi-particles.min.js` );
-						console.log(filePath);
-						console.log(jsBuildPath + fileName);
 		const proc = spawn(
 			'browserify',
 			[
@@ -57,7 +54,6 @@ chokidar.watch( jsPath + 'inc/*.js', {
 	.on( 'change', function( filePath ) {
 		const segments = filePath.split( '/' );
 		const fileName = segments[ segments.length - 1 ];
-		const incRx = /{INCLUDES}([\s\S]*){\/INCLUDES}/g;
 		const jsRx = /([\w\-. ]+\.js)/g;
 		// matches require statements
 		const reqRx = /require\(\s*?'([\w\-. \/]*\.js)'\s*?\)/g;
