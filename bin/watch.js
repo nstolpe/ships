@@ -33,8 +33,6 @@ chokidar.watch( jsPath + '*.js', {
 				filePath,
 				'-o',
 				jsBuildPath + fileName,
-				// `--noparse=${ __dirname }/../node_modules/pixi-particles/dist/pixi-particles.min.js`
-				// `--noparse=/media/suse-storage/linked/Code/ships/node_modules/pixi-particles/dist/pixi-particles.min.js`
 				`--noparse=${ path.join( __dirname, '..' ) }/node_modules/pixi-particles/dist/pixi-particles.min.js`
 			],
 			{
