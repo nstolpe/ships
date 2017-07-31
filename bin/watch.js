@@ -1,6 +1,8 @@
 const chokidar = require( 'chokidar' );
+const browserify = require('browserify')
 const spawn = require( 'child_process' ).spawn;
 const fs = require( 'fs' );
+const path = require( 'path' );
 
 const jsPath = 'source/js/';
 const imagePath = 'source/images';
@@ -17,20 +19,31 @@ const spritesheetBuildPath = '.static/assets/spritesheets/';
 chokidar.watch( jsPath + '*.js', {
 		ignored: /(^|[\/\\])\../
 	} )
-	.on( 'change', function( path ) {
-		const segments = path.split( '/' );
+	.on( 'change', function( filePath ) {
+		const segments = filePath.split( '/' );
 		const fileName = segments[ segments.length - 1 ];
 
-		console.log( `recompiling \`${ jsBuildPath + fileName }\` due to changes to \`${ path }\`` );
-						console.log(path);
+		console.log( `recompiling \`${ jsBuildPath + fileName }\` due to changes to \`${ filePath }\`` );
+						console.log( `--noparse=${ __dirname }/../node_modules/pixi-particles/dist/pixi-particles.min.js` );
+						console.log(filePath);
 						console.log(jsBuildPath + fileName);
-		const proc = spawn( 'browserify', [ path, '-o', jsBuildPath + fileName ], {
-			stdio: 'inherit'
-		} );
-
+		const proc = spawn(
+			'browserify',
+			[
+				filePath,
+				'-o',
+				jsBuildPath + fileName,
+				// `--noparse=${ __dirname }/../node_modules/pixi-particles/dist/pixi-particles.min.js`
+				// `--noparse=/media/suse-storage/linked/Code/ships/node_modules/pixi-particles/dist/pixi-particles.min.js`
+				`--noparse=${ path.join( __dirname, '..' ) }/node_modules/pixi-particles/dist/pixi-particles.min.js`
+			],
+			{
+				stdio: 'inherit'
+			}
+		);
 		proc.on( 'close', code => {
-			if ( code === 1) 
-				console.error( `✖ "browserify ${ path } -o ${ jsBuildPath + fileName }" failed`);
+			if ( code === 1)
+				console.error( `✖ "browserify ${ filePath } -o ${ jsBuildPath + fileName }" failed`);
 			else
 				console.log('watching scripts...');
 		} );
@@ -43,8 +56,8 @@ chokidar.watch( jsPath + '*.js', {
 chokidar.watch( jsPath + 'inc/*.js', {
 		ignored: /(^|[\/\\])\../
 	} )
-	.on( 'change', function( path ) {
-		const segments = path.split( '/' );
+	.on( 'change', function( filePath ) {
+		const segments = filePath.split( '/' );
 		const fileName = segments[ segments.length - 1 ];
 		const incRx = /{INCLUDES}([\s\S]*){\/INCLUDES}/g;
 		const jsRx = /([\w\-. ]+\.js)/g;
@@ -70,11 +83,11 @@ chokidar.watch( jsPath + 'inc/*.js', {
 						stdio: 'inherit'
 					} );
 
-					console.log( `recompiling \`${ jsBuildPath + scripts[ i ] }\` due to changes to \`${ path }\`` );
+					console.log( `recompiling \`${ jsBuildPath + scripts[ i ] }\` due to changes to \`${ filePath }\`` );
 
 					proc.on( 'close', code => {
 						if ( code === 1 ) 
-							console.error( `✖ "browserify ${ path } -o ${ jsBuildPath + fileName }" failed` );
+							console.error( `✖ "browserify ${ filePath } -o ${ jsBuildPath + fileName }" failed` );
 						else
 							console.log( 'Watching scripts...' );
 					} );
@@ -93,11 +106,11 @@ chokidar.watch( jsPath + 'inc/*.js', {
 chokidar.watch( imagePath, {
 		ignored: /(^|[\/\\])\../
 	} )
-	.on( 'change', function( path ) {
-		console.log( path );
-		let subPath = path.replace( imagePath, '' );
+	.on( 'change', function( filePath ) {
+		console.log( filePath );
+		let subPath = filePath.replace( imagePath, '' );
 		console.log( imageBuildPath + subPath  );
-		const proc = spawn( 'cp', [ path, imageBuildPath + subPath ], {
+		const proc = spawn( 'cp', [ filePath, imageBuildPath + subPath ], {
 			stdio: 'inherit'
 		} );
 
@@ -105,7 +118,7 @@ chokidar.watch( imagePath, {
 			if ( code === 1)
 				console.error( `✖ "failed"`);
 			else
-				console.log(`Copied ${path} to ${imageBuildPath}`);
+				console.log(`Copied ${filePath} to ${imageBuildPath}`);
 				console.log('Watching images...');
 		} );
 	} );
@@ -115,8 +128,8 @@ chokidar.watch( imagePath, {
 chokidar.watch( spritesheetPath, {
 		ignored: /(^|[\/\\])\../
 	} )
-	.on( 'change', function( path ) {
-		const proc = spawn( 'cp', [ path, spritesheetBuildPath ], {
+	.on( 'change', function( filePath ) {
+		const proc = spawn( 'cp', [ filePath, spritesheetBuildPath ], {
 			stdio: 'inherit'
 		} );
 
@@ -124,7 +137,7 @@ chokidar.watch( spritesheetPath, {
 			if ( code === 1)
 				console.error( `✖ "failed"`);
 			else
-				console.log(`Copied ${path} to ${spritesheetBuildPath}`);
+				console.log(`Copied ${ filePath } to ${ spritesheetBuildPath }`);
 				console.log('Watching spritesheets...');
 		} );
 	} );
