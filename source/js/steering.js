@@ -71,7 +71,7 @@ function setup() {
 	turtle.sprite.height *= .5;
 	SteeringKeyboard();
 
-	app.stage.addChild( polyGraphics );
+	// app.stage.addChild( polyGraphics );
 	app.ticker.add( animate );
 }
 
