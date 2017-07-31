@@ -5,11 +5,13 @@ const fs = require( 'fs' );
 const path = require( 'path' );
 
 const jsPath = 'source/js/';
+const dataPath = 'source/data/';
 const imagePath = 'source/images';
 const spritesheetPath = 'source/spritesheets';
 
 
 const jsBuildPath = '.static/assets/js/';
+const dataBuildPath = '.static/assets/data/';
 const imageBuildPath = '.static/assets/images/';
 const spritesheetBuildPath = '.static/assets/spritesheets/';
 
@@ -133,6 +135,25 @@ chokidar.watch( spritesheetPath, {
 			else
 				console.log(`Copied ${ filePath } to ${ spritesheetBuildPath }`);
 				console.log('Watching spritesheets...');
+		} );
+	} );
+/**
+ * Watches the `dataPath` (default: 'source/data') for changes
+ */
+chokidar.watch( dataPath, {
+		ignored: /(^|[\/\\])\../
+	} )
+	.on( 'change', function( filePath ) {
+		const proc = spawn( 'cp', [ filePath, dataBuildPath ], {
+			stdio: 'inherit'
+		} );
+
+		proc.on( 'close', code => {
+			if ( code === 1)
+				console.error( `✖ "failed"`);
+			else
+				console.log(`Copied ${ filePath } to ${ dataBuildPath }`);
+				console.log('Watching data...');
 		} );
 	} );
 
