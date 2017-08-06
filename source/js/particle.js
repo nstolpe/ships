@@ -8,7 +8,7 @@ const particles = require( 'pixi-particles' );
 const view = document.getElementById( 'view' );
 const viewWidth = 1000;
 const viewHeight = 800;
-const app = new PIXI.Application( viewWidth, viewHeight, { view: view, backgroundColor : 0x82bdf1 } );
+const app = new PIXI.Application( viewWidth, viewHeight, { view: view, backgroundColor : 0x02bdf1 } );
 
 const loader = PIXI.loader;
 
@@ -16,7 +16,6 @@ let emitters = [];
 let elapsed;
 
 function animate( delta ) {
-	// console.log( 'animate' );
 	let now = Date.now();
 
 	for ( let i = 0, l = emitters.length; i < l; i ++ ) {
