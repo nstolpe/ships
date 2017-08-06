@@ -1,6 +1,6 @@
 'use strict';
 
-module.exports = function( config, parent, textures, dimensions, emitterCount ) {
+module.exports = function( config, parent, textures, dimensions, emitterCount, direction ) {
 	return {
 		config: config,
 		parent: parent,
@@ -8,13 +8,18 @@ module.exports = function( config, parent, textures, dimensions, emitterCount ) 
 		dimensions: dimensions,
 		emitters: [],
 		emitterCount: emitterCount,
+		direction: direction,
 		elapsed: 0,
 		createEmitterInstance( baseEmitterConfig, textures ) {
 			const minPos = 0;
 			const maxPos = 600;
 			let emitterContainer = new PIXI.Container();
 			let emitterConfig = Object.assign( baseEmitterConfig, {
-				emitterLifetime: Math.random() * ( 10 - 3 ) + 3
+				emitterLifetime: Math.random() * ( 10 - 3 ) + 3,
+				startRotation: {
+					min: this.direction - 15,
+					max: this.direction - 15
+				}
 			} );
 
 			let emitter = new PIXI.particles.Emitter(
@@ -38,14 +43,28 @@ module.exports = function( config, parent, textures, dimensions, emitterCount ) 
 
 			this.elapsed = Date.now();
 		},
-		update( delta ) {
+		update( delta, forces ) {
 			let now = Date.now();
 
 			for ( let i = 0, l = this.emitters.length; i < l; i ++ ) {
 				let emitter = this.emitters[ i ];
+				let accumulated = { x: 0, y: 0 };
+
 				emitter.update( ( now - this.elapsed ) * 0.001 );
-				emitter.ownerPos.x += ( now - this.elapsed ) * 0.01;
-				emitter.ownerPos.y += ( now - this.elapsed ) * 0.01;
+
+				for ( let ii = 0, ll = forces.length; ii < ll; ii++ ) {
+					let force = forces[ ii ];
+
+					// {
+					// 	x: force.force * math.cos( math.unit( force.direction, 'deg' ) ),
+					// 	y: force.force * math.sin( math.unit( force.direction, 'deg' ) )
+					// }
+					accumulated.x += force.force * math.cos( math.unit( force.direction, 'deg' ) );
+					accumulated.y += force.force * math.sin( math.unit( force.direction, 'deg' ) );
+				}
+
+				emitter.ownerPos.x += accumulated.x * delta;
+				emitter.ownerPos.y += accumulated.y * delta;
 				if ( !emitter.emit && emitter.particleCount <= 0 ) {
 					this.parent.removeChild( emitter.parent );
 					emitter.destroy();

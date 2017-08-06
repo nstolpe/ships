@@ -50,7 +50,8 @@ function setup( loader, resources ) {
 		emitterParent,
 		[ resources['particle'].texture ],
 		{ w: viewWidth, h: viewHeight },
-		16
+		16,
+		current.direction
 	);
 	emitterManager.start();
 
@@ -97,7 +98,7 @@ function animate( delta ) {
 			frictions: [ window.friction ]
 		} );
 
-		emitterManager.update();
+		emitterManager.update( delta, [ current ] );
 		// Debug Display Logic
 		// @TODO move this out
 		if ( model.base.debug ) {
