@@ -75,9 +75,18 @@ chokidar.watch( jsPath + 'inc/*.js', {
 			while ( reqMatch = reqRx.exec( fileText ) ) {
 				// console.log(reqMatch[ 1 ].substring( reqMatch[ 1 ].length - fileName.length ));
 				if ( fileName === reqMatch[ 1 ].substring( reqMatch[ 1 ].length - fileName.length ) ) {
-					let proc = spawn( 'browserify', [ jsPath + scripts[ i ], '-o', jsBuildPath + scripts[ i ] ], {
-						stdio: 'inherit'
-					} );
+					let proc = spawn(
+						'browserify',
+						[
+							jsPath + scripts[ i ],
+							'-o',
+							jsBuildPath + scripts[ i ],
+							`--noparse=${ path.join( __dirname, '..' ) }/node_modules/pixi-particles/dist/pixi-particles.min.js`
+						],
+						{
+							stdio: 'inherit'
+						}
+					);
 
 					console.log( `recompiling \`${ jsBuildPath + scripts[ i ] }\` due to changes to \`${ filePath }\`` );
 
