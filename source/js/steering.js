@@ -4,6 +4,7 @@ const Util = require( './inc/util.js' );
 const SteeringKeyboard = require( './inc/steering-keyboard.js' );
 const GameModels = require( './inc/game-models.js' );
 const EmitterManager = require( './inc/emitter-manager.js' );
+const CollisionPolygon = require( './inc/collision-polygon.js' );
 
 window.math = require( 'mathjs' );
 const PIXI = require( 'pixi.js' ),
@@ -34,7 +35,7 @@ window.gameModels = [];
 window.current = {
 	direction: 145,
 	force: .3
-}
+};
 
 window.friction = 0.98;
 
