@@ -3,8 +3,7 @@
 const Util = require( './inc/util.js' );
 const SteeringKeyboard = require( './inc/steering-keyboard.js' );
 const GameModels = require( './inc/game-models.js' );
-const WaterManager = require( './inc/water-manager.js' );
-const AnimatedTilingSprite = require( './inc/animated-tiling-sprite.js' );
+const EmitterManager = require( './inc/emitter-manager.js' );
 
 window.math = require( 'mathjs' );
 const PIXI = require( 'pixi.js' ),
@@ -14,7 +13,8 @@ const PIXI = require( 'pixi.js' ),
 	viewWidth = 1000,
 	viewHeight = 800,
 	scale = window.devicePixelRatio,
-	app = new PIXI.Application( viewWidth, viewHeight, { view: view, backgroundColor : 0x000000, resolution: scale } );
+	app = new PIXI.Application( viewWidth, viewHeight, { view: view, backgroundColor : 0x02bdf1, resolution: scale } );
+const Particles = require( 'pixi-particles' );
 
 const Config = require( './inc/config.js' )( PIXI, app );
 
@@ -25,12 +25,9 @@ view.style.width = viewWidth + 'px';
 view.style.height = viewHeight + 'px';
 
 loader
-	.add( "assets/spritesheets/ships.json" )
-	.add( 'water-00', 'assets/images/water-00.png' )
-	.add( 'water-01', 'assets/images/water-01.png' )
-	.add( 'water-02', 'assets/images/water-02.png' )
-	.add( 'water-03', 'assets/images/water-03.png' )
-	.add( 'water-04', 'assets/images/water-04.png' )
+	.add( 'assets/spritesheets/ships.json' )
+	.add( 'particle', 'assets/images/particle.png' )
+	.add( 'emitter', 'assets/data/emitter.json' )
 	.load( setup );
 
 window.gameModels = [];
@@ -41,28 +38,23 @@ window.current = {
 
 window.friction = 0.98;
 
-let waterManager = WaterManager( {
-	uResolution: { type: 'v2', value: [ viewWidth, viewHeight ] },
-} ).init();
+let emitterManager;
+let emitterParent = new PIXI.Container();
 
-var oceanFloor;
-
-function setup() {
-	var id = PIXI.loader.resources[ Config.spriteSheetPath + "ships.json" ].textures;
-	gameModels = loadGameModels();
-	oceanFloor = AnimatedTilingSprite(
-		[
-			PIXI.loader.resources[ 'water-00' ].texture,
-			PIXI.loader.resources[ 'water-01' ].texture,
-			PIXI.loader.resources[ 'water-02' ].texture,
-			PIXI.loader.resources[ 'water-03' ].texture,
-			PIXI.loader.resources[ 'water-04' ].texture
-		],
-		viewWidth,
-		viewHeight
+function setup( loader, resources ) {
+	emitterParent.width = viewWidth;
+	emitterParent.height = viewHeight;
+	app.stage.addChild( emitterParent );
+	emitterManager = EmitterManager(
+		resources.emitter.data,
+		emitterParent,
+		[ resources['particle'].texture ],
+		{ w: viewWidth, h: viewHeight },
+		16
 	);
-	window.oceanFloor = oceanFloor;
-	app.stage.addChild( oceanFloor );
+	emitterManager.start();
+
+	gameModels = loadGameModels();
 	for ( let i = 0, l = gameModels.length; i < l; i++ ) {
 		app.stage.addChild( gameModels[ i ].base.sprite );
 	}
@@ -71,7 +63,6 @@ function setup() {
 	turtle.sprite.height *= .5;
 	SteeringKeyboard();
 
-	// app.stage.addChild( polyGraphics );
 	app.ticker.add( animate );
 }
 
@@ -95,8 +86,6 @@ const poly = new PIXI.Polygon(
 const polyGraphics = new PIXI.Graphics();
 
 function animate( delta ) {
-	// waterManager.update( delta );
-	oceanFloor.update( delta );
 	for ( let i = 0, l = gameModels.length; i < l; i++ ) {
 		let model = gameModels[ i ];
 
@@ -108,6 +97,7 @@ function animate( delta ) {
 			frictions: [ window.friction ]
 		} );
 
+		emitterManager.update();
 		// Debug Display Logic
 		// @TODO move this out
 		if ( model.base.debug ) {
@@ -149,8 +139,8 @@ function animate( delta ) {
 			let stageGraphics = app.stage.children.find( ( c ) => PIXI.Graphics.prototype.isPrototypeOf( c ) );
 			let modelGraphics = model.base.sprite.children.find( ( c ) => PIXI.Graphics.prototype.isPrototypeOf( c ) );
 
-			if ( stageGraphics )
-				app.stage.removeChild( stageGraphics );
+			// if ( stageGraphics )
+			// 	app.stage.removeChild( stageGraphics );
 
 			if ( modelGraphics )
 				model.base.sprite.removeChild( modelGraphics );
@@ -158,19 +148,19 @@ function animate( delta ) {
 		// END Debug Display Logic
 	}
 
-	polyGraphics.clear();
-	polyGraphics.lineStyle( 1, 0x000000, 1 );
-	polyGraphics.beginFill( 0x000000 );
+	let stageGraphics = app.stage.children.find( ( c ) => PIXI.Graphics.prototype.isPrototypeOf( c ) );
+	stageGraphics.lineStyle( 1, 0x00ffff, 1 );
+	stageGraphics.beginFill( 0x00ffff );
 
-	polyGraphics.moveTo( poly.points[ 0 ] + 100, poly.points[ 1 ] + 100 );
+	stageGraphics.moveTo( poly.points[ 0 ] + 100, poly.points[ 1 ] + 100 );
 
 	for ( let i = 2, l = poly.points.length; i < l; i += 2 ) {
-		polyGraphics.lineTo( poly.points[ i ] + 100, poly.points[ i + 1 ] + 100 );
+		stageGraphics.lineTo( poly.points[ i ] + 100, poly.points[ i + 1 ] + 100 );
 	}
 
-	polyGraphics.lineTo( poly.points[ 0 ] + 100, poly.points[ 1 ] + 100 );
+	stageGraphics.lineTo( poly.points[ 0 ] + 100, poly.points[ 1 ] + 100 );
 
-	polyGraphics.endFill();
+	stageGraphics.endFill();
 
 	checkScreenBounds( turtle, { left: 0, right: app.view.offsetWidth, top: 0, bottom: app.view.offsetHeight } );
 }
