@@ -1,5 +1,7 @@
 'use strict'
 
+// @TODO Make this better if it will actually be used.
+//       Use TilingSprite and AnimatedSprite
 // module.exports = function() {
 // 	return {
 // 		fromImage() {
