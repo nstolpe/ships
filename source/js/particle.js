@@ -56,7 +56,7 @@ function createEmitterInstance( baseEmitterConfig, textures ) {
 	let emitter = new PIXI.particles.Emitter(
 		emitterContainer,
 		textures,
-		emitterConfig,
+		emitterConfig
 	);
 
 	app.stage.addChild( emitterContainer );
