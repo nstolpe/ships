@@ -13,8 +13,8 @@
 		"end": "#dcebf9"
 	},
 	"speed": {
-		"start": 50,
-		"end": 10,
+		"start": 10,
+		"end": 8,
 		"minimumSpeedMultiplier": 1
 	},
 	"acceleration": {
@@ -24,7 +24,7 @@
 	"maxSpeed": 0,
 	"startRotation": {
 		"min": 0,
-		"max": 0
+		"max": 360
 	},
 	"noRotation": false,
 	"rotationSpeed": {
@@ -38,22 +38,22 @@
 	"blendMode": "normal",
 	"frequency": 0.01,
 	"emitterLifetime": 0,
-	"maxParticles": 13,
+	"maxParticles": 53,
 	"pos": {
 		"x": 0,
 		"y": 0
 	},
 	"addAtBack": false,
-	"spawnType": "circle",
+	"spawnType": "rect",
 	"spawnRect": {
 		"x": 0,
 		"y": 0,
-		"w": 10,
+		"w": 80,
 		"y": 10
 	},
 	"spawnCircle": {
 		"x": 0,
 		"y": 0,
-		"r": 50
+		"r": 20
 	}
 }
