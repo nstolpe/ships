@@ -14,7 +14,7 @@ const PIXI = require( 'pixi.js' ),
 	viewWidth = 1000,
 	viewHeight = 800,
 	scale = window.devicePixelRatio,
-	app = new PIXI.Application( viewWidth, viewHeight, { view: view, backgroundColor : 0x02bdf1, resolution: scale } );
+	app = new PIXI.Application( viewWidth, viewHeight, { view: view, backgroundColor : 0x051224, resolution: scale } );
 const Particles = require( 'pixi-particles' );
 
 const Config = require( './inc/config.js' )( PIXI, app );
@@ -51,7 +51,7 @@ function setup( loader, resources ) {
 		emitterParent,
 		[ resources['particle'].texture ],
 		{ w: viewWidth, h: viewHeight },
-		16,
+		17,
 		current.direction
 	);
 	emitterManager.start();
@@ -154,16 +154,31 @@ function animate( delta ) {
 	stageGraphics.lineStyle( 1, 0x00ffff, 1 );
 	stageGraphics.beginFill( 0x00ffff );
 
+	// start: draw the polygon
 	stageGraphics.moveTo( poly.points[ 0 ] + 100, poly.points[ 1 ] + 100 );
 
-	for ( let i = 2, l = poly.points.length; i < l; i += 2 ) {
+	for ( let i = 2, l = poly.points.length; i < l; i += 2 )
 		stageGraphics.lineTo( poly.points[ i ] + 100, poly.points[ i + 1 ] + 100 );
-	}
-
+	// close the poly
 	stageGraphics.lineTo( poly.points[ 0 ] + 100, poly.points[ 1 ] + 100 );
 
 	stageGraphics.endFill();
 
+	stageGraphics.lineStyle( 2, 0xff0000, 1 );
+	stageGraphics.beginFill( 0xff0000 );
+
+	for ( let i = 0, l = poly.points.length; i < l; i += 2 ) {
+		let x = poly.points[ i ] + ( poly.edges[ i ] / 2 ) + 100;
+		let y = poly.points[ i + 1 ] + ( poly.edges[ i + 1 ] / 2 ) + 100;
+		stageGraphics.moveTo( x, y );
+		stageGraphics.lineTo( x + poly.normals[ i ] * 10, y + poly.normals[ i + 1 ] * 10 );
+	}
+
+	stageGraphics.endFill();
+	// end: draw the polygon
+
+	// check if the turtle is leaving the screen bounds
+	// @TODO use better collision detection
 	checkScreenBounds( turtle, { left: 0, right: app.view.offsetWidth, top: 0, bottom: app.view.offsetHeight } );
 }
 
