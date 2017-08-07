@@ -13,8 +13,6 @@ module.exports = function( config, parent, textures, dimensions, emitterCount, d
 		direction: direction,
 		elapsed: 0,
 		createEmitterInstance( baseEmitterConfig, textures ) {
-			const minPos = 0;
-			const maxPos = 600;
 			let emitterContainer = new PIXI.Container();
 			let emitterConfig = Object.assign( baseEmitterConfig, {
 				emitterLifetime: Math.random() * ( 10 - 3 ) + 3,
@@ -31,11 +29,13 @@ module.exports = function( config, parent, textures, dimensions, emitterCount, d
 			);
 
 			this.parent.addChild( emitterContainer );
-
+			emitterContainer.pivot.x = emitterContainer.width / 2;
+			emitterContainer.pivot.y = emitterContainer.height / 2;
+			emitterContainer.rotation = direction;
 			emitter.update( 0 );
 
-			emitter.ownerPos.x = Math.floor( Math.random() * ( dimensions.w - 0 ) ) + 0;
-			emitter.ownerPos.y = Math.floor( Math.random() * ( dimensions.h - 0 ) ) + 0;
+			emitterContainer.position.x = Math.floor( Math.random() * ( dimensions.w - 0 ) ) + 0;
+			emitterContainer.position.y = Math.floor( Math.random() * ( dimensions.h - 0 ) ) + 0;
 
 			return emitter;
 		},
@@ -56,12 +56,7 @@ module.exports = function( config, parent, textures, dimensions, emitterCount, d
 
 				for ( let ii = 0, ll = forces.length; ii < ll; ii++ ) {
 					let force = forces[ ii ];
-					emitter.parent.rotation = force.direction; //Util.toRadians( force.direction );
 
-					// {
-					// 	x: force.force * math.cos( math.unit( force.direction, 'deg' ) ),
-					// 	y: force.force * math.sin( math.unit( force.direction, 'deg' ) )
-					// }
 					accumulated.x += force.force * math.cos( math.unit( force.direction, 'deg' ) );
 					accumulated.y += force.force * math.sin( math.unit( force.direction, 'deg' ) );
 				}
