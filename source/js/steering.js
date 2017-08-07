@@ -68,7 +68,7 @@ function setup( loader, resources ) {
 	app.ticker.add( animate );
 }
 
-const poly = new PIXI.Polygon(
+const poly = CollisionPolygon(
 	48,   0,
 	71,   7,
 	83,  33,
