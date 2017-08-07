@@ -1,5 +1,7 @@
 'use strict';
 
+const Util = require( './util.js' );
+
 module.exports = function( config, parent, textures, dimensions, emitterCount, direction ) {
 	return {
 		config: config,
@@ -16,10 +18,10 @@ module.exports = function( config, parent, textures, dimensions, emitterCount, d
 			let emitterContainer = new PIXI.Container();
 			let emitterConfig = Object.assign( baseEmitterConfig, {
 				emitterLifetime: Math.random() * ( 10 - 3 ) + 3,
-				startRotation: {
-					min: this.direction - 15,
-					max: this.direction - 15
-				}
+				// startRotation: {
+				// 	min: this.direction - 15,
+				// 	max: this.direction - 15
+				// }
 			} );
 
 			let emitter = new PIXI.particles.Emitter(
@@ -54,6 +56,7 @@ module.exports = function( config, parent, textures, dimensions, emitterCount, d
 
 				for ( let ii = 0, ll = forces.length; ii < ll; ii++ ) {
 					let force = forces[ ii ];
+					emitter.parent.rotation = force.direction; //Util.toRadians( force.direction );
 
 					// {
 					// 	x: force.force * math.cos( math.unit( force.direction, 'deg' ) ),
