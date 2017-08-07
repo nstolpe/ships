@@ -2,7 +2,7 @@
 
 const PIXI = require( 'pixi.js' );
 
-module.exports = function () {
+module.exports = function ( ...points ) {
 	const proto = {
 		foo() {
 			console.log( 'bar' );
@@ -12,5 +12,8 @@ module.exports = function () {
 		}
 	};
 
-	return Object.assign( Object.create( PIXI.Polygon.prototype ), proto );
+	const poly = Object.assign( Object.create( PIXI.Polygon.prototype ), proto );
+	PIXI.Polygon.apply( poly, points );
+
+	return poly;
 }
