@@ -103,64 +103,7 @@ function animate( delta ) {
 		// Debug Display Logic
 		// @TODO move this out
 		if ( model.base.debug ) {
-			let stageGraphics = app.stage.children.find( ( c ) => PIXI.Graphics.prototype.isPrototypeOf( c ) );
-
-			if ( stageGraphics ) {
-				stageGraphics.clear();
-			} else {
-				stageGraphics = new PIXI.Graphics();
-				app.stage.addChild( stageGraphics );
-			}
-
-			if ( model.base.sprite.hitArea ) {
-				let p1 = model.base.sprite.transform.worldTransform.apply( { x: model.base.sprite.hitArea.x, y: model.base.sprite.hitArea.y } );
-				let p2 = model.base.sprite.transform.worldTransform.apply( { x: model.base.sprite.hitArea.x, y: model.base.sprite.hitArea.y + model.base.sprite.hitArea.height } );
-				let p3 = model.base.sprite.transform.worldTransform.apply( { x: model.base.sprite.hitArea.x + model.base.sprite.hitArea.width, y: model.base.sprite.hitArea.y + model.base.sprite.hitArea.height } );
-				let p4 = model.base.sprite.transform.worldTransform.apply( { x: model.base.sprite.hitArea.x + model.base.sprite.hitArea.width, y: model.base.sprite.hitArea.y } );
-
-				stageGraphics.lineStyle( 1, 0xf1ff32, 1 );
-
-				stageGraphics.moveTo( p1.x, p1.y );
-				stageGraphics.lineTo( p2.x, p2.y );
-				stageGraphics.lineTo( p3.x, p3.y );
-				stageGraphics.lineTo( p4.x, p4.y );
-				stageGraphics.lineTo( p1.x, p1.y );
-			}
-
-			let bounds = model.base.sprite.getBounds();
-
-			stageGraphics.lineStyle( 1, 0xff4cc7, 1 );
-			stageGraphics.moveTo( bounds.x, bounds.y );
-			stageGraphics.lineTo( bounds.x, bounds.y + bounds.height );
-			stageGraphics.lineTo( bounds.x + bounds.width, bounds.y + bounds.height );
-			stageGraphics.lineTo( bounds.x + bounds.width, bounds.y );
-			stageGraphics.lineTo( bounds.x, bounds.y );
-
-			stageGraphics.lineStyle( 1, 0x00ffff, 1 );
-			stageGraphics.beginFill( 0x00ffff );
-
-			// start: draw the polygon
-			stageGraphics.moveTo( poly.points[ 0 ] + 100, poly.points[ 1 ] + 100 );
-
-			for ( let i = 2, l = poly.points.length; i < l; i += 2 )
-				stageGraphics.lineTo( poly.points[ i ] + 100, poly.points[ i + 1 ] + 100 );
-			// close the poly
-			stageGraphics.lineTo( poly.points[ 0 ] + 100, poly.points[ 1 ] + 100 );
-
-			stageGraphics.endFill();
-
-			stageGraphics.lineStyle( 2, 0xff0000, 1 );
-			stageGraphics.beginFill( 0xff0000 );
-
-			for ( let i = 0, l = poly.points.length; i < l; i += 2 ) {
-				let x = poly.points[ i ] + ( poly.edges[ i ] / 2 ) + 100;
-				let y = poly.points[ i + 1 ] + ( poly.edges[ i + 1 ] / 2 ) + 100;
-				stageGraphics.moveTo( x, y );
-				stageGraphics.lineTo( x + poly.normals[ i ] * 10, y + poly.normals[ i + 1 ] * 10 );
-			}
-
-			stageGraphics.endFill();
-			// end: draw the polygon
+			drawDebug( model );
 		} else {
 			let stageGraphics = app.stage.children.find( ( c ) => PIXI.Graphics.prototype.isPrototypeOf( c ) );
 
@@ -175,6 +118,66 @@ function animate( delta ) {
 	checkScreenBounds( turtle, { left: 0, right: app.view.offsetWidth, top: 0, bottom: app.view.offsetHeight } );
 }
 
+function drawDebug( model ) {
+	let stageGraphics = app.stage.children.find( ( c ) => PIXI.Graphics.prototype.isPrototypeOf( c ) );
+
+	if ( stageGraphics ) {
+		stageGraphics.clear();
+	} else {
+		stageGraphics = new PIXI.Graphics();
+		app.stage.addChild( stageGraphics );
+	}
+
+	if ( model.base.sprite.hitArea ) {
+		let p1 = model.base.sprite.transform.worldTransform.apply( { x: model.base.sprite.hitArea.x, y: model.base.sprite.hitArea.y } );
+		let p2 = model.base.sprite.transform.worldTransform.apply( { x: model.base.sprite.hitArea.x, y: model.base.sprite.hitArea.y + model.base.sprite.hitArea.height } );
+		let p3 = model.base.sprite.transform.worldTransform.apply( { x: model.base.sprite.hitArea.x + model.base.sprite.hitArea.width, y: model.base.sprite.hitArea.y + model.base.sprite.hitArea.height } );
+		let p4 = model.base.sprite.transform.worldTransform.apply( { x: model.base.sprite.hitArea.x + model.base.sprite.hitArea.width, y: model.base.sprite.hitArea.y } );
+
+		stageGraphics.lineStyle( 1, 0xf1ff32, 1 );
+
+		stageGraphics.moveTo( p1.x, p1.y );
+		stageGraphics.lineTo( p2.x, p2.y );
+		stageGraphics.lineTo( p3.x, p3.y );
+		stageGraphics.lineTo( p4.x, p4.y );
+		stageGraphics.lineTo( p1.x, p1.y );
+	}
+
+	let bounds = model.base.sprite.getBounds();
+
+	stageGraphics.lineStyle( 1, 0xff4cc7, 1 );
+	stageGraphics.moveTo( bounds.x, bounds.y );
+	stageGraphics.lineTo( bounds.x, bounds.y + bounds.height );
+	stageGraphics.lineTo( bounds.x + bounds.width, bounds.y + bounds.height );
+	stageGraphics.lineTo( bounds.x + bounds.width, bounds.y );
+	stageGraphics.lineTo( bounds.x, bounds.y );
+
+	stageGraphics.lineStyle( 1, 0x00ffff, 1 );
+	stageGraphics.beginFill( 0x00ffff );
+
+	// start: draw the polygon
+	stageGraphics.moveTo( poly.points[ 0 ] + 100, poly.points[ 1 ] + 100 );
+
+	for ( let i = 2, l = poly.points.length; i < l; i += 2 )
+		stageGraphics.lineTo( poly.points[ i ] + 100, poly.points[ i + 1 ] + 100 );
+	// close the poly
+	stageGraphics.lineTo( poly.points[ 0 ] + 100, poly.points[ 1 ] + 100 );
+
+	stageGraphics.endFill();
+
+	stageGraphics.lineStyle( 2, 0xff0000, 1 );
+	stageGraphics.beginFill( 0xff0000 );
+
+	for ( let i = 0, l = poly.points.length; i < l; i += 2 ) {
+		let x = poly.points[ i ] + ( poly.edges[ i ] / 2 ) + 100;
+		let y = poly.points[ i + 1 ] + ( poly.edges[ i + 1 ] / 2 ) + 100;
+		stageGraphics.moveTo( x, y );
+		stageGraphics.lineTo( x + poly.normals[ i ] * 10, y + poly.normals[ i + 1 ] * 10 );
+	}
+
+	stageGraphics.endFill();
+	// end: draw the polygon
+}
 /**
  * Checks if an object is withing the screen bounds. Could have a better name.
  */

@@ -43,7 +43,6 @@ module.exports = function ( ...points ) {
 
 	const poly = Object.assign( Object.create( PIXI.Polygon.prototype ), proto );
 	PIXI.Polygon.apply( poly, points );
-
 	poly.setEdges();
 	return poly;
 }
