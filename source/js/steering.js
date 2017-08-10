@@ -35,7 +35,7 @@ loader
 window.gameModels = [];
 window.current = {
 	direction: 145,
-	force: .3
+	force: .05
 };
 
 window.friction = 0.98;
