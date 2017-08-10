@@ -97625,8 +97625,59 @@ module.exports = {
 };
 
 },{}],733:[function(require,module,exports){
+'use strict';
+
+const PIXI = require( 'pixi.js' );
+
+function Vector( x, y ) {
+	const proto = {
+		x: x || 0,
+		y: y || 0,
+		perp() {
+
+		}
+	}
+}
+
+module.exports = function ( ...points ) {
+	const proto = {
+		edges: [],
+		normals: [],
+		foo() {
+			console.log( 'bar' );
+		},
+		bar() {
+			console.log( 'foo' );
+		},
+		setEdges() {
+			// create an edge and normal between each set of points.
+			for ( let i = 0, l = this.points.length; i < l; i += 2 ) {
+				let p1 = { x: poly.points[ i ], y: poly.points[ i + 1 ] };
+				// need to start again and grab the original point's x and y
+				let p2 = i + 2 < l ? { x: poly.points[ i + 2 ], y: poly.points[ i + 3 ] } : { x: poly.points[ 0 ], y: poly.points[ 1 ] };
+				let edge = { x: p2.x - p1.x, y: p2.y - p1.y };
+				let perp = { x: edge.y, y: -edge.x };
+				let perpLength = Math.sqrt( perp.x * perp.x + perp.y * perp.y );
+				let normal = perpLength != 0 ? { x: perp.x / perpLength, y: perp.y / perpLength } : perp;
+				this.edges[ i ] = edge.x;
+				this.edges[ i + 1 ] = edge.y;
+				this.normals[ i ] = normal.x;
+				this.normals[ i + 1 ] = normal.y;
+			}
+			console.log( this.edges );
+		}
+	};
+
+	const poly = Object.assign( Object.create( PIXI.Polygon.prototype ), proto );
+	PIXI.Polygon.apply( poly, points );
+	poly.setEdges();
+	return poly;
+}
+
+},{"pixi.js":682}],734:[function(require,module,exports){
 'use strict'
 const Util = require( './util.js' );
+const CollisionPolygon = require( './collision-polygon.js' );
 
 module.exports = function( PIXI, app ) {
 
@@ -97634,10 +97685,110 @@ module.exports = function( PIXI, app ) {
 		spriteSheetPath: 'assets/spritesheets/',
 		gameModels: [
 			{
-				name: 'turtle',
+				options: {
+					basePosition: { x: 128, y: 128 },
+					name: 'boards-left',
+					rotationConstraints: { pos: 0, neg: 0 },
+					positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
+					debug: true
+				},
+				children: [
+					{
+						texture: 'boards',
+						tiling: true,
+						options: {
+							tiling: true,
+							dimensions: { w: 128, h: 512 },
+							// basePosition: { x: 15, y: 0 },
+							rotationConstraints: { pos: 0, neg: 0 },
+							positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } }
+						},
+						init: ( child, parent) => {
+							// child.pivot.x = parent.width / 2;
+						}
+					}
+				]
+			},
+			{
+				options: {
+					basePosition: { x: 512, y: 128 },
+					name: 'boards-right',
+					rotationConstraints: { pos: 0, neg: 0 },
+					positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
+					debug: true
+				},
+				children: [
+					{
+						texture: 'boards',
+						tiling: true,
+						options: {
+							tiling: true,
+							dimensions: { w: 128, h: 512 },
+							// basePosition: { x: 15, y: 0 },
+							rotationConstraints: { pos: 0, neg: 0 },
+							positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } }
+						},
+						init: ( child, parent) => {
+							// child.pivot.x = parent.width / 2;
+						}
+					}
+				]
+			},
+			{
+				options: {
+					basePosition: { x: 256, y: 128 },
+					name: 'boards-top',
+					rotationConstraints: { pos: 0, neg: 0 },
+					positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
+					debug: true
+				},
+				children: [
+					{
+						texture: 'boards',
+						tiling: true,
+						options: {
+							tiling: true,
+							dimensions: { w: 256, h: 128 },
+							// basePosition: { x: 15, y: 0 },
+							rotationConstraints: { pos: 0, neg: 0 },
+							positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } }
+						},
+						init: ( child, parent) => {
+							// child.pivot.x = parent.width / 2;
+						}
+					}
+				]
+			},
+			{
+				options: {
+					basePosition: { x: 256, y: 512 },
+					name: 'boards-bottom',
+					rotationConstraints: { pos: 0, neg: 0 },
+					positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
+					debug: true
+				},
+				children: [
+					{
+						texture: 'boards',
+						tiling: true,
+						options: {
+							tiling: true,
+							dimensions: { w: 256, h: 128 },
+							// basePosition: { x: 15, y: 0 },
+							rotationConstraints: { pos: 0, neg: 0 },
+							positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } }
+						},
+						init: ( child, parent) => {
+							// child.pivot.x = parent.width / 2;
+						}
+					}
+				]
+			},
+			{
 				spriteSheet: 'ships.json',
 				options: {
-					currentPosition: { x: 200, y: 300 },
+					name: 'turtle',
+					currentPosition: { x: 384, y: 384 },
 					// rotationConstraints: { pos: Infinity, neg: Infinity },
 					// positionConstraints: { pos: { x: Infinity, y: Infinity }, neg: { x: Infinity, y: Infinity } },
 					maxForwardVelocity: 4,
@@ -97654,11 +97805,27 @@ module.exports = function( PIXI, app ) {
 				},
 
 				init: ( base ) => {
-					base.sprite.hitArea = new PIXI.Rectangle(
-						0,
-						0,
-						base.sprite.width,
-						base.sprite.height
+					// base.sprite.hitArea = new PIXI.Rectangle(
+					// 	0,
+					// 	0,
+					// 	base.sprite.width,
+					// 	base.sprite.height
+					// );
+					base.sprite.hitArea = new CollisionPolygon(
+						48,   0,
+						71,   7,
+						83,  33,
+						86,  58,
+						83,  87,
+						71, 113,
+						48, 120,
+						38, 120,
+						15, 113,
+						 3,  87,
+						 0,  58,
+						 3,  33,
+						15,   7,
+						38,   0
 					);
 					base.sprite.interactive = true;
 					base.sprite.on( 'click', ( e ) => console.log( e ) );
@@ -97800,7 +97967,7 @@ module.exports = function( PIXI, app ) {
 	};
 };
 
-},{"./util.js":736}],734:[function(require,module,exports){
+},{"./collision-polygon.js":733,"./util.js":737}],735:[function(require,module,exports){
 'use strict'
 const PIXI = require( 'pixi.js' );
 const Sprite = PIXI.Sprite;
@@ -98108,7 +98275,7 @@ module.exports = {
 	}
 }
 
-},{"./util.js":736,"mathjs":10,"pixi.js":682}],735:[function(require,module,exports){
+},{"./util.js":737,"mathjs":10,"pixi.js":682}],736:[function(require,module,exports){
 'use strict'
 
 const Util = require( './util.js' );
@@ -98262,7 +98429,7 @@ module.exports = function() {
 	setupInput();
 }
 
-},{"./util.js":736}],736:[function(require,module,exports){
+},{"./util.js":737}],737:[function(require,module,exports){
 'use strict'
 
 module.exports = {
@@ -98282,7 +98449,7 @@ module.exports = {
 	} )
 }
 
-},{}],737:[function(require,module,exports){
+},{}],738:[function(require,module,exports){
 'use strict'
 
 const Config = require( './inc/config.js' );
@@ -98434,4 +98601,4 @@ function loadGameModel( model ) {
 	return { base: base }
 }
 
-},{"./inc/config.js":733,"./inc/game-models.js":734,"./inc/steering-keyboard.js":735,"./inc/util.js":736,"mathjs":10,"pixi.js":682}]},{},[737]);
+},{"./inc/config.js":734,"./inc/game-models.js":735,"./inc/steering-keyboard.js":736,"./inc/util.js":737,"mathjs":10,"pixi.js":682}]},{},[738]);
