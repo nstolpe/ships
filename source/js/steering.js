@@ -49,6 +49,7 @@ function setup( loader, resources ) {
 	emitterParent.width = viewWidth;
 	emitterParent.height = viewHeight;
 	app.stage.addChild( emitterParent );
+	app.stage.addChild( stageGraphics );
 	emitterManager = EmitterManager(
 		resources.emitter.data,
 		emitterParent,
