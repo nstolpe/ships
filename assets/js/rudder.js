@@ -97692,6 +97692,14 @@ module.exports = function( PIXI, app ) {
 					positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
 					debug: true
 				},
+				init: ( base ) => {
+					base.sprite.hitArea = new CollisionPolygon(
+						  0,   0,
+						128,   0,
+						128, 512,
+						  0, 512
+					);
+				},
 				children: [
 					{
 						texture: 'boards',
@@ -97716,6 +97724,14 @@ module.exports = function( PIXI, app ) {
 					rotationConstraints: { pos: 0, neg: 0 },
 					positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
 					debug: true
+				},
+				init: ( base ) => {
+					base.sprite.hitArea = new CollisionPolygon(
+						  0,   0,
+						128,   0,
+						128, 512,
+						  0, 512
+					);
 				},
 				children: [
 					{
@@ -97742,6 +97758,14 @@ module.exports = function( PIXI, app ) {
 					positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
 					debug: true
 				},
+				init: ( base ) => {
+					base.sprite.hitArea = new CollisionPolygon(
+						  0,   0,
+						256,   0,
+						256, 128,
+						  0, 128
+					);
+				},
 				children: [
 					{
 						texture: 'boards',
@@ -97752,9 +97776,6 @@ module.exports = function( PIXI, app ) {
 							// basePosition: { x: 15, y: 0 },
 							rotationConstraints: { pos: 0, neg: 0 },
 							positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } }
-						},
-						init: ( child, parent) => {
-							// child.pivot.x = parent.width / 2;
 						}
 					}
 				]
@@ -97766,6 +97787,14 @@ module.exports = function( PIXI, app ) {
 					rotationConstraints: { pos: 0, neg: 0 },
 					positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
 					debug: true
+				},
+				init: ( base ) => {
+					base.sprite.hitArea = new CollisionPolygon(
+						  0,   0,
+						256,   0,
+						256, 128,
+						  0, 128
+					);
 				},
 				children: [
 					{

@@ -97703,6 +97703,14 @@ module.exports = function( PIXI, app ) {
 					positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
 					debug: true
 				},
+				init: ( base ) => {
+					base.sprite.hitArea = new CollisionPolygon(
+						  0,   0,
+						128,   0,
+						128, 512,
+						  0, 512
+					);
+				},
 				children: [
 					{
 						texture: 'boards',
@@ -97727,6 +97735,14 @@ module.exports = function( PIXI, app ) {
 					rotationConstraints: { pos: 0, neg: 0 },
 					positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
 					debug: true
+				},
+				init: ( base ) => {
+					base.sprite.hitArea = new CollisionPolygon(
+						  0,   0,
+						128,   0,
+						128, 512,
+						  0, 512
+					);
 				},
 				children: [
 					{
@@ -97753,6 +97769,14 @@ module.exports = function( PIXI, app ) {
 					positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
 					debug: true
 				},
+				init: ( base ) => {
+					base.sprite.hitArea = new CollisionPolygon(
+						  0,   0,
+						256,   0,
+						256, 128,
+						  0, 128
+					);
+				},
 				children: [
 					{
 						texture: 'boards',
@@ -97763,9 +97787,6 @@ module.exports = function( PIXI, app ) {
 							// basePosition: { x: 15, y: 0 },
 							rotationConstraints: { pos: 0, neg: 0 },
 							positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } }
-						},
-						init: ( child, parent) => {
-							// child.pivot.x = parent.width / 2;
 						}
 					}
 				]
@@ -97777,6 +97798,14 @@ module.exports = function( PIXI, app ) {
 					rotationConstraints: { pos: 0, neg: 0 },
 					positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
 					debug: true
+				},
+				init: ( base ) => {
+					base.sprite.hitArea = new CollisionPolygon(
+						  0,   0,
+						256,   0,
+						256, 128,
+						  0, 128
+					);
 				},
 				children: [
 					{
@@ -98571,14 +98600,14 @@ view.style.height = viewHeight + 'px';
 loader
 	.add( 'assets/spritesheets/ships.json' )
 	.add( 'emitter', 'assets/data/emitter.json' )
-	.add( 'particle', 'assets/images/particle.png' )
+	.add( 'particle', 'assets/images/pixel.png' )
 	.add( 'boards', 'assets/images/boards.png' )
 	.load( setup );
 
 window.gameModels = [];
 window.current = {
 	direction: 145,
-	force: .3
+	force: .05
 };
 
 window.friction = 0.98;
@@ -98615,24 +98644,6 @@ function setup( loader, resources ) {
 
 	app.ticker.add( animate );
 }
-
-const poly = CollisionPolygon(
-	48,   0,
-	71,   7,
-	83,  33,
-	86,  58,
-	83,  87,
-	71, 113,
-	48, 120,
-	38, 120,
-	15, 113,
-	 3,  87,
-	 0,  58,
-	 3,  33,
-	15,   7,
-	38,   0
-);
-
 
 function animate( delta ) {
 	stageGraphics.clear();
