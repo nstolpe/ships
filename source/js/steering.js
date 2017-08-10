@@ -141,22 +141,32 @@ function drawDebug( model ) {
 		stageGraphics.lineTo( p.x, p.y );
 
 		for ( let i = 0, l = model.base.sprite.hitArea.points.length; i < l; i += 2 ) {
+			// get the point on the face half way between the points
+			// with the sprites transform applied.
 			p = model.base.sprite.transform.localTransform.apply( {
 				x: model.base.sprite.hitArea.points[ i ] + ( model.base.sprite.hitArea.edges[ i ] / 2 ),
 				y: model.base.sprite.hitArea.points[ i + 1 ] + ( model.base.sprite.hitArea.edges[ i + 1 ] / 2 )
 			} );
+			// make a vector from the normals.
 			let e = model.base.sprite.transform.localTransform.apply( {
 				x: model.base.sprite.hitArea.normals[ i ],
 				y: model.base.sprite.hitArea.normals[ i + 1 ]
 			} );
-			// let rot = {
-			// 	x: Math.cos( model.base.sprite.transform.rotation ),
-			// 	y: Math.sin( model.base.sprite.transform.rotation )
-			// }
+			// get sprite's rotation around z as x and y
+			let rot = {
+				x: Math.cos( model.base.sprite.transform.rotation ),
+				y: Math.sin( model.base.sprite.transform.rotation )
+			};
+
+			// start at the half-way point.
 			stageGraphics.moveTo( p.x, p.y );
+			// draw a line to the half-way point rotated by the normal * 10
 			stageGraphics.lineTo(
-				e.x + model.base.sprite.hitArea.normals[ i ] * 10,
-				e.y + model.base.sprite.hitArea.normals[ i + 1 ] * 10
+				// p.x + e.x * 10,
+				// p.y + e.y * 10
+				// below starts out with lines oriented from normals out. on rotation they don't stay with the side
+				p.x + model.base.sprite.hitArea.normals[ i ] * 10,
+				p.y + model.base.sprite.hitArea.normals[ i + 1 ] * 10
 			);
 		}
 	}
