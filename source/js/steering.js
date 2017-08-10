@@ -64,7 +64,7 @@ function setup( loader, resources ) {
 		app.stage.addChild( gameModels[ i ].base.sprite );
 	}
 	app.stage.addChild( stageGraphics );
-	
+
 	window.turtle = gameModels[ 0 ].base;
 	turtle.sprite.width *= .5;
 	turtle.sprite.height *= .5;
@@ -130,9 +130,12 @@ function drawDebug( model ) {
 		p = model.base.sprite.transform.localTransform.apply( { x: model.base.sprite.hitArea.points[ 0 ], y: model.base.sprite.hitArea.points[ 1 ] } );
 		stageGraphics.lineTo( p.x, p.y );
 
+		// start: draw normal lines
 		for ( let i = 0, l = model.base.sprite.hitArea.points.length; i < l; i += 2 ) {
-			// get the point on the face half way between the points
+			// get the point on the face half way down the edge
 			let halfEdge = {
+				// x: model.base.sprite.hitArea.points[ i ] + ( model.base.sprite.hitArea.points[ i + 2 ] / 2 ),
+				// y: model.base.sprite.hitArea.points[ i + 1 ] + ( model.base.sprite.hitArea.points[ i + 3 ] / 2 )
 				x: model.base.sprite.hitArea.points[ i ] + ( model.base.sprite.hitArea.edges[ i ] / 2 ),
 				y: model.base.sprite.hitArea.points[ i + 1 ] + ( model.base.sprite.hitArea.edges[ i + 1 ] / 2 )
 			};
@@ -153,6 +156,7 @@ function drawDebug( model ) {
 				end.y
 			);
 		}
+		// end: draw normal lines
 	}
 
 	// draw the AABB for the sprite.
