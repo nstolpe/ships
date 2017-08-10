@@ -28,7 +28,7 @@ view.style.height = viewHeight + 'px';
 loader
 	.add( 'assets/spritesheets/ships.json' )
 	.add( 'emitter', 'assets/data/emitter.json' )
-	.add( 'particle', 'assets/images/particle.png' )
+	.add( 'particle', 'assets/images/pixel.png' )
 	.add( 'boards', 'assets/images/boards.png' )
 	.load( setup );
 
@@ -72,24 +72,6 @@ function setup( loader, resources ) {
 
 	app.ticker.add( animate );
 }
-
-const poly = CollisionPolygon(
-	48,   0,
-	71,   7,
-	83,  33,
-	86,  58,
-	83,  87,
-	71, 113,
-	48, 120,
-	38, 120,
-	15, 113,
-	 3,  87,
-	 0,  58,
-	 3,  33,
-	15,   7,
-	38,   0
-);
-
 
 function animate( delta ) {
 	stageGraphics.clear();
