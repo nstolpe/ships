@@ -8,6 +8,28 @@ module.exports = function( PIXI, app ) {
 		spriteSheetPath: 'assets/spritesheets/',
 		gameModels: [
 			{
+				name: 'boards-left',
+				options: {
+					currentPosition: { x: 200, y: 300 },
+				},
+				children: [
+					{
+						texture: 'boards',
+						tiling: true,
+						id: 'turtle-body.png',
+						options: {
+							tiling: true,
+							// basePosition: { x: 15, y: 0 },
+							rotationConstraints: { pos: 0, neg: 0 },
+							positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } }
+						},
+						init: ( child, parent) => {
+							// child.pivot.x = parent.width / 2;
+						}
+					}
+				]
+			},
+			{
 				name: 'turtle',
 				spriteSheet: 'ships.json',
 				options: {

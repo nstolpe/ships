@@ -12,8 +12,8 @@ const Sprite = PIXI.Sprite;
 const loader = PIXI.loader;
 const view = document.getElementById('view');
 const scale = window.devicePixelRatio;
-const viewWidth = 1000 / scale;
-const viewHeight = 800 / scale;
+const viewWidth = document.body.offsetWidth;// * scale;
+const viewHeight = document.body.offsetHeight;// * scale;
 const app = new PIXI.Application( viewWidth, viewHeight, { view: view, backgroundColor : 0x051224, resolution: scale, autoResize: true } );
 const Particles = require( 'pixi-particles' );
 
@@ -27,8 +27,9 @@ view.style.height = viewHeight + 'px';
 
 loader
 	.add( 'assets/spritesheets/ships.json' )
-	.add( 'particle', 'assets/images/particle.png' )
 	.add( 'emitter', 'assets/data/emitter.json' )
+	.add( 'particle', 'assets/images/particle.png' )
+	.add( 'boards', 'assets/images/boards.png' )
 	.load( setup );
 
 window.gameModels = [];
@@ -41,6 +42,8 @@ window.friction = 0.98;
 
 let emitterManager;
 let emitterParent = new PIXI.Container();
+let stageGraphics = new PIXI.Graphics();
+
 
 function setup( loader, resources ) {
 	emitterParent.width = viewWidth;
@@ -85,7 +88,6 @@ const poly = CollisionPolygon(
 	38,   0
 );
 
-const polyGraphics = new PIXI.Graphics();
 
 function animate( delta ) {
 	for ( let i = 0, l = gameModels.length; i < l; i++ ) {
@@ -102,14 +104,8 @@ function animate( delta ) {
 		emitterManager.update( delta, [ current ] );
 		// Debug Display Logic
 		// @TODO move this out
-		if ( model.base.debug ) {
+		if ( model.base.debug )
 			drawDebug( model );
-		} else {
-			let stageGraphics = app.stage.children.find( ( c ) => PIXI.Graphics.prototype.isPrototypeOf( c ) );
-
-			if ( stageGraphics )
-				app.stage.removeChild( stageGraphics );
-		}
 		// END Debug Display Logic
 	}
 
@@ -119,25 +115,20 @@ function animate( delta ) {
 }
 
 function drawDebug( model ) {
-	let stageGraphics = app.stage.children.find( ( c ) => PIXI.Graphics.prototype.isPrototypeOf( c ) );
 
-	if ( stageGraphics ) {
-		stageGraphics.clear();
-	} else {
-		stageGraphics = new PIXI.Graphics();
-		app.stage.addChild( stageGraphics );
-	}
+	stageGraphics.clear();
 
+	// draw the hitarea if it has it. only works for collision polygons.
 	if ( model.base.sprite.hitArea ) {
 		stageGraphics.lineStyle( 1, 0xf1ff32, 1 );
 
-		let p = model.base.sprite.transform.localTransform.apply( { x: poly.points[ 0 ], y: poly.points[ 1 ] } );
+		let p = model.base.sprite.transform.localTransform.apply( { x: model.base.sprite.hitArea.points[ 0 ], y: model.base.sprite.hitArea.points[ 1 ] } );
 		stageGraphics.moveTo( p.x, p.y );
 		for ( let i = 2, l = model.base.sprite.hitArea.points.length; i < l; i += 2 ) {
-			p = model.base.sprite.transform.localTransform.apply( { x: poly.points[ i ], y: poly.points[ i + 1 ] } );
+			p = model.base.sprite.transform.localTransform.apply( { x: model.base.sprite.hitArea.points[ i ], y: model.base.sprite.hitArea.points[ i + 1 ] } );
 			stageGraphics.lineTo( p.x, p.y );
 		}
-		p = model.base.sprite.transform.localTransform.apply( { x: poly.points[ 0 ], y: poly.points[ 1 ] } );
+		p = model.base.sprite.transform.localTransform.apply( { x: model.base.sprite.hitArea.points[ 0 ], y: model.base.sprite.hitArea.points[ 1 ] } );
 		stageGraphics.lineTo( p.x, p.y );
 
 		for ( let i = 0, l = model.base.sprite.hitArea.points.length; i < l; i += 2 ) {
@@ -165,6 +156,7 @@ function drawDebug( model ) {
 		}
 	}
 
+	// draw the AABB for the sprite.
 	let bounds = model.base.sprite.getBounds();
 
 	stageGraphics.lineStyle( 1, 0xff4cc7, 1 );
@@ -174,31 +166,7 @@ function drawDebug( model ) {
 	stageGraphics.lineTo( bounds.x + bounds.width, bounds.y );
 	stageGraphics.lineTo( bounds.x, bounds.y );
 
-	stageGraphics.lineStyle( 1, 0x00ffff, 1 );
-	stageGraphics.beginFill( 0x00ffff );
-
-	// start: draw the polygon
-	stageGraphics.moveTo( poly.points[ 0 ] + 100, poly.points[ 1 ] + 100 );
-
-	for ( let i = 2, l = poly.points.length; i < l; i += 2 )
-		stageGraphics.lineTo( poly.points[ i ] + 100, poly.points[ i + 1 ] + 100 );
-	// close the poly
-	stageGraphics.lineTo( poly.points[ 0 ] + 100, poly.points[ 1 ] + 100 );
-
 	stageGraphics.endFill();
-
-	stageGraphics.lineStyle( 2, 0xff0000, 1 );
-	stageGraphics.beginFill( 0xff0000 );
-
-	for ( let i = 0, l = poly.points.length; i < l; i += 2 ) {
-		let x = poly.points[ i ] + ( poly.edges[ i ] / 2 ) + 100;
-		let y = poly.points[ i + 1 ] + ( poly.edges[ i + 1 ] / 2 ) + 100;
-		stageGraphics.moveTo( x, y );
-		stageGraphics.lineTo( x + poly.normals[ i ] * 10, y + poly.normals[ i + 1 ] * 10 );
-	}
-
-	stageGraphics.endFill();
-	// end: draw the polygon
 }
 /**
  * Checks if an object is withing the screen bounds. Could have a better name.
@@ -277,16 +245,24 @@ function loadGameModels() {
 function loadGameModel( model ) {
 	const base = GameModels.TransformableGroup( model.options );
 
-	for ( let i = 0, l = model.children.length; i < l; i++ ) {
+	for ( let i = 0, l = model.children ? model.children.length : 0; i < l; i++ ) {
 		let child = model.children[ i ];
-		let texture = PIXI.loader.resources[ Config.spriteSheetPath + model.spriteSheet ].textures[ child.id ];
-		let sprite = new Sprite( texture );
-		let tr = GameModels.TransformableRenderable( Object.assign( { sprite: sprite }, child.options ) );
+		let texture;
+		let sprite;
+		let tr;
+
+		 if ( model.spriteSheet )
+			texture = PIXI.loader.resources[ Config.spriteSheetPath + model.spriteSheet ].textures[ child.id ];
+		else
+			texture = PIXI.loader.resources[ child.texture ].texture;
+
+		sprite = new Sprite( texture );
+		tr = GameModels.TransformableRenderable( Object.assign( { sprite: sprite }, child.options ) );
 
 		base.addChild( child.name, tr, child.init );
 	}
 
-	model.init( base );
+	typeof model.init === 'function' && model.init( base );
 	base.update( 0 );
 	return { base: base }
 }
