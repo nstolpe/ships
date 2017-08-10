@@ -1,5 +1,6 @@
 'use strict'
 const Util = require( './util.js' );
+const CollisionPolygon = require( './collision-polygon.js' );
 
 module.exports = function( PIXI, app ) {
 
@@ -27,11 +28,27 @@ module.exports = function( PIXI, app ) {
 				},
 
 				init: ( base ) => {
-					base.sprite.hitArea = new PIXI.Rectangle(
-						0,
-						0,
-						base.sprite.width,
-						base.sprite.height
+					// base.sprite.hitArea = new PIXI.Rectangle(
+					// 	0,
+					// 	0,
+					// 	base.sprite.width,
+					// 	base.sprite.height
+					// );
+					base.sprite.hitArea = new CollisionPolygon(
+						48,   0,
+						71,   7,
+						83,  33,
+						86,  58,
+						83,  87,
+						71, 113,
+						48, 120,
+						38, 120,
+						15, 113,
+						 3,  87,
+						 0,  58,
+						 3,  33,
+						15,   7,
+						38,   0
 					);
 					base.sprite.interactive = true;
 					base.sprite.on( 'click', ( e ) => console.log( e ) );

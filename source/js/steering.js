@@ -115,7 +115,7 @@ function animate( delta ) {
 
 	// check if the turtle is leaving the screen bounds
 	// @TODO use better collision detection
-	checkScreenBounds( turtle, { left: 0, right: app.view.offsetWidth, top: 0, bottom: app.view.offsetHeight } );
+	// checkScreenBounds( turtle, { left: 0, right: app.view.offsetWidth, top: 0, bottom: app.view.offsetHeight } );
 }
 
 function drawDebug( model ) {
@@ -129,18 +129,36 @@ function drawDebug( model ) {
 	}
 
 	if ( model.base.sprite.hitArea ) {
-		let p1 = model.base.sprite.transform.worldTransform.apply( { x: model.base.sprite.hitArea.x, y: model.base.sprite.hitArea.y } );
-		let p2 = model.base.sprite.transform.worldTransform.apply( { x: model.base.sprite.hitArea.x, y: model.base.sprite.hitArea.y + model.base.sprite.hitArea.height } );
-		let p3 = model.base.sprite.transform.worldTransform.apply( { x: model.base.sprite.hitArea.x + model.base.sprite.hitArea.width, y: model.base.sprite.hitArea.y + model.base.sprite.hitArea.height } );
-		let p4 = model.base.sprite.transform.worldTransform.apply( { x: model.base.sprite.hitArea.x + model.base.sprite.hitArea.width, y: model.base.sprite.hitArea.y } );
-
 		stageGraphics.lineStyle( 1, 0xf1ff32, 1 );
 
-		stageGraphics.moveTo( p1.x, p1.y );
-		stageGraphics.lineTo( p2.x, p2.y );
-		stageGraphics.lineTo( p3.x, p3.y );
-		stageGraphics.lineTo( p4.x, p4.y );
-		stageGraphics.lineTo( p1.x, p1.y );
+		let p = model.base.sprite.transform.localTransform.apply( { x: poly.points[ 0 ], y: poly.points[ 1 ] } );
+		stageGraphics.moveTo( p.x, p.y );
+		for ( let i = 2, l = model.base.sprite.hitArea.points.length; i < l; i += 2 ) {
+			p = model.base.sprite.transform.localTransform.apply( { x: poly.points[ i ], y: poly.points[ i + 1 ] } );
+			stageGraphics.lineTo( p.x, p.y );
+		}
+		p = model.base.sprite.transform.localTransform.apply( { x: poly.points[ 0 ], y: poly.points[ 1 ] } );
+		stageGraphics.lineTo( p.x, p.y );
+
+		for ( let i = 0, l = model.base.sprite.hitArea.points.length; i < l; i += 2 ) {
+			p = model.base.sprite.transform.localTransform.apply( {
+				x: model.base.sprite.hitArea.points[ i ] + ( model.base.sprite.hitArea.edges[ i ] / 2 ),
+				y: model.base.sprite.hitArea.points[ i + 1 ] + ( model.base.sprite.hitArea.edges[ i + 1 ] / 2 )
+			} );
+			let e = model.base.sprite.transform.localTransform.apply( {
+				x: model.base.sprite.hitArea.normals[ i ],
+				y: model.base.sprite.hitArea.normals[ i + 1 ]
+			} );
+			// let rot = {
+			// 	x: Math.cos( model.base.sprite.transform.rotation ),
+			// 	y: Math.sin( model.base.sprite.transform.rotation )
+			// }
+			stageGraphics.moveTo( p.x, p.y );
+			stageGraphics.lineTo(
+				e.x + model.base.sprite.hitArea.normals[ i ] * 10,
+				e.y + model.base.sprite.hitArea.normals[ i + 1 ] * 10
+			);
+		}
 	}
 
 	let bounds = model.base.sprite.getBounds();
