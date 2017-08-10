@@ -7,14 +7,14 @@ const EmitterManager = require( './inc/emitter-manager.js' );
 const CollisionPolygon = require( './inc/collision-polygon.js' );
 
 window.math = require( 'mathjs' );
-const PIXI = require( 'pixi.js' ),
-	Sprite = PIXI.Sprite,
-	loader = PIXI.loader,
-	view = document.getElementById('view'),
-	viewWidth = 1000,
-	viewHeight = 800,
-	scale = window.devicePixelRatio,
-	app = new PIXI.Application( viewWidth, viewHeight, { view: view, backgroundColor : 0x051224, resolution: scale } );
+const PIXI = require( 'pixi.js' );
+const Sprite = PIXI.Sprite;
+const loader = PIXI.loader;
+const view = document.getElementById('view');
+const scale = window.devicePixelRatio;
+const viewWidth = 1000 / scale;
+const viewHeight = 800 / scale;
+const app = new PIXI.Application( viewWidth, viewHeight, { view: view, backgroundColor : 0x051224, resolution: scale, autoResize: true } );
 const Particles = require( 'pixi-particles' );
 
 const Config = require( './inc/config.js' )( PIXI, app );
