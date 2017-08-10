@@ -49,7 +49,6 @@ function setup( loader, resources ) {
 	emitterParent.width = viewWidth;
 	emitterParent.height = viewHeight;
 	app.stage.addChild( emitterParent );
-	app.stage.addChild( stageGraphics );
 	emitterManager = EmitterManager(
 		resources.emitter.data,
 		emitterParent,
@@ -64,6 +63,8 @@ function setup( loader, resources ) {
 	for ( let i = 0, l = gameModels.length; i < l; i++ ) {
 		app.stage.addChild( gameModels[ i ].base.sprite );
 	}
+	app.stage.addChild( stageGraphics );
+	
 	window.turtle = gameModels[ 0 ].base;
 	turtle.sprite.width *= .5;
 	turtle.sprite.height *= .5;
@@ -91,6 +92,8 @@ const poly = CollisionPolygon(
 
 
 function animate( delta ) {
+	stageGraphics.clear();
+
 	for ( let i = 0, l = gameModels.length; i < l; i++ ) {
 		let model = gameModels[ i ];
 
@@ -102,13 +105,11 @@ function animate( delta ) {
 			frictions: [ window.friction ]
 		} );
 
-		emitterManager.update( delta, [ current ] );
-		// Debug Display Logic
-		// @TODO move this out
 		if ( model.base.debug )
 			drawDebug( model );
-		// END Debug Display Logic
 	}
+
+	emitterManager.update( delta, [ current ] );
 
 	// check if the turtle is leaving the screen bounds
 	// @TODO use better collision detection
@@ -116,9 +117,6 @@ function animate( delta ) {
 }
 
 function drawDebug( model ) {
-
-	stageGraphics.clear();
-
 	// draw the hitarea if it has it. only works for collision polygons.
 	if ( model.base.sprite.hitArea ) {
 		stageGraphics.lineStyle( 1, 0xf1ff32, 1 );
@@ -257,7 +255,7 @@ function loadGameModel( model ) {
 		else
 			texture = PIXI.loader.resources[ child.texture ].texture;
 
-		sprite = new Sprite( texture );
+		sprite = child.options.tiling ? new PIXI.extras.TilingSprite( texture, child.options.dimensions.w, child.options.dimensions.h ) : new Sprite( texture );
 		tr = GameModels.TransformableRenderable( Object.assign( { sprite: sprite }, child.options ) );
 
 		base.addChild( child.name, tr, child.init );
