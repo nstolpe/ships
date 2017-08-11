@@ -12,8 +12,8 @@ const Sprite = PIXI.Sprite;
 const loader = PIXI.loader;
 const view = document.getElementById('view');
 const scale = window.devicePixelRatio;
-const viewWidth = document.body.offsetWidth;// * scale;
-const viewHeight = document.body.offsetHeight;// * scale;
+const viewWidth = document.body.offsetWidth;
+const viewHeight = document.body.offsetHeight;
 const app = new PIXI.Application( viewWidth, viewHeight, { view: view, backgroundColor : 0x051224, resolution: scale, autoResize: true } );
 const Particles = require( 'pixi-particles' );
 
