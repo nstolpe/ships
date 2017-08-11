@@ -179,6 +179,12 @@ module.exports = function( PIXI, app ) {
 						15,   7,
 						38,   0
 					);
+					// base.sprite.hitArea = new CollisionPolygon(
+					// 	 0,   0,
+					// 	86,   0,
+					// 	86, 120,
+					// 	 0, 120
+					// );
 					base.sprite.interactive = true;
 					base.sprite.on( 'click', ( e ) => console.log( e ) );
 					base.pivot.x = base.sprite.width / 2;
