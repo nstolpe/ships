@@ -91,11 +91,33 @@ function animate( delta ) {
 			drawDebug( model );
 	}
 
+	for ( let i = 0, l = gameModels.length; i < l; i++ ) {
+		for ( let ii = 0, ll = gameModels.length; ii < ll; ii++ ) {
+			if ( i !== ii ) checkCollision( gameModels[ i ], gameModels[ ii ] );
+		}
+	}
+
 	emitterManager.update( delta, [ current ] );
 
 	// check if the turtle is leaving the screen bounds
 	// @TODO use better collision detection
 	// checkScreenBounds( turtle, { left: 0, right: app.view.offsetWidth, top: 0, bottom: app.view.offsetHeight } );
+}
+
+function checkCollision( one, two ) {
+	let one2 = [];
+	let two2 = [];
+	let p;
+
+	for ( let i = 0, l = one.base.sprite.hitArea.points.length + two.base.sprite.hitArea.points.length; i < l; i += 2 ) {
+		if ( i < one.base.sprite.hitArea.points.length ) {
+			p = one.base.sprite.transform.localTransform.apply( { x: one.base.sprite.hitArea.points[ i ], y: one.base.sprite.hitArea.points[ i + 1 ] } );
+			one2.push( p );
+		} else {
+			p = two.base.sprite.transform.localTransform.apply( { x: two.base.sprite.hitArea.points[ i ], y: two.base.sprite.hitArea.points[ i + 1 ] } );
+			two2.push( p );
+		}
+	}
 }
 
 function drawDebug( model ) {
