@@ -16,12 +16,6 @@ module.exports = function ( ...points ) {
 	const proto = {
 		edges: [],
 		normals: [],
-		foo() {
-			console.log( 'bar' );
-		},
-		bar() {
-			console.log( 'foo' );
-		},
 		setEdges() {
 			// create an edge and normal between each set of points.
 			for ( let i = 0, l = this.points.length; i < l; i += 2 ) {
