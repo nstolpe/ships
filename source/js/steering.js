@@ -91,10 +91,15 @@ function animate( delta ) {
 			drawDebug( model );
 	}
 
+	// check collision between every game model. very inneficient.
+	// for ( let i = 0, l = gameModels.length; i < l; i++ ) {
+	// 	for ( let ii = 0, ll = gameModels.length; ii < ll; ii++ ) {
+	// 		if ( i !== ii ) checkCollision( gameModels[ i ], gameModels[ ii ] );
+	// 	}
+	// }
+	let t = gameModels.find((v) => v.base.name === 'turtle');
 	for ( let i = 0, l = gameModels.length; i < l; i++ ) {
-		for ( let ii = 0, ll = gameModels.length; ii < ll; ii++ ) {
-			if ( i !== ii ) checkCollision( gameModels[ i ], gameModels[ ii ] );
-		}
+		if ( gameModels[ i ] !== t ) checkCollision( t, gameModels[ i ] );
 	}
 
 	emitterManager.update( delta, [ current ] );
@@ -105,33 +110,118 @@ function animate( delta ) {
 }
 
 function checkCollision( one, two ) {
-	let one2 = [];
-	let two2 = [];
+	let positionOne = one.base.currentPosition;
+	let positionTwo = two.base.currentPosition;
+	let lengthOne = one.base.sprite.hitArea.points.length;
+	let lengthTwo = two.base.sprite.hitArea.points.length;
+	let pointsOne = [];
+	let pointsTwo = [];
 	let p;
 
-	for ( let i = 0, l = one.base.sprite.hitArea.points.length + two.base.sprite.hitArea.points.length; i < l; i += 2 ) {
-		if ( i < one.base.sprite.hitArea.points.length ) {
-			p = one.base.sprite.transform.localTransform.apply( { x: one.base.sprite.hitArea.points[ i ], y: one.base.sprite.hitArea.points[ i + 1 ] } );
-			one2.push( p );
+	// make arrays of the incoming points.
+	for ( let i = 0, l = lengthOne + lengthTwo; i < l; i += 2 ) {
+		if ( i < lengthOne ) {
+			p = one.base.sprite.transform.localTransform.apply( {
+				x: one.base.sprite.hitArea.points[ i ],
+				y: one.base.sprite.hitArea.points[ i + 1 ]
+			} );
+			pointsOne.push( p );
 		} else {
-			p = two.base.sprite.transform.localTransform.apply( { x: two.base.sprite.hitArea.points[ i ], y: two.base.sprite.hitArea.points[ i + 1 ] } );
-			two2.push( p );
+			p = two.base.sprite.transform.localTransform.apply( {
+				x: two.base.sprite.hitArea.points[ Math.floor( i - lengthOne ) ],
+				y: two.base.sprite.hitArea.points[ Math.floor( i - lengthOne ) + 1 ]
+			} );
+			pointsTwo.push( p );
 		}
 	}
+
+	for ( let i = 0, l = pointsOne.length; i < l; i++ ) {
+		let normal = {
+			x: one.base.sprite.hitArea.normals[ i * 2 ],
+			y: one.base.sprite.hitArea.normals[ i * 2 + 1 ]
+		};
+
+		let separating = separatingAxis( positionOne, positionTwo, pointsOne, pointsTwo, normal, { one: one.base.name, two: two.base.name } );
+	}
+	// console.log( one2 );
+	// console.log( two2 );
 }
 
+function separatingAxis( positionOne, positionTwo, pointsOne, pointsTwo, normal, names ) {
+	let rangeOne = projectPoints( pointsOne, normal );
+	let rangeTwo = projectPoints( pointsTwo, normal );
+	let offsetVec = {
+		x: positionTwo.x - positionOne.x,
+		y: positionTwo.y - positionOne.y
+	};
+
+	let offsetDot = offsetVec.x * normal.x + offsetVec.y * normal.y
+
+	rangeTwo.min += offsetDot;
+	rangeTwo.max += offsetDot;
+
+	if ( rangeOne.min > rangeTwo.max || rangeTwo.min > rangeOne.max ) {
+		// window.dispatchEvent( new CustomEvent('message', {
+		// 	detail: {
+		// 		type: 'update-collision',
+		// 		names: `${ names.one } ${ names.two }`
+		// 	}
+		// } ) );
+		return true;
+	}
+
+	return false;
+}
+
+function projectPoints( points, normal ) {
+	let min = Number.MAX_VALUE;
+	let max = -Number.MAX_VALUE;
+
+	for ( let i = 0, l = points.length; i < l; i++ ) {
+		let point = points[ i ];
+		let dot = point.x * normal.x + point.y * normal.y;
+		min = dot < min ? dot : min;
+		max = dot > max ? dot : max;
+	}
+	return { min: min, max: max } ;
+}
 function drawDebug( model ) {
 	// draw the hitarea if it has it. only works for collision polygons.
 	if ( model.base.sprite.hitArea ) {
 		stageGraphics.lineStyle( 1, 0xf1ff32, 1 );
 
-		let p = model.base.sprite.transform.localTransform.apply( { x: model.base.sprite.hitArea.points[ 0 ], y: model.base.sprite.hitArea.points[ 1 ] } );
+		let p = {
+			x: ( model.base.sprite.hitArea.points[ 0 ] - model.base.pivot.x ) * model.base.sprite.scale.x,
+			y: ( model.base.sprite.hitArea.points[ 1 ] - model.base.pivot.y ) * model.base.sprite.scale.y
+		};
+		let q = Object.assign( {}, p );
+		p.x = q.x * Math.cos( model.base.sprite.rotation ) - q.y * Math.sin( model.base.currentRotation );
+		p.y = q.x * Math.sin( model.base.sprite.rotation ) + q.y * Math.cos( model.base.currentRotation );
+		p.x += model.base.currentPosition.x;
+		p.y += model.base.currentPosition.y;
+
 		stageGraphics.moveTo( p.x, p.y );
 		for ( let i = 2, l = model.base.sprite.hitArea.points.length; i < l; i += 2 ) {
-			p = model.base.sprite.transform.localTransform.apply( { x: model.base.sprite.hitArea.points[ i ], y: model.base.sprite.hitArea.points[ i + 1 ] } );
+			p = {
+				x: ( model.base.sprite.hitArea.points[ i ] - model.base.pivot.x ) * model.base.sprite.scale.x,
+				y: ( model.base.sprite.hitArea.points[ i + 1 ] - model.base.pivot.y ) * model.base.sprite.scale.y
+			};
+			q = Object.assign( {}, p );
+			p.x = q.x * Math.cos( model.base.sprite.rotation ) - q.y * Math.sin( model.base.currentRotation );
+			p.y = q.x * Math.sin( model.base.sprite.rotation ) + q.y * Math.cos( model.base.currentRotation );
+			p.x += model.base.currentPosition.x;
+			p.y += model.base.currentPosition.y;
 			stageGraphics.lineTo( p.x, p.y );
 		}
-		p = model.base.sprite.transform.localTransform.apply( { x: model.base.sprite.hitArea.points[ 0 ], y: model.base.sprite.hitArea.points[ 1 ] } );
+		p = {
+			x: ( model.base.sprite.hitArea.points[ 0 ] - model.base.pivot.x ) * model.base.sprite.scale.x,
+			y: ( model.base.sprite.hitArea.points[ 1 ] - model.base.pivot.y ) * model.base.sprite.scale.y
+		};
+		q = Object.assign( {}, p );
+		p.x = q.x * Math.cos( model.base.sprite.rotation ) - q.y * Math.sin( model.base.currentRotation );
+		p.y = q.x * Math.sin( model.base.sprite.rotation ) + q.y * Math.cos( model.base.currentRotation );
+		p.x += model.base.currentPosition.x;
+		p.y += model.base.currentPosition.y;
 		stageGraphics.lineTo( p.x, p.y );
 
 		// start: draw normal lines
