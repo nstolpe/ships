@@ -37,7 +37,6 @@ module.exports = function ( ...points ) {
 				this.normals[ i ] = normal.x;
 				this.normals[ i + 1 ] = normal.y;
 			}
-			console.log( this.edges );
 		}
 	};
 
