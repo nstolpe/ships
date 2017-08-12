@@ -5,6 +5,7 @@ const SteeringKeyboard = require( './inc/steering-keyboard.js' );
 const GameModels = require( './inc/game-models.js' );
 const EmitterManager = require( './inc/emitter-manager.js' );
 const CollisionPolygon = require( './inc/collision-polygon.js' );
+const Vec2 = require( './inc/vector2.js');
 
 window.math = require( 'mathjs' );
 const PIXI = require( 'pixi.js' );
