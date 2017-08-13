@@ -24,6 +24,8 @@ module.exports = function( PIXI, app ) {
 					);
 					base.pivot.x = base.sprite.width / 2;
 					base.pivot.y = base.sprite.height / 2;
+					base.sprite.width *= 0.5;
+					base.sprite.height *= 0.5;
 				},
 				children: [
 					{
@@ -59,6 +61,8 @@ module.exports = function( PIXI, app ) {
 					);
 					base.pivot.x = base.sprite.width / 2;
 					base.pivot.y = base.sprite.height / 2;
+					base.sprite.width *= 0.5;
+					base.sprite.height *= 0.5;
 				},
 				children: [
 					{
