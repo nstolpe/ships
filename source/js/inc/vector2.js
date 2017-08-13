@@ -3,23 +3,49 @@ const Util = require( './util.js' );
 
 function Coords( x, y ) {
 	// no arguments returns zeroed.
-	if ( x === undefined && y === undefined ) {
+	if ( x == null && y == null ) {
 		return { x: 0, y: 0 };
 	// cascading approach if their are args. `x` Array or object takes presedence over `y`,
 	// objects take presedence over arrays. ex: {x: 1 }, [ undefined, 2 ] returns { x: 1, y: 2 }
 	} else {
-		return {
-			x: Number( x != null ? x.x : undefined ) ||
-			   Number( x != null ? x[0] : undefined ) || 
-			   Number( x != null ? x : undefined ),
+		let i = 0;
+		let xx = x != null ? Object.assign( x ) : NaN;
+		let yy = y != null ? Object.assign( y ) : NaN;
 
-			y: Number( x != null ? x.y : undefined ) ||
-			   Number( x != null ? x[1] : undefined ) ||
-			   Number( y != null ? y.y : undefined ) ||
-			   Number( y != null ? y[1] : undefined ) ||
-			   Number( y != null ? y : undefined ) ||
-			   Number( x != null && !Array.isArray( x ) ? x : undefined )
+		const solvers = {
+			// when iterated, solvers.x tries for x.x, x[0], and x
+			x: [
+				( x ) => Number( x.x ),
+				( x ) => Number( x[0] ),
+				( x ) => Number( x ),
+			],
+			// when iterated, solvers.y tries for x.y, x[1], y.y, y[1], y, and x
+			y: [
+				( y ) => Number( x != null ? x.y : undefined ),
+				( y ) => Number( x != null ? x[1] : undefined ),
+				( y ) => Number( y != null ? y.y : undefined ),
+				( y ) => Number( y != null ? y[1] : undefined ),
+				( y ) => Number( y != null ? y : undefined ),
+				( y ) => Number( x != null && !Array.isArray( x ) ? x : undefined ),
+			]
 		};
+
+		// run solvers on `x`
+		while ( !Util.isNumeric( xx ) && i < solvers.x.length ) {
+			xx = solvers.x[ i ]( x );
+			i++;
+		}
+
+		// reset `i`
+		i = 0;
+
+		// run solvers on `y`
+		while ( !Util.isNumeric( yy ) && i < solvers.y.length ) {
+			yy = solvers.y[ i ]( y );
+			i++;
+		}
+
+		return { x: xx.valueOf(), y: yy.valueOf() };
 	}
 }
 
@@ -154,6 +180,7 @@ const Vector2 = function( x, y ) {
 			return Math.sqrt( dx * dx + dy * dy );
 		},
 		project( target ) {
+			target = Vector2( target );
 			const amt = this.dot( target ) / target.len2();
 			this.x = amt * target.x;
 			this.y = amt * target.y;
