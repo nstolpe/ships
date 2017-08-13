@@ -94,16 +94,16 @@ function animate( delta ) {
 	}
 
 	// check collision between every game model. very inneficient.
-	// for ( let i = 0, l = gameModels.length; i < l; i++ ) {
-	// 	for ( let ii = 0, ll = gameModels.length; ii < ll; ii++ ) {
-	// 		if ( i !== ii ) checkCollision( gameModels[ i ], gameModels[ ii ] );
-	// 	}
-	// }
-	let t = gameModels.find((v) => v.base.name === 'turtle');
 	for ( let i = 0, l = gameModels.length; i < l; i++ ) {
-		if ( gameModels[ i ] !== t ) 
-			collisions[ collisions.length ] = checkCollision( t, gameModels[ i ] );
+		for ( let ii = 0, ll = gameModels.length; ii < ll; ii++ ) {
+			if ( i !== ii ) collisions[ collisions.length ] = checkCollision( gameModels[ i ], gameModels[ ii ] );
+		}
 	}
+	// let t = gameModels.find((v) => v.base.name === 'turtle');
+	// for ( let i = 0, l = gameModels.length; i < l; i++ ) {
+	// 	if ( gameModels[ i ] !== t ) 
+	// 		collisions[ collisions.length ] = checkCollision( t, gameModels[ i ] );
+	// }
 
 	let compiled = collisions.reduce( ( sum, val ) => {
 		if ( val.active )
@@ -142,7 +142,7 @@ function checkCollision( one, two ) {
 					one.base.sprite.hitArea.points[ i ],
 					one.base.sprite.hitArea.points[ i + 1 ]
 				).sub( one.base.pivot )
-				.scale( one.base.sprite.scale )
+				// .scale( one.base.sprite.scale )
 				.rotate( one.base.sprite.rotation )
 				.add( one.base.currentPosition );
 			pointsOne.push( p );
@@ -151,7 +151,7 @@ function checkCollision( one, two ) {
 					two.base.sprite.hitArea.points[ Math.floor( i - lengthOne ) ],
 					two.base.sprite.hitArea.points[ Math.floor( i - lengthOne ) + 1 ]
 				).sub( two.base.pivot )
-				.scale( two.base.sprite.scale )
+				// .scale( two.base.sprite.scale )
 				.rotate( two.base.sprite.rotation )
 				.add( two.base.currentPosition );
 			pointsTwo.push( p );
@@ -166,7 +166,10 @@ function checkCollision( one, two ) {
 		// .scale( one.base.sprite.scale )
 		//.rotate( one.base.sprite.rotation )
 		// .add( one.base.currentPosition );
-
+		let p1 = pointsOne[ i ];
+		let p2 = pointsOne[ (i + 1) % l ];
+		let edge = p2.copy().sub( p1 );
+		normal = edge.copy().perp().nor();
 		let separating = separatingAxis( positionOne, positionTwo, pointsOne, pointsTwo, normal );
 		if ( separating ) {
 			collision.active = false;
@@ -182,7 +185,10 @@ function checkCollision( one, two ) {
 		// .scale( one.base.sprite.scale )
 		//.rotate( one.base.sprite.rotation )
 		// .add( two.base.currentPosition );
-
+		let p1 = pointsTwo[ i ];
+		let p2 = pointsTwo[ (i + 1) % l ];
+		let edge = p1.copy().sub( p2 );
+		normal = edge.copy().perp().nor();
 		let separating = separatingAxis( positionOne, positionTwo, pointsOne, pointsTwo, normal );
 		if ( separating ) {
 			collision.active = false;
