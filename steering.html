@@ -5,12 +5,37 @@
 		<title>Canvas Ship</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<style media="screen" type="text/css">
-		* { margin: 0; padding: 0; }
-		html, body { height: 100%; overflow: hidden; }
+			* { margin: 0; padding: 0; }
+			html, body { height: 100%; overflow: hidden; }
+			.feedback {
+				position: absolute;
+				bottom: 0;
+				right: 0;
+				min-width: 100px;
+				background-color: white;
+			}
+			.collision {
+				width: 300px;
+			}
 		</style>
 	</head>
 	<body>
 		<canvas id="view"></canvas>
+		<div class="feedback" id="feedback">
+			<div class="collision" id="collision" type="text">no collision<div>
+		</div>
 		<script src="assets/js/steering.js"></script>
+		<script type="text/javascript">
+			const collision = document.getElementById( 'collision' );
+			window.addEventListener( 'message', function( e ) {
+				switch ( e.detail.type ) {
+					case 'update-collision':
+						collision.innerHTML = `${ e.detail.names }`;
+						break;
+					default:
+						break;
+				}
+			}, false );
+		</script>
 	</body>
 </html>
