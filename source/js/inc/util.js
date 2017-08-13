@@ -17,9 +17,9 @@ module.exports = {
 	},
 	/**
 	 * Checks is a value is numeric
-	 * https://stackoverflow.com/questions/9716468/is-there-any-function-like-isnumeric-in-javascript-to-validate-numbers#answer-16655847
+	 * https://stackoverflow.com/questions/9716468/is-there-any-function-like-isnumeric-in-javascript-to-validate-numbers#answer-9716488
 	 */
-	isNumeric( val ) {
-		return Number( parseFloat( val ) ) == val;
+	isNumeric(n) {
+		return !isNaN(parseFloat(n)) && isFinite(n);
 	}
 };
