@@ -153,35 +153,37 @@ function checkCollision( one, two ) {
 		// .add( two.base.currentPosition );
 
 		let separating = separatingAxis( positionOne, positionTwo, pointsOne, pointsTwo, normal, { one: one.base.name, two: two.base.name } );
+		if ( separating ) {
+			window.dispatchEvent( new CustomEvent('message', {
+				detail: {
+					type: 'update-collision',
+					names: `no collision`
+				}
+			} ) );
+			return separating;
+		}
 	}
-	// console.log( one2 );
-	// console.log( two2 );
+
+	window.dispatchEvent( new CustomEvent('message', {
+		detail: {
+			type: 'update-collision',
+			names: `collision: ${ one.base.name } ${ two.base.name }`
+		}
+	} ) );
+
+	return false;
 }
 
 function separatingAxis( positionOne, positionTwo, pointsOne, pointsTwo, normal, names ) {
 	let rangeOne = projectPoints( pointsOne, normal );
 	let rangeTwo = projectPoints( pointsTwo, normal );
-	let offsetVec = {
-		x: positionTwo.x - positionOne.x,
-		y: positionTwo.y - positionOne.y
-	};
-
-	let offsetDot = offsetVec.x * normal.x + offsetVec.y * normal.y
+	let offsetVec = Vec2( positionTwo.x, positionTwo.y ).sub( positionOne.x, positionOne.y );
+	let offsetDot = offsetVec.dot( normal );
 
 	rangeTwo.min += offsetDot;
 	rangeTwo.max += offsetDot;
 
-	if ( rangeOne.min > rangeTwo.max || rangeTwo.min > rangeOne.max ) {
-		window.dispatchEvent( new CustomEvent('message', {
-			detail: {
-				type: 'update-collision',
-				names: `${ names.one } ${ names.two }`
-			}
-		} ) );
-		return true;
-	}
-
-	return false;
+	return rangeOne.min > rangeTwo.max || rangeTwo.min > rangeOne.max ? true : false;
 }
 
 function projectPoints( points, normal ) {
@@ -189,13 +191,14 @@ function projectPoints( points, normal ) {
 	let max = -Number.MAX_VALUE;
 
 	for ( let i = 0, l = points.length; i < l; i++ ) {
-		let point = points[ i ];
-		let dot = point.x * normal.x + point.y * normal.y;
+		let dot = points[ i ].dot( normal );
 		min = dot < min ? dot : min;
 		max = dot > max ? dot : max;
 	}
-	return { min: min, max: max } ;
+
+	return { min: min, max: max };
 }
+
 function drawDebug( model ) {
 	// draw the hitarea if it has it. only works for collision polygons.
 	if ( model.base.sprite.hitArea ) {
