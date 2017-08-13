@@ -193,6 +193,12 @@ const Vector2 = function( x, y ) {
 			this.x -= x;
 			this.y -= y;
 			return this;
+		},
+		perp() {
+			let x = this.x;
+			this.x = this.y;
+			this.y = -x;
+			return this;
 		}
 	};
 
