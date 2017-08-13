@@ -223,28 +223,32 @@ function drawDebug( model ) {
 		// start: draw normal lines
 		for ( let i = 0, l = model.base.sprite.hitArea.points.length; i < l; i += 2 ) {
 			// get the point on the face half way down the edge
-			let halfEdge = {
-				// x: model.base.sprite.hitArea.points[ i ] + ( model.base.sprite.hitArea.points[ i + 2 ] / 2 ),
-				// y: model.base.sprite.hitArea.points[ i + 1 ] + ( model.base.sprite.hitArea.points[ i + 3 ] / 2 )
-				x: model.base.sprite.hitArea.points[ i ] + ( model.base.sprite.hitArea.edges[ i ] / 2 ),
-				y: model.base.sprite.hitArea.points[ i + 1 ] + ( model.base.sprite.hitArea.edges[ i + 1 ] / 2 )
-			};
+			let halfEdge = Vec2(
+				model.base.sprite.hitArea.points[ i ] + ( model.base.sprite.hitArea.edges[ i ] / 2 ),
+				model.base.sprite.hitArea.points[ i + 1 ] + ( model.base.sprite.hitArea.edges[ i + 1 ] / 2 )
+			);
+
 			// get the endpoint for the normal line.
-			let end = model.base.sprite.transform.localTransform.apply( {
-				x: halfEdge.x + model.base.sprite.hitArea.normals[ i ] * 10,
-				y: halfEdge.y + model.base.sprite.hitArea.normals[ i + 1 ] * 10
-			} );
+			let end = halfEdge.copy().add(
+					model.base.sprite.hitArea.normals[ i ] * 10,
+					model.base.sprite.hitArea.normals[ i + 1 ] * 10
+				)
+				.sub( model.base.pivot )
+				.scale( model.base.sprite.scale )
+				.rotate( model.base.sprite.rotation )
+				.add( model.base.currentPosition );
 
 			// apply the sprite's transform to the halfEdge point to get the start of the normal line.
-			p = model.base.sprite.transform.localTransform.apply( halfEdge );
+			p.set( halfEdge )
+				.sub( model.base.pivot )
+				.scale( model.base.sprite.scale )
+				.rotate( model.base.sprite.rotation )
+				.add( model.base.currentPosition );
 
 			// start a line at the half-way point.
 			stageGraphics.moveTo( p.x, p.y );
 			// draw a line to the half-way point rotated by the normal * 10
-			stageGraphics.lineTo(
-				end.x,
-				end.y
-			);
+			stageGraphics.lineTo( end.x, end.y );
 		}
 		// end: draw normal lines
 	}
