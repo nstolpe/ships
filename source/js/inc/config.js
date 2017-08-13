@@ -143,6 +143,79 @@ module.exports = function( PIXI, app ) {
 			{
 				spriteSheet: 'ships.json',
 				options: {
+					name: 'dud',
+					currentPosition: { x: 512, y: 512 },
+					// rotationConstraints: { pos: Infinity, neg: Infinity },
+					// positionConstraints: { pos: { x: Infinity, y: Infinity }, neg: { x: Infinity, y: Infinity } },
+					maxForwardVelocity: 4,
+					forwardVelocityIncrement: .05,
+					debug: true,
+					postUpdates: [
+						function( delta ) {
+							// console.log( this.children[ 'rudder' ].currentRotation );
+							// console.log( this.rotationVelocity );
+							// this.children[ 'rudder' ].currentRotation = -this.currentRotation;
+							// this.children[ 'rudder' ].rotationVelocity = -this.rotationVelocity;
+						}
+					]
+				},
+
+				init: ( base ) => {
+					// base.sprite.hitArea = new PIXI.Rectangle(
+					// 	0,
+					// 	0,
+					// 	base.sprite.width,
+					// 	base.sprite.height
+					// );
+					base.sprite.hitArea = new CollisionPolygon(
+						48,   0,
+						71,   7,
+						83,  33,
+						86,  58,
+						83,  87,
+						71, 113,
+						48, 120,
+						38, 120,
+						15, 113,
+						 3,  87,
+						 0,  58,
+						 3,  33,
+						15,   7,
+						38,   0
+					);
+					// base.sprite.hitArea = new CollisionPolygon(
+					// 	 0,   0,
+					// 	86,   0,
+					// 	86, 120,
+					// 	 0, 120
+					// );
+					base.sprite.interactive = true;
+					base.sprite.on( 'click', ( e ) => console.log( e ) );
+					base.pivot.x = base.sprite.width / 2;
+					base.pivot.y = base.sprite.height / 2;
+					base.sprite.width *= 0.5;
+					base.sprite.height *= 0.5;
+					// base.children.rudder.currentPosition.x = base.sprite.width / 2;
+					// base.children.rudder.basePosition.x = base.sprite.width / 2;
+				},
+				children: [
+					{
+						name: 'body',
+						id: 'turtle-body.png',
+						options: {
+							// basePosition: { x: 15, y: 0 },
+							rotationConstraints: { pos: 0, neg: 0 },
+							positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } }
+						},
+						init: ( child, parent) => {
+							// child.pivot.x = parent.width / 2;
+						}
+					}
+				]
+			},
+			{
+				spriteSheet: 'ships.json',
+				options: {
 					name: 'turtle',
 					currentPosition: { x: 384, y: 384 },
 					// rotationConstraints: { pos: Infinity, neg: Infinity },
