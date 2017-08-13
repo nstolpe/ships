@@ -106,17 +106,28 @@ const Vector2 = function( x, y ) {
 			}
 			return this;
 		},
-		angle() {
-			const angle = Util.toDegrees( Math.atan2( y, x ) );
-			return angle < 0 ? angle + 360 : angle;
+		/**
+		 * Returns the angle between this `vector` and the x axis.
+		 * If `radians` is true, the angle will be returned as radians between -Math.PI and Math.PI.
+		 * If not, the angle will be returned in degrees, between 0 and 360.
+		 */
+		angle( radians ) {
+			let angle;
+			if ( radians ) {
+				angle = Math.atan2( y, x );
+			} else {
+				angle = Util.toDegrees( Math.atan2( y, x ) );
+				return angle < 0 ? angle + 360 : angle;
+			}
+			return angle;
 		},
 		/**
 		 * Rotates the vector by `angle`
+		 * `angle` is expected to be in radians. 
 		 */
 		rotate( angle ) {
-			let rad = Util.toRadians( angle );
-			let cos = Math.cos( rad );
-			let sin = Math.sin( rad );
+			let cos = Math.cos( angle );
+			let sin = Math.sin( angle );
 			let x = this.x * cos - this.y * sin;
 			let y = this.x * sin + this.y * cos;
 
@@ -124,6 +135,13 @@ const Vector2 = function( x, y ) {
 			this.y = y;
 
 			return this;
+		},
+		/**
+		 * Rotates the vector by `angle`
+		 * `angle` is expected to be in degrees. 
+		 */
+		rotateDeg( angle ) {
+			return rotate( Util.toRadians( angle ) );
 		},
 		/**
 		 * Returns the distance between this and another vector
