@@ -119,28 +119,38 @@ function checkCollision( one, two ) {
 	let pointsTwo = [];
 	let p;
 
-	// make arrays of the incoming points.
+	// make vector arrays of the incoming points.
+	// points have the game object's transform applied
 	for ( let i = 0, l = lengthOne + lengthTwo; i < l; i += 2 ) {
 		if ( i < lengthOne ) {
-			p = one.base.sprite.transform.localTransform.apply( {
-				x: one.base.sprite.hitArea.points[ i ],
-				y: one.base.sprite.hitArea.points[ i + 1 ]
-			} );
+			p = Vec2(
+					one.base.sprite.hitArea.points[ i ],
+					one.base.sprite.hitArea.points[ i + 1 ]
+				).sub( one.base.pivot )
+				.scale( one.base.sprite.scale )
+				.rotate( one.base.sprite.rotation )
+				.add( one.base.currentPosition );
 			pointsOne.push( p );
 		} else {
-			p = two.base.sprite.transform.localTransform.apply( {
-				x: two.base.sprite.hitArea.points[ Math.floor( i - lengthOne ) ],
-				y: two.base.sprite.hitArea.points[ Math.floor( i - lengthOne ) + 1 ]
-			} );
+			p = Vec2(
+					two.base.sprite.hitArea.points[ Math.floor( i - lengthOne ) ],
+					two.base.sprite.hitArea.points[ Math.floor( i - lengthOne ) + 1 ]
+				).sub( two.base.pivot )
+				.scale( two.base.sprite.scale )
+				.rotate( two.base.sprite.rotation )
+				.add( two.base.currentPosition );
 			pointsTwo.push( p );
 		}
 	}
 
 	for ( let i = 0, l = pointsOne.length; i < l; i++ ) {
-		let normal = {
-			x: one.base.sprite.hitArea.normals[ i * 2 ],
-			y: one.base.sprite.hitArea.normals[ i * 2 + 1 ]
-		};
+		let normal = Vec2(
+			one.base.sprite.hitArea.normals[ i * 2 ],
+			one.base.sprite.hitArea.normals[ i * 2 + 1 ]
+		)//.sub( two.base.pivot )
+		// .scale( two.base.sprite.scale )
+		// .rotate( two.base.sprite.rotation )
+		// .add( two.base.currentPosition );
 
 		let separating = separatingAxis( positionOne, positionTwo, pointsOne, pointsTwo, normal, { one: one.base.name, two: two.base.name } );
 	}
@@ -162,12 +172,12 @@ function separatingAxis( positionOne, positionTwo, pointsOne, pointsTwo, normal,
 	rangeTwo.max += offsetDot;
 
 	if ( rangeOne.min > rangeTwo.max || rangeTwo.min > rangeOne.max ) {
-		// window.dispatchEvent( new CustomEvent('message', {
-		// 	detail: {
-		// 		type: 'update-collision',
-		// 		names: `${ names.one } ${ names.two }`
-		// 	}
-		// } ) );
+		window.dispatchEvent( new CustomEvent('message', {
+			detail: {
+				type: 'update-collision',
+				names: `${ names.one } ${ names.two }`
+			}
+		} ) );
 		return true;
 	}
 
@@ -234,7 +244,7 @@ function drawDebug( model ) {
 					model.base.sprite.hitArea.normals[ i + 1 ] * 10
 				)
 				.sub( model.base.pivot )
-				.scale( model.base.sprite.scale )
+				.scale( model.base.sprite.scale.x, model.base.sprite.scale.y )
 				.rotate( model.base.sprite.rotation )
 				.add( model.base.currentPosition );
 
