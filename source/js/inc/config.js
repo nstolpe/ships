@@ -9,7 +9,7 @@ module.exports = function( PIXI, app ) {
 		gameModels: [
 			{
 				options: {
-					basePosition: { x: 128, y: 128 },
+					basePosition: { x: 256, y: 384 },
 					name: 'boards-left',
 					rotationConstraints: { pos: 0, neg: 0 },
 					positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
@@ -22,6 +22,8 @@ module.exports = function( PIXI, app ) {
 						128, 512,
 						  0, 512
 					);
+					base.pivot.x = base.sprite.width / 2;
+					base.pivot.y = base.sprite.height / 2;
 				},
 				children: [
 					{
@@ -40,39 +42,41 @@ module.exports = function( PIXI, app ) {
 					}
 				]
 			},
-			// {
-			// 	options: {
-			// 		basePosition: { x: 512, y: 128 },
-			// 		name: 'boards-right',
-			// 		rotationConstraints: { pos: 0, neg: 0 },
-			// 		positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
-			// 		debug: true
-			// 	},
-			// 	init: ( base ) => {
-			// 		base.sprite.hitArea = new CollisionPolygon(
-			// 			  0,   0,
-			// 			128,   0,
-			// 			128, 512,
-			// 			  0, 512
-			// 		);
-			// 	},
-			// 	children: [
-			// 		{
-			// 			texture: 'boards',
-			// 			tiling: true,
-			// 			options: {
-			// 				tiling: true,
-			// 				dimensions: { w: 128, h: 512 },
-			// 				// basePosition: { x: 15, y: 0 },
-			// 				rotationConstraints: { pos: 0, neg: 0 },
-			// 				positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } }
-			// 			},
-			// 			init: ( child, parent) => {
-			// 				// child.pivot.x = parent.width / 2;
-			// 			}
-			// 		}
-			// 	]
-			// },
+			{
+				options: {
+					basePosition: { x: 640, y: 384 },
+					name: 'boards-right',
+					rotationConstraints: { pos: 0, neg: 0 },
+					positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
+					debug: true
+				},
+				init: ( base ) => {
+					base.sprite.hitArea = new CollisionPolygon(
+						  0,   0,
+						128,   0,
+						128, 512,
+						  0, 512
+					);
+					base.pivot.x = base.sprite.width / 2;
+					base.pivot.y = base.sprite.height / 2;
+				},
+				children: [
+					{
+						texture: 'boards',
+						tiling: true,
+						options: {
+							tiling: true,
+							dimensions: { w: 128, h: 512 },
+							// basePosition: { x: 15, y: 0 },
+							rotationConstraints: { pos: 0, neg: 0 },
+							positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } }
+						},
+						init: ( child, parent) => {
+							// child.pivot.x = parent.width / 2;
+						}
+					}
+				]
+			},
 			// {
 			// 	options: {
 			// 		basePosition: { x: 256, y: 128 },

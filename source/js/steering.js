@@ -75,6 +75,7 @@ function setup( loader, resources ) {
 }
 
 function animate( delta ) {
+	let collisions = [];
 	stageGraphics.clear();
 
 	for ( let i = 0, l = gameModels.length; i < l; i++ ) {
@@ -100,9 +101,22 @@ function animate( delta ) {
 	// }
 	let t = gameModels.find((v) => v.base.name === 'turtle');
 	for ( let i = 0, l = gameModels.length; i < l; i++ ) {
-		if ( gameModels[ i ] !== t ) checkCollision( t, gameModels[ i ] );
+		if ( gameModels[ i ] !== t ) 
+			collisions[ collisions.length ] = checkCollision( t, gameModels[ i ] );
 	}
 
+	let compiled = collisions.reduce( ( sum, val ) => {
+		if ( val.active )
+			return sum + ( `<p>${ val.one.base.name } ${ val.two.base.name }</p>` );
+		else
+			return sum;
+	}, '' );
+	window.dispatchEvent( new CustomEvent('message', {
+		detail: {
+			type: 'update-collision',
+			names: `<h3>collisions:</h3> ${ compiled }`
+		}
+	} ) );
 	emitterManager.update( delta, [ current ] );
 
 	// check if the turtle is leaving the screen bounds
@@ -118,6 +132,7 @@ function checkCollision( one, two ) {
 	let pointsOne = [];
 	let pointsTwo = [];
 	let p;
+	let collision = { one: one, two: two };
 
 	// make vector arrays of the incoming points.
 	// points have the game object's transform applied
@@ -147,37 +162,42 @@ function checkCollision( one, two ) {
 		let normal = Vec2(
 			one.base.sprite.hitArea.normals[ i * 2 ],
 			one.base.sprite.hitArea.normals[ i * 2 + 1 ]
-		)//.sub( two.base.pivot )
-		// .scale( two.base.sprite.scale )
-		// .rotate( two.base.sprite.rotation )
-		// .add( two.base.currentPosition );
+		)//.sub( one.base.pivot )
+		// .scale( one.base.sprite.scale )
+		//.rotate( one.base.sprite.rotation )
+		// .add( one.base.currentPosition );
 
-		let separating = separatingAxis( positionOne, positionTwo, pointsOne, pointsTwo, normal, { one: one.base.name, two: two.base.name } );
+		let separating = separatingAxis( positionOne, positionTwo, pointsOne, pointsTwo, normal );
 		if ( separating ) {
-			window.dispatchEvent( new CustomEvent('message', {
-				detail: {
-					type: 'update-collision',
-					names: `no collision`
-				}
-			} ) );
-			return separating;
+			collision.active = false;
+			return collision;
 		}
 	}
 
-	window.dispatchEvent( new CustomEvent('message', {
-		detail: {
-			type: 'update-collision',
-			names: `collision: ${ one.base.name } ${ two.base.name }`
-		}
-	} ) );
+	for ( let i = 0, l = pointsTwo.length; i < l; i++ ) {
+		let normal = Vec2(
+			two.base.sprite.hitArea.normals[ i * 2 ],
+			two.base.sprite.hitArea.normals[ i * 2 + 1 ]
+		)//.sub( one.base.pivot )
+		// .scale( one.base.sprite.scale )
+		//.rotate( one.base.sprite.rotation )
+		// .add( two.base.currentPosition );
 
-	return false;
+		let separating = separatingAxis( positionOne, positionTwo, pointsOne, pointsTwo, normal );
+		if ( separating ) {
+			collision.active = false;
+			return collision;
+		}
+	}
+
+	collision.active = true;
+	return collision;
 }
 
-function separatingAxis( positionOne, positionTwo, pointsOne, pointsTwo, normal, names ) {
+function separatingAxis( positionOne, positionTwo, pointsOne, pointsTwo, normal ) {
 	let rangeOne = projectPoints( pointsOne, normal );
 	let rangeTwo = projectPoints( pointsTwo, normal );
-	let offsetVec = Vec2( positionTwo.x, positionTwo.y ).sub( positionOne.x, positionOne.y );
+	let offsetVec = Vec2( positionTwo ).sub( positionOne );
 	let offsetDot = offsetVec.dot( normal );
 
 	rangeTwo.min += offsetDot;
