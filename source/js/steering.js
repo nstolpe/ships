@@ -191,38 +191,33 @@ function drawDebug( model ) {
 	if ( model.base.sprite.hitArea ) {
 		stageGraphics.lineStyle( 1, 0xf1ff32, 1 );
 
-		let p = {
-			x: ( model.base.sprite.hitArea.points[ 0 ] - model.base.pivot.x ) * model.base.sprite.scale.x,
-			y: ( model.base.sprite.hitArea.points[ 1 ] - model.base.pivot.y ) * model.base.sprite.scale.y
-		};
-		let q = Object.assign( {}, p );
-		p.x = q.x * Math.cos( model.base.sprite.rotation ) - q.y * Math.sin( model.base.currentRotation );
-		p.y = q.x * Math.sin( model.base.sprite.rotation ) + q.y * Math.cos( model.base.currentRotation );
-		p.x += model.base.currentPosition.x;
-		p.y += model.base.currentPosition.y;
+		let p = Vec2(
+			model.base.sprite.hitArea.points[ 0 ] - model.base.pivot.x,
+			model.base.sprite.hitArea.points[ 1 ] - model.base.pivot.y
+		).scale( model.base.sprite.scale )
+		.rotate( model.base.sprite.rotation )
+		.add( model.base.currentPosition );
 
 		stageGraphics.moveTo( p.x, p.y );
+
 		for ( let i = 2, l = model.base.sprite.hitArea.points.length; i < l; i += 2 ) {
-			p = {
-				x: ( model.base.sprite.hitArea.points[ i ] - model.base.pivot.x ) * model.base.sprite.scale.x,
-				y: ( model.base.sprite.hitArea.points[ i + 1 ] - model.base.pivot.y ) * model.base.sprite.scale.y
-			};
-			q = Object.assign( {}, p );
-			p.x = q.x * Math.cos( model.base.sprite.rotation ) - q.y * Math.sin( model.base.currentRotation );
-			p.y = q.x * Math.sin( model.base.sprite.rotation ) + q.y * Math.cos( model.base.currentRotation );
-			p.x += model.base.currentPosition.x;
-			p.y += model.base.currentPosition.y;
+			p.set(
+				model.base.sprite.hitArea.points[ i ] - model.base.pivot.x,
+				model.base.sprite.hitArea.points[ i + 1 ] - model.base.pivot.y
+			).scale( model.base.sprite.scale )
+			.rotate( model.base.sprite.rotation )
+			.add( model.base.currentPosition );
+
 			stageGraphics.lineTo( p.x, p.y );
 		}
-		p = {
-			x: ( model.base.sprite.hitArea.points[ 0 ] - model.base.pivot.x ) * model.base.sprite.scale.x,
-			y: ( model.base.sprite.hitArea.points[ 1 ] - model.base.pivot.y ) * model.base.sprite.scale.y
-		};
-		q = Object.assign( {}, p );
-		p.x = q.x * Math.cos( model.base.sprite.rotation ) - q.y * Math.sin( model.base.currentRotation );
-		p.y = q.x * Math.sin( model.base.sprite.rotation ) + q.y * Math.cos( model.base.currentRotation );
-		p.x += model.base.currentPosition.x;
-		p.y += model.base.currentPosition.y;
+
+		p.set(
+			model.base.sprite.hitArea.points[ 0 ] - model.base.pivot.x,
+			model.base.sprite.hitArea.points[ 1 ] - model.base.pivot.y
+		).scale( model.base.sprite.scale )
+		.rotate( model.base.sprite.rotation )
+		.add( model.base.currentPosition );
+
 		stageGraphics.lineTo( p.x, p.y );
 
 		// start: draw normal lines
