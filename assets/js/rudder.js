@@ -97473,8 +97473,16 @@ module.exports = function( PIXI, app ) {
 						128, 512,
 						  0, 512
 					);
+					// base.sprite.hitArea = new CollisionPolygon(
+					// 	-64, -256,
+					// 	64, -256,
+					// 	64,  256,
+					// 	-64,  256
+					// );
 					base.pivot.x = base.sprite.width / 2;
 					base.pivot.y = base.sprite.height / 2;
+					// base.sprite.width *= 0.5;
+					// base.sprite.height *= 0.5;
 				},
 				children: [
 					{
@@ -97510,6 +97518,8 @@ module.exports = function( PIXI, app ) {
 					);
 					base.pivot.x = base.sprite.width / 2;
 					base.pivot.y = base.sprite.height / 2;
+					base.sprite.width *= 0.5;
+					base.sprite.height *= 0.5;
 				},
 				children: [
 					{

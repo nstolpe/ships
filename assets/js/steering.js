@@ -97420,6 +97420,7 @@ module.exports = {
 'use strict';
 
 const PIXI = require( 'pixi.js' );
+const Vec2 = require( './vector2.js' );
 
 function Vector( x, y ) {
 	const proto = {
@@ -97438,17 +97439,17 @@ module.exports = function ( ...points ) {
 		setEdges() {
 			// create an edge and normal between each set of points.
 			for ( let i = 0, l = this.points.length; i < l; i += 2 ) {
-				let p1 = { x: poly.points[ i ], y: poly.points[ i + 1 ] };
+				let p1 = Vec2( poly.points[ i ], poly.points[ i + 1 ] );
 				// need to start again and grab the original point's x and y
-				let p2 = i + 2 < l ? { x: poly.points[ i + 2 ], y: poly.points[ i + 3 ] } : { x: poly.points[ 0 ], y: poly.points[ 1 ] };
-				let edge = { x: p2.x - p1.x, y: p2.y - p1.y };
-				let perp = { x: edge.y, y: -edge.x };
-				let perpLength = Math.sqrt( perp.x * perp.x + perp.y * perp.y );
-				let normal = perpLength != 0 ? { x: perp.x / perpLength, y: perp.y / perpLength } : perp;
-				this.edges[ i ] = edge.x;
-				this.edges[ i + 1 ] = edge.y;
-				this.normals[ i ] = normal.x;
-				this.normals[ i + 1 ] = normal.y;
+				let p2 = i + 2 < l ? Vec2( poly.points[ i + 2 ], poly.points[ i + 3 ] ) : Vec2( poly.points[ 0 ], poly.points[ 1 ] );
+				let edge = Vec2( p2.x - p1.x, p2.y - p1.y );
+				let perp = edge.copy().perp();
+				let perpLength = perp.len();
+				let normal = perp.copy().nor();
+				this.edges[ Math.ceil( i / 2 ) ] = edge;
+				this.normals[ Math.ceil( i / 2 ) ] = normal;
+				// this.edges[ i ] = edge.x;
+				// this.edges[ i + 1 ] = edge.y;
 			}
 		}
 	};
@@ -97459,7 +97460,7 @@ module.exports = function ( ...points ) {
 	return poly;
 }
 
-},{"pixi.js":682}],734:[function(require,module,exports){
+},{"./vector2.js":739,"pixi.js":682}],734:[function(require,module,exports){
 'use strict'
 const Util = require( './util.js' );
 const CollisionPolygon = require( './collision-polygon.js' );
@@ -97484,8 +97485,16 @@ module.exports = function( PIXI, app ) {
 						128, 512,
 						  0, 512
 					);
+					// base.sprite.hitArea = new CollisionPolygon(
+					// 	-64, -256,
+					// 	64, -256,
+					// 	64,  256,
+					// 	-64,  256
+					// );
 					base.pivot.x = base.sprite.width / 2;
 					base.pivot.y = base.sprite.height / 2;
+					// base.sprite.width *= 0.5;
+					// base.sprite.height *= 0.5;
 				},
 				children: [
 					{
@@ -97521,6 +97530,8 @@ module.exports = function( PIXI, app ) {
 					);
 					base.pivot.x = base.sprite.width / 2;
 					base.pivot.y = base.sprite.height / 2;
+					base.sprite.width *= 0.5;
+					base.sprite.height *= 0.5;
 				},
 				children: [
 					{
@@ -98552,7 +98563,7 @@ const Vector2 = function( x, y ) {
 		 * Returns the length of this `vector`
 		 */
 		len() {
-			return Math.sqrt( this.x * this.x + this.y + this.y );
+			return Math.sqrt( this.x * this.x + this.y * this.y );
 		},
 		len2() {
 			return this.dot( this );
@@ -98804,6 +98815,9 @@ function checkCollision( one, two ) {
 		}
 	}
 
+	/**
+	 * loop through the points of the first poly
+	 */
 	for ( let i = 0, l = pointsOne.length; i < l; i++ ) {
 		let normal = Vec2(
 			one.base.sprite.hitArea.normals[ i * 2 ],
@@ -98813,9 +98827,10 @@ function checkCollision( one, two ) {
 		//.rotate( one.base.sprite.rotation )
 		// .add( one.base.currentPosition );
 		let p1 = pointsOne[ i ];
-		let p2 = pointsOne[ (i + 1) % l ];
+		let p2 = pointsOne[ ( i + 1 ) % l ];
 		let edge = p2.copy().sub( p1 );
 		normal = edge.copy().perp().nor();
+		// normal = one.base.sprite.hitArea.normals[ i ];
 		let separating = separatingAxis( positionOne, positionTwo, pointsOne, pointsTwo, normal );
 		if ( separating ) {
 			collision.active = false;
@@ -98827,9 +98842,9 @@ function checkCollision( one, two ) {
 		let normal = Vec2(
 			two.base.sprite.hitArea.normals[ i * 2 ],
 			two.base.sprite.hitArea.normals[ i * 2 + 1 ]
-		)//.sub( one.base.pivot )
-		// .scale( one.base.sprite.scale )
-		//.rotate( one.base.sprite.rotation )
+		)//.sub( two.base.pivot )
+		// .scale( two.base.sprite.scale )
+		//.rotate( two.base.sprite.rotation )
 		// .add( two.base.currentPosition );
 		let p1 = pointsTwo[ i ];
 		let p2 = pointsTwo[ (i + 1) % l ];
@@ -98909,15 +98924,12 @@ function drawDebug( model ) {
 		for ( let i = 0, l = model.base.sprite.hitArea.points.length; i < l; i += 2 ) {
 			// get the point on the face half way down the edge
 			let halfEdge = Vec2(
-				model.base.sprite.hitArea.points[ i ] + ( model.base.sprite.hitArea.edges[ i ] / 2 ),
-				model.base.sprite.hitArea.points[ i + 1 ] + ( model.base.sprite.hitArea.edges[ i + 1 ] / 2 )
+				model.base.sprite.hitArea.points[ i ] + ( model.base.sprite.hitArea.edges[ Math.ceil( i / 2 ) ].x / 2 ),
+				model.base.sprite.hitArea.points[ i + 1 ] + ( model.base.sprite.hitArea.edges[ Math.ceil( i / 2 ) ].y / 2 )
 			);
 
 			// get the endpoint for the normal line.
-			let end = halfEdge.copy().add(
-					model.base.sprite.hitArea.normals[ i ] * 10,
-					model.base.sprite.hitArea.normals[ i + 1 ] * 10
-				)
+			let end = halfEdge.copy().add( model.base.sprite.hitArea.normals[ Math.ceil( i / 2 ) ].copy().mul( 10 ) )
 				.sub( model.base.pivot )
 				.scale( model.base.sprite.scale.x, model.base.sprite.scale.y )
 				.rotate( model.base.sprite.rotation )
