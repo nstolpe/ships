@@ -116,7 +116,7 @@ const Vector2 = function( x, y ) {
 		 * Returns the length of this `vector`
 		 */
 		len() {
-			return Math.sqrt( this.x * this.x + this.y + this.y );
+			return Math.sqrt( this.x * this.x + this.y * this.y );
 		},
 		len2() {
 			return this.dot( this );
