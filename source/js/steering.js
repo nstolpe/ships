@@ -181,9 +181,9 @@ function checkCollision( one, two ) {
 		let normal = Vec2(
 			two.base.sprite.hitArea.normals[ i * 2 ],
 			two.base.sprite.hitArea.normals[ i * 2 + 1 ]
-		)//.sub( one.base.pivot )
-		// .scale( one.base.sprite.scale )
-		//.rotate( one.base.sprite.rotation )
+		)//.sub( two.base.pivot )
+		// .scale( two.base.sprite.scale )
+		//.rotate( two.base.sprite.rotation )
 		// .add( two.base.currentPosition );
 		let p1 = pointsTwo[ i ];
 		let p2 = pointsTwo[ (i + 1) % l ];
@@ -263,15 +263,12 @@ function drawDebug( model ) {
 		for ( let i = 0, l = model.base.sprite.hitArea.points.length; i < l; i += 2 ) {
 			// get the point on the face half way down the edge
 			let halfEdge = Vec2(
-				model.base.sprite.hitArea.points[ i ] + ( model.base.sprite.hitArea.edges[ i ] / 2 ),
-				model.base.sprite.hitArea.points[ i + 1 ] + ( model.base.sprite.hitArea.edges[ i + 1 ] / 2 )
+				model.base.sprite.hitArea.points[ i ] + ( model.base.sprite.hitArea.edges[ i ].x / 2 ),
+				model.base.sprite.hitArea.points[ i + 1 ] + ( model.base.sprite.hitArea.edges[ i ].y / 2 )
 			);
 
 			// get the endpoint for the normal line.
-			let end = halfEdge.copy().add(
-					model.base.sprite.hitArea.normals[ i ] * 10,
-					model.base.sprite.hitArea.normals[ i + 1 ] * 10
-				)
+			let end = halfEdge.copy().add( model.base.sprite.hitArea.normals[ i ].copy().mul( 10 ) )
 				.sub( model.base.pivot )
 				.scale( model.base.sprite.scale.x, model.base.sprite.scale.y )
 				.rotate( model.base.sprite.rotation )
