@@ -158,6 +158,9 @@ function checkCollision( one, two ) {
 		}
 	}
 
+	/**
+	 * loop through the points of the first poly
+	 */
 	for ( let i = 0, l = pointsOne.length; i < l; i++ ) {
 		let normal = Vec2(
 			one.base.sprite.hitArea.normals[ i * 2 ],
@@ -167,9 +170,10 @@ function checkCollision( one, two ) {
 		//.rotate( one.base.sprite.rotation )
 		// .add( one.base.currentPosition );
 		let p1 = pointsOne[ i ];
-		let p2 = pointsOne[ (i + 1) % l ];
+		let p2 = pointsOne[ ( i + 1 ) % l ];
 		let edge = p2.copy().sub( p1 );
 		normal = edge.copy().perp().nor();
+		// normal = one.base.sprite.hitArea.normals[ i ];
 		let separating = separatingAxis( positionOne, positionTwo, pointsOne, pointsTwo, normal );
 		if ( separating ) {
 			collision.active = false;
@@ -263,12 +267,12 @@ function drawDebug( model ) {
 		for ( let i = 0, l = model.base.sprite.hitArea.points.length; i < l; i += 2 ) {
 			// get the point on the face half way down the edge
 			let halfEdge = Vec2(
-				model.base.sprite.hitArea.points[ i ] + ( model.base.sprite.hitArea.edges[ i ].x / 2 ),
-				model.base.sprite.hitArea.points[ i + 1 ] + ( model.base.sprite.hitArea.edges[ i ].y / 2 )
+				model.base.sprite.hitArea.points[ i ] + ( model.base.sprite.hitArea.edges[ Math.ceil( i / 2 ) ].x / 2 ),
+				model.base.sprite.hitArea.points[ i + 1 ] + ( model.base.sprite.hitArea.edges[ Math.ceil( i / 2 ) ].y / 2 )
 			);
 
 			// get the endpoint for the normal line.
-			let end = halfEdge.copy().add( model.base.sprite.hitArea.normals[ i ].copy().mul( 10 ) )
+			let end = halfEdge.copy().add( model.base.sprite.hitArea.normals[ Math.ceil( i / 2 ) ].copy().mul( 10 ) )
 				.sub( model.base.pivot )
 				.scale( model.base.sprite.scale.x, model.base.sprite.scale.y )
 				.rotate( model.base.sprite.rotation )

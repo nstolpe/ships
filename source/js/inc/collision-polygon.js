@@ -27,8 +27,8 @@ module.exports = function ( ...points ) {
 				let perp = edge.copy().perp();
 				let perpLength = perp.len();
 				let normal = perp.copy().nor();
-				this.edges[ i ] = edge;
-				this.normals[ i ] = normal;
+				this.edges[ Math.ceil( i / 2 ) ] = edge;
+				this.normals[ Math.ceil( i / 2 ) ] = normal;
 				// this.edges[ i ] = edge.x;
 				// this.edges[ i + 1 ] = edge.y;
 			}
