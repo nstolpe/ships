@@ -162,19 +162,9 @@ function checkCollision( one, two ) {
 	 * loop through the points of the first poly
 	 */
 	for ( let i = 0, l = pointsOne.length; i < l; i++ ) {
-		let normal = Vec2(
-			one.base.sprite.hitArea.normals[ i * 2 ],
-			one.base.sprite.hitArea.normals[ i * 2 + 1 ]
-		)//.sub( one.base.pivot )
-		// .scale( one.base.sprite.scale )
-		//.rotate( one.base.sprite.rotation )
-		// .add( one.base.currentPosition );
-		let p1 = pointsOne[ i ];
-		let p2 = pointsOne[ ( i + 1 ) % l ];
-		let edge = p2.copy().sub( p1 );
-		normal = edge.copy().perp().nor();
-		// normal = one.base.sprite.hitArea.normals[ i ];
+		let normal = one.base.sprite.hitArea.normals[ i ];
 		let separating = separatingAxis( positionOne, positionTwo, pointsOne, pointsTwo, normal );
+
 		if ( separating ) {
 			collision.active = false;
 			return collision;
@@ -182,18 +172,9 @@ function checkCollision( one, two ) {
 	}
 
 	for ( let i = 0, l = pointsTwo.length; i < l; i++ ) {
-		let normal = Vec2(
-			two.base.sprite.hitArea.normals[ i * 2 ],
-			two.base.sprite.hitArea.normals[ i * 2 + 1 ]
-		)//.sub( two.base.pivot )
-		// .scale( two.base.sprite.scale )
-		//.rotate( two.base.sprite.rotation )
-		// .add( two.base.currentPosition );
-		let p1 = pointsTwo[ i ];
-		let p2 = pointsTwo[ (i + 1) % l ];
-		let edge = p1.copy().sub( p2 );
-		normal = edge.copy().perp().nor();
+		let normal = two.base.sprite.hitArea.normals[ i ];
 		let separating = separatingAxis( positionOne, positionTwo, pointsOne, pointsTwo, normal );
+
 		if ( separating ) {
 			collision.active = false;
 			return collision;
