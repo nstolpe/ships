@@ -53,7 +53,7 @@ function setup( loader, resources ) {
 	emitterManager = EmitterManager(
 		resources.emitter.data,
 		emitterParent,
-		[ resources['particle'].texture ],
+		[ resources[ 'particle' ].texture ],
 		{ w: viewWidth, h: viewHeight },
 		17,
 		current.direction
@@ -67,8 +67,6 @@ function setup( loader, resources ) {
 	app.stage.addChild( stageGraphics );
 
 	window.turtle = gameModels[ 0 ].base;
-	turtle.sprite.width *= .5;
-	turtle.sprite.height *= .5;
 	SteeringKeyboard();
 
 	app.ticker.add( animate );
