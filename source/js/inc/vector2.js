@@ -179,6 +179,9 @@ const Vector2 = function( x, y ) {
 
 			return Math.sqrt( dx * dx + dy * dy );
 		},
+		/**
+		 * Projects this vector on another vector
+		 */
 		project( target ) {
 			target = Vector2( target );
 			const amt = this.dot( target ) / target.len2();
@@ -186,6 +189,9 @@ const Vector2 = function( x, y ) {
 			this.y = amt * target.y;
 			return this;
 		},
+		/**
+		 * Reflects this vector on to an axis.
+		 */
 		reflect( axis ) {
 			const x = this.x;
 			const y = this.y;
@@ -194,11 +200,29 @@ const Vector2 = function( x, y ) {
 			this.y -= y;
 			return this;
 		},
+		/**
+		 * Converts this vector to it's perpendicular vector
+		 */
 		perp() {
 			let x = this.x;
 			this.x = this.y;
 			this.y = -x;
 			return this;
+		},
+		/**
+		 * @TODO use object create and getters/setters for the next few
+		 */
+		min() {
+			return this.x;
+		},
+		max() {
+			return this.y;
+		},
+		a() {
+			return this.x;
+		},
+		b() {
+			return this.y;
 		}
 	};
 
