@@ -141,18 +141,20 @@ function checkCollision( one, two ) {
 			p = Vec2(
 					one.base.sprite.hitArea.points[ i ],
 					one.base.sprite.hitArea.points[ i + 1 ]
-				).sub( one.base.pivot )
+				)
+				.sub( one.base.pivot.x, one.base.pivot.y )
 				// .scale( one.base.sprite.scale )
-				.rotate( one.base.sprite.rotation )
+				.rotate( one.base.currentRotation )
 				.add( one.base.currentPosition );
 			pointsOne.push( p );
 		} else {
 			p = Vec2(
-					two.base.sprite.hitArea.points[ Math.floor( i - lengthOne ) ],
-					two.base.sprite.hitArea.points[ Math.floor( i - lengthOne ) + 1 ]
-				).sub( two.base.pivot )
+					two.base.sprite.hitArea.points[ i - lengthOne ],
+					two.base.sprite.hitArea.points[ i - lengthOne + 1 ]
+				)
+				.sub( two.base.pivot.x, two.base.pivot.y )
 				// .scale( two.base.sprite.scale )
-				.rotate( two.base.sprite.rotation )
+				.rotate( two.base.currentRotation )
 				.add( two.base.currentPosition );
 			pointsTwo.push( p );
 		}
@@ -213,8 +215,9 @@ function projectPoints( points, normal ) {
 function drawDebug( model ) {
 	// draw the hitarea if it has it. only works for collision polygons.
 	if ( model.base.sprite.hitArea ) {
-		stageGraphics.lineStyle( 1, 0xf1ff32, 1 );
+		stageGraphics.lineStyle( 1, 0x00ff32, 1 );
 
+		// set the first point before the loop for moveTo
 		let p = Vec2(
 			model.base.sprite.hitArea.points[ 0 ] - model.base.pivot.x,
 			model.base.sprite.hitArea.points[ 1 ] - model.base.pivot.y
@@ -224,29 +227,33 @@ function drawDebug( model ) {
 
 		stageGraphics.moveTo( p.x, p.y );
 
+		// draw a line from each point to the one after it 
 		for ( let i = 2, l = model.base.sprite.hitArea.points.length; i < l; i += 2 ) {
 			p.set(
-				model.base.sprite.hitArea.points[ i ] - model.base.pivot.x,
-				model.base.sprite.hitArea.points[ i + 1 ] - model.base.pivot.y
-			).scale( model.base.sprite.scale )
+				model.base.sprite.hitArea.points[ i ],
+				model.base.sprite.hitArea.points[ i + 1 ]
+			).sub( model.base.pivot.x, model.base.pivot.y )
+			.scale( model.base.sprite.scale )
 			.rotate( model.base.sprite.rotation )
 			.add( model.base.currentPosition );
 
 			stageGraphics.lineTo( p.x, p.y );
 		}
 
+		// draw a final line back to the original point to close the polygon.
 		p.set(
-			model.base.sprite.hitArea.points[ 0 ] - model.base.pivot.x,
-			model.base.sprite.hitArea.points[ 1 ] - model.base.pivot.y
-		).scale( model.base.sprite.scale )
+			model.base.sprite.hitArea.points[ 0 ],
+			model.base.sprite.hitArea.points[ 1 ]
+		).sub( model.base.pivot.x, model.base.pivot.y )
+		.scale( model.base.sprite.scale )
 		.rotate( model.base.sprite.rotation )
 		.add( model.base.currentPosition );
 
 		stageGraphics.lineTo( p.x, p.y );
 
-		// start: draw normal lines
+		// draw the normal lines
 		for ( let i = 0, l = model.base.sprite.hitArea.points.length; i < l; i += 2 ) {
-			// get the point on the face half way down the edge
+			// get the point in the middle of the edge.
 			let halfEdge = Vec2(
 				model.base.sprite.hitArea.points[ i ] + ( model.base.sprite.hitArea.edges[ Math.ceil( i / 2 ) ].x / 2 ),
 				model.base.sprite.hitArea.points[ i + 1 ] + ( model.base.sprite.hitArea.edges[ Math.ceil( i / 2 ) ].y / 2 )
@@ -271,7 +278,6 @@ function drawDebug( model ) {
 			// draw a line to the half-way point rotated by the normal * 10
 			stageGraphics.lineTo( end.x, end.y );
 		}
-		// end: draw normal lines
 	}
 
 	// draw the AABB for the sprite.
