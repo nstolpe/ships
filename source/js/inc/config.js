@@ -276,6 +276,8 @@ module.exports = function( PIXI, app ) {
 					base.sprite.on( 'click', ( e ) => console.log( e ) );
 					base.pivot.x = base.sprite.width / 2;
 					base.pivot.y = base.sprite.height / 2;
+					base.sprite.width *= .5;
+					base.sprite.height *= .5;
 					// base.children.rudder.currentPosition.x = base.sprite.width / 2;
 					// base.children.rudder.basePosition.x = base.sprite.width / 2;
 				},
