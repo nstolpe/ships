@@ -109,17 +109,28 @@ function animate( delta ) {
 		else
 			return sum;
 	}, '' );
+
 	window.dispatchEvent( new CustomEvent('message', {
 		detail: {
 			type: 'update-collision',
 			names: `<h3>collisions:</h3> ${ compiled }`
 		}
 	} ) );
+
 	emitterManager.update( delta, [ current ] );
 
 	// check if the turtle is leaving the screen bounds
 	// @TODO use better collision detection
 	// checkScreenBounds( turtle, { left: 0, right: app.view.offsetWidth, top: 0, bottom: app.view.offsetHeight } );
+}
+
+function applyTransformsToPoint( point, source ) {
+	point.sub( source.base.pivot.x, source.base.pivot.y )
+		// @TODO needs the mul( 2 ) of detection only works on objects
+		// with .5 scale. Figure out why.
+		.scale( Vec2( source.base.sprite.scale ).mul( 2 ) )
+		.rotate( source.base.currentRotation )
+		.add( source.base.currentPosition );
 }
 
 function checkCollision( one, two ) {
@@ -136,24 +147,12 @@ function checkCollision( one, two ) {
 	// points have the game object's transform applied
 	for ( let i = 0, l = lengthOne + lengthTwo; i < l; i += 2 ) {
 		if ( i < lengthOne ) {
-			p = Vec2(
-					one.base.sprite.hitArea.points[ i ],
-					one.base.sprite.hitArea.points[ i + 1 ]
-				)
-				.sub( one.base.pivot.x, one.base.pivot.y )
-				// .scale( one.base.sprite.scale )
-				.rotate( one.base.currentRotation )
-				.add( one.base.currentPosition );
+			p = Vec2( one.base.sprite.hitArea.points[ i ], one.base.sprite.hitArea.points[ i + 1 ] );
+			applyTransformsToPoint( p, one );
 			pointsOne.push( p );
 		} else {
-			p = Vec2(
-					two.base.sprite.hitArea.points[ i - lengthOne ],
-					two.base.sprite.hitArea.points[ i - lengthOne + 1 ]
-				)
-				.sub( two.base.pivot.x, two.base.pivot.y )
-				// .scale( two.base.sprite.scale )
-				.rotate( two.base.currentRotation )
-				.add( two.base.currentPosition );
+			p = Vec2( two.base.sprite.hitArea.points[ i - lengthOne ], two.base.sprite.hitArea.points[ i - lengthOne + 1 ] );
+			applyTransformsToPoint( p, two );
 			pointsTwo.push( p );
 		}
 	}
