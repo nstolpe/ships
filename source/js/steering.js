@@ -94,7 +94,10 @@ function animate( delta ) {
 	// check collision between every game model. very inneficient.
 	for ( let i = 0, l = gameModels.length; i < l; i++ ) {
 		for ( let ii = 0, ll = gameModels.length; ii < ll; ii++ ) {
-			if ( i !== ii ) collisions[ collisions.length ] = checkCollision( gameModels[ i ], gameModels[ ii ] );
+			if ( i !== ii ) {
+				let collision = checkCollision( gameModels[ i ], gameModels[ ii ] );
+				collisions[ collisions.length ] = collision;
+			}
 		}
 	}
 	// let t = gameModels.find((v) => v.base.name === 'turtle');
@@ -134,14 +137,12 @@ function applyTransformsToPoint( point, source ) {
 }
 
 function checkCollision( one, two ) {
-	let positionOne = one.base.currentPosition;
-	let positionTwo = two.base.currentPosition;
 	let lengthOne = one.base.sprite.hitArea.points.length;
 	let lengthTwo = two.base.sprite.hitArea.points.length;
 	let pointsOne = [];
 	let pointsTwo = [];
 	let p;
-	let collision = { one: one, two: two };
+	let collision = {};
 
 	// make vector arrays of the incoming points.
 	// points have the game object's transform applied
@@ -162,7 +163,7 @@ function checkCollision( one, two ) {
 	 */
 	for ( let i = 0, l = pointsOne.length; i < l; i++ ) {
 		let normal = one.base.sprite.hitArea.normals[ i ];
-		let separating = separatingAxis( positionOne, positionTwo, pointsOne, pointsTwo, normal );
+		let separating = isSeparatingAxis( one, two, pointsOne, pointsTwo, normal, collision );
 
 		if ( separating ) {
 			collision.active = false;
@@ -172,7 +173,7 @@ function checkCollision( one, two ) {
 
 	for ( let i = 0, l = pointsTwo.length; i < l; i++ ) {
 		let normal = two.base.sprite.hitArea.normals[ i ];
-		let separating = separatingAxis( positionOne, positionTwo, pointsOne, pointsTwo, normal );
+		let separating = isSeparatingAxis( one, two, pointsOne, pointsTwo, normal, collision );
 
 		if ( separating ) {
 			collision.active = false;
@@ -180,11 +181,15 @@ function checkCollision( one, two ) {
 		}
 	}
 
+	collision.one = one;
+	collision.two = two;
 	collision.active = true;
 	return collision;
 }
 
-function separatingAxis( positionOne, positionTwo, pointsOne, pointsTwo, normal ) {
+function isSeparatingAxis( one, two, pointsOne, pointsTwo, normal, collision ) {
+	let positionOne = one.base.currentPosition;
+	let positionTwo = two.base.currentPosition;
 	let rangeOne = projectPoints( pointsOne, normal );
 	let rangeTwo = projectPoints( pointsTwo, normal );
 	let offsetVec = Vec2( positionTwo ).sub( positionOne );
@@ -193,7 +198,44 @@ function separatingAxis( positionOne, positionTwo, pointsOne, pointsTwo, normal 
 	rangeTwo.min += offsetDot;
 	rangeTwo.max += offsetDot;
 
-	return rangeOne.min > rangeTwo.max || rangeTwo.min > rangeOne.max ? true : false;
+	if ( rangeOne.min > rangeTwo.max || rangeTwo.min > rangeOne.max ) return true;
+
+	if ( collision ) {
+		var overlap = 0;
+		collision.one = one;
+		collision.two = two;
+
+		// one starts further left than two
+		if ( rangeOne[0] < rangeTwo[0] ) {
+			collision.oneInTwo = false;
+			// one ends before two does. We have to pull one out of two
+			if (rangeOne[1] < rangeTwo[1]) { 
+				overlap = rangeOne[1] - rangeTwo[0];
+				collision.twoInOne = false;
+			// two is fully inside one. Pick the shortest way out.
+			} else {
+				var option1 = rangeOne[1] - rangeTwo[0];
+				var option2 = rangeTwo[1] - rangeOne[0];
+				overlap = option1 < option2 ? option1 : -option2;
+			}
+		// two starts further left than one
+		} else {
+			collision.twoInOne = false;
+			// two ends before one ends. We have to push one out of two
+			if ( rangeOne[1] > rangeTwo[1] ) { 
+				overlap = rangeOne[0] - rangeTwo[1];
+				collision.oneInTwo = false;
+			// one is fully inside two. Pick the shortest way out.
+			} else {
+				var option1 = rangeOne[1] - rangeTwo[0];
+				var option2 = rangeTwo[1] - rangeOne[0];
+				overlap = option1 < option2 ? option1 : -option2;
+			}
+		}
+	}
+	// one.base.forwardVelocity = 0;
+	// two.base.forwardVelocity = 0;
+	return false;
 }
 
 function projectPoints( points, normal ) {
