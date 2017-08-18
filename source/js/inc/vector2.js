@@ -132,6 +132,11 @@ const Vector2 = function( x, y ) {
 			}
 			return this;
 		},
+		reverse() {
+			this.x = -this.x;
+			this.y = -this.y;
+			return this;
+		},
 		/**
 		 * Returns the angle between this `vector` and the x axis.
 		 * If `radians` is true, the angle will be returned as radians between -Math.PI and Math.PI.
