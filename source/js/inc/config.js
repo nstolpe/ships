@@ -67,8 +67,8 @@ module.exports = function( PIXI, app ) {
 					);
 					base.pivot.x = base.sprite.width / 2;
 					base.pivot.y = base.sprite.height / 2;
-					base.sprite.width *= 0.5;
-					base.sprite.height *= 0.5;
+					// base.sprite.width *= 0.5;
+					// base.sprite.height *= 0.5;
 				},
 				children: [
 					{
@@ -87,69 +87,108 @@ module.exports = function( PIXI, app ) {
 					}
 				]
 			},
-			// {
-			// 	options: {
-			// 		basePosition: { x: 256, y: 128 },
-			// 		name: 'boards-top',
-			// 		rotationConstraints: { pos: 0, neg: 0 },
-			// 		positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
-			// 		debug: true
-			// 	},
-			// 	init: ( base ) => {
-			// 		base.sprite.hitArea = new CollisionPolygon(
-			// 			  0,   0,
-			// 			256,   0,
-			// 			256, 128,
-			// 			  0, 128
-			// 		);
-			// 	},
-			// 	children: [
-			// 		{
-			// 			texture: 'boards',
-			// 			tiling: true,
-			// 			options: {
-			// 				tiling: true,
-			// 				dimensions: { w: 256, h: 128 },
-			// 				// basePosition: { x: 15, y: 0 },
-			// 				rotationConstraints: { pos: 0, neg: 0 },
-			// 				positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } }
-			// 			}
-			// 		}
-			// 	]
-			// },
-			// {
-			// 	options: {
-			// 		basePosition: { x: 256, y: 512 },
-			// 		name: 'boards-bottom',
-			// 		rotationConstraints: { pos: 0, neg: 0 },
-			// 		positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
-			// 		debug: true
-			// 	},
-			// 	init: ( base ) => {
-			// 		base.sprite.hitArea = new CollisionPolygon(
-			// 			  0,   0,
-			// 			256,   0,
-			// 			256, 128,
-			// 			  0, 128
-			// 		);
-			// 	},
-			// 	children: [
-			// 		{
-			// 			texture: 'boards',
-			// 			tiling: true,
-			// 			options: {
-			// 				tiling: true,
-			// 				dimensions: { w: 256, h: 128 },
-			// 				// basePosition: { x: 15, y: 0 },
-			// 				rotationConstraints: { pos: 0, neg: 0 },
-			// 				positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } }
-			// 			},
-			// 			init: ( child, parent) => {
-			// 				// child.pivot.x = parent.width / 2;
-			// 			}
-			// 		}
-			// 	]
-			// },
+			{
+				options: {
+					basePosition: { x: 448, y: 192 },
+					name: 'boards-top',
+					rotationConstraints: { pos: 0, neg: 0 },
+					positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
+					debug: true
+				},
+				init: ( base ) => {
+					base.sprite.hitArea = new CollisionPolygon(
+						  0,   0,
+						256,   0,
+						256, 128,
+						  0, 128
+					);
+					base.pivot.x = base.sprite.width / 2;
+					base.pivot.y = base.sprite.height / 2;
+				},
+				children: [
+					{
+						texture: 'boards',
+						tiling: true,
+						options: {
+							tiling: true,
+							dimensions: { w: 256, h: 128 },
+							// basePosition: { x: 15, y: 0 },
+							rotationConstraints: { pos: 0, neg: 0 },
+							positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } }
+						}
+					}
+				]
+			},
+			{
+				options: {
+					basePosition: { x: 352, y: 576 },
+					name: 'boards-bottom-left',
+					rotationConstraints: { pos: 0, neg: 0 },
+					positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
+					debug: true
+				},
+				init: ( base ) => {
+					base.sprite.hitArea = new CollisionPolygon(
+						 0,   0,
+						64,   0,
+						64, 128,
+						 0, 128
+					);
+					base.pivot.x = base.sprite.width / 2;
+					base.pivot.y = base.sprite.height / 2;
+				},
+				children: [
+					{
+						texture: 'boards',
+						tiling: true,
+						options: {
+							tiling: true,
+							dimensions: { w: 64, h: 128 },
+							// basePosition: { x: 15, y: 0 },
+							rotationConstraints: { pos: 0, neg: 0 },
+							positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } }
+						},
+						init: ( child, parent) => {
+							// child.pivot.x = parent.width / 2;
+						}
+					}
+				]
+			},
+			{
+				options: {
+					basePosition: { x: 544, y: 576 },
+					name: 'boards-bottom-right',
+					rotationConstraints: { pos: 0, neg: 0 },
+					positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
+					debug: true
+				},
+				init: ( base ) => {
+					base.sprite.hitArea = new CollisionPolygon(
+						 0,   0,
+						64,   0,
+						64, 128,
+						 0, 128
+					);
+					base.pivot.x = base.sprite.width / 2;
+					base.pivot.y = base.sprite.height / 2;
+				},
+				children: [
+					{
+						texture: 'boards',
+						tiling: true,
+						options: {
+							tiling: true,
+							dimensions: { w: 64, h: 128 },
+							// basePosition: { x: 15, y: 0 },
+							rotationConstraints: { pos: 0, neg: 0 },
+							positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } }
+						},
+						init: ( child, parent) => {
+							// child.pivot.x = parent.width / 2;
+						}
+					}
+				]
+			},
 			{
 				spriteSheet: 'ships.json',
 				options: {
