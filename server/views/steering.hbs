@@ -17,6 +17,9 @@
 			.collision {
 				width: 300px;
 			}
+			.frame-rate::before {
+				content: 'frame rate: 'attr(data-framerate);
+			}
 			.debug-toggle {
 				position: absolute;
 				bottom: 0;
@@ -34,6 +37,7 @@
 		<div class="debug-toggle" id="debug-toggle" data-active="on"></div>
 		<div class="feedback" id="feedback">
 			{{!-- <div class="collision" id="collision">no collision<div> --}}
+			<div class="frame-rate" id="frame-rate" data-framerate="1"><div>
 		</div>
 		<script src="assets/js/steering.js"></script>
 		<script type="text/javascript">
