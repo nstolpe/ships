@@ -228,6 +228,9 @@ const Vector2 = function( x, y ) {
 		},
 		b() {
 			return this.y;
+		},
+		toString() {
+			return `[ x: ${ this.x}, y: ${ this.y } ]`;
 		}
 	};
 

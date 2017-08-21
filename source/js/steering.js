@@ -92,14 +92,42 @@ function animate( delta ) {
 	}
 
 	// check collision between every game model. very inneficient.
-	for ( let i = 0, l = gameModels.length; i < l; i++ ) {
+	// for ( let i = 0, l = gameModels.length; i < l; i++ ) {
+	// 	for ( let ii = 0, ll = gameModels.length; ii < ll; ii++ ) {
+	// 		if ( i !== ii ) {
+	// 			let collision = checkCollision( gameModels[ i ], gameModels[ ii ] );
+	// 			collisions[ collisions.length ] = collision;
+	// 		}
+	// 	}
+	// }
+
+	// Check each moving (movable really) object for a collision with every other object.
+	// @TODO check only actually moving and check w/i same area. 
+	let collidables = gameModels.filter( ( model ) => {
+		return model.base.positionConstraints.neg.x !== 0 ||
+		model.base.positionConstraints.neg.y !== 0 ||
+		model.base.positionConstraints.pos.x !== 0 ||
+		model.base.positionConstraints.pos.y !== 0
+	} );
+
+	for ( let i = 0, l = collidables.length; i < l; i++ ) {
 		for ( let ii = 0, ll = gameModels.length; ii < ll; ii++ ) {
 			if ( i !== ii ) {
 				let collision = checkCollision( gameModels[ i ], gameModels[ ii ] );
 				collisions[ collisions.length ] = collision;
+				if ( collision ) {
+					console.log( collision.overlapV.toString() + ' ' + collision.overlap );
+					collision.one.base.currentPosition.x -= collision.overlapV.x;
+					collision.one.base.currentPosition.y -= collision.overlapV.y;
+				}
+				// if ( collision && collision.twoInOne ) {
+				// 	collision.two.base.currentPosition.x += collision.overlapV.x;
+				// 	collision.two.base.currentPosition.y += collision.overlapV.y;
+				// }
 			}
 		}
 	}
+
 	// let t = gameModels.find((v) => v.base.name === 'turtle');
 	// for ( let i = 0, l = gameModels.length; i < l; i++ ) {
 	// 	if ( gameModels[ i ] !== t ) 
@@ -142,7 +170,15 @@ function checkCollision( one, two ) {
 	let pointsOne = [];
 	let pointsTwo = [];
 	let p;
-	let collision = {};
+	let collision = {
+		one: one,
+		two: two,
+		active: true,
+		overlapN: Vec2(),
+		overlap: Number.MAX_VALUE,
+		oneInTwo: true,
+		twoInOne: true
+	};
 
 	// make vector arrays of the incoming points.
 	// points have the game object's transform applied
@@ -165,26 +201,26 @@ function checkCollision( one, two ) {
 		let normal = one.base.sprite.hitArea.normals[ i ];
 		let separating = isSeparatingAxis( one, two, pointsOne, pointsTwo, normal, collision );
 
-		if ( separating ) {
-			collision.active = false;
-			return collision;
-		}
+		// if ( collision )
+		// 	collision.overlapV = Vec2( collision.overlapN ).scale( collision.overlap );
+		if ( separating ) 
+			return false;
 	}
 
 	for ( let i = 0, l = pointsTwo.length; i < l; i++ ) {
 		let normal = two.base.sprite.hitArea.normals[ i ];
 		let separating = isSeparatingAxis( one, two, pointsOne, pointsTwo, normal, collision );
 
-		if ( separating ) {
-			collision.active = false;
-			return collision;
-		}
+		// if ( collision )
+		// 	collision.overlapV = Vec2( collision.overlapN ).scale( collision.overlap );
+		if ( separating ) 
+			return false;
 	}
 
-	collision.one = one;
-	collision.two = two;
-	collision.active = true;
-	return collision;
+	if ( collision )
+		collision.overlapV = Vec2( collision.overlapN ).scale( collision.overlap );
+
+	return collision || true;
 }
 
 function isSeparatingAxis( one, two, pointsOne, pointsTwo, normal, collision ) {
@@ -202,42 +238,51 @@ function isSeparatingAxis( one, two, pointsOne, pointsTwo, normal, collision ) {
 
 	if ( collision ) {
 		var overlap = 0;
-		collision.one = one;
-		collision.two = two;
 
 		// one starts further left than two
-		if ( rangeOne[0] < rangeTwo[0] ) {
+		if ( rangeOne.min < rangeTwo.min ) {
 			collision.oneInTwo = false;
 			// one ends before two does. We have to pull one out of two
-			if (rangeOne[1] < rangeTwo[1]) { 
-				overlap = rangeOne[1] - rangeTwo[0];
+			if ( rangeOne.max < rangeTwo.max ) { 
+				overlap = rangeOne.max - rangeTwo.min;
 				collision.twoInOne = false;
 			// two is fully inside one. Pick the shortest way out.
 			} else {
-				var option1 = rangeOne[1] - rangeTwo[0];
-				var option2 = rangeTwo[1] - rangeOne[0];
+				var option1 = rangeOne.max - rangeTwo.min;
+				var option2 = rangeTwo.max - rangeOne.min;
 				overlap = option1 < option2 ? option1 : -option2;
 			}
 		// two starts further left than one
 		} else {
 			collision.twoInOne = false;
 			// two ends before one ends. We have to push one out of two
-			if ( rangeOne[1] > rangeTwo[1] ) { 
-				overlap = rangeOne[0] - rangeTwo[1];
+			if ( rangeOne.max > rangeTwo.max ) { 
+				overlap = rangeOne.min - rangeTwo.max;
 				collision.oneInTwo = false;
 			// one is fully inside two. Pick the shortest way out.
 			} else {
-				var option1 = rangeOne[1] - rangeTwo[0];
-				var option2 = rangeTwo[1] - rangeOne[0];
+				var option1 = rangeOne.max - rangeTwo.min;
+				var option2 = rangeTwo.max - rangeOne.min;
 				overlap = option1 < option2 ? option1 : -option2;
 			}
 		}
+		var absOverlap = Math.abs( overlap );
+		if ( absOverlap < collision.overlap ) {
+			collision.overlap = absOverlap;
+			collision.overlapN.set( normal );
+			if ( overlap < 0 ) {
+				collision.overlapN.reverse();
+			}
+		}
 	}
-	// one.base.forwardVelocity = 0;
-	// two.base.forwardVelocity = 0;
+
 	return false;
 }
 
+/**
+ * Projects a set of points onto an axis/normal.
+ * Returns the minimum/maximum range of the projected points.
+ */
 function projectPoints( points, normal ) {
 	let min = Number.MAX_VALUE;
 	let max = -Number.MAX_VALUE;

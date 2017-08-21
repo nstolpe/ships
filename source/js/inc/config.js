@@ -193,9 +193,11 @@ module.exports = function( PIXI, app ) {
 				spriteSheet: 'ships.json',
 				options: {
 					name: 'dud',
-					currentPosition: { x: 512, y: 512 },
+					// currentPosition: { x: 512, y: 512 },
+					basePosition: { x: 800, y: 300 },
 					// rotationConstraints: { pos: Infinity, neg: Infinity },
 					// positionConstraints: { pos: { x: Infinity, y: Infinity }, neg: { x: Infinity, y: Infinity } },
+					positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
 					maxForwardVelocity: 4,
 					forwardVelocityIncrement: .05,
 					debug: true,
@@ -242,8 +244,8 @@ module.exports = function( PIXI, app ) {
 					base.sprite.on( 'click', ( e ) => console.log( e ) );
 					base.pivot.x = base.sprite.width / 2;
 					base.pivot.y = base.sprite.height / 2;
-					base.sprite.width *= 0.5;
-					base.sprite.height *= 0.5;
+					// base.sprite.width *= 0.5;
+					// base.sprite.height *= 0.5;
 					// base.children.rudder.currentPosition.x = base.sprite.width / 2;
 					// base.children.rudder.basePosition.x = base.sprite.width / 2;
 				},
