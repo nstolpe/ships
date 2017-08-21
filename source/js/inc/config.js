@@ -13,7 +13,6 @@ module.exports = function( PIXI, app ) {
 					name: 'boards-left',
 					rotationConstraints: { pos: 0, neg: 0 },
 					positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
-					debug: true
 				},
 				init: ( base ) => {
 					base.sprite.hitArea = new CollisionPolygon(
@@ -22,16 +21,8 @@ module.exports = function( PIXI, app ) {
 						128, 512,
 						  0, 512
 					);
-					// base.sprite.hitArea = new CollisionPolygon(
-					// 	-64, -256,
-					// 	64, -256,
-					// 	64,  256,
-					// 	-64,  256
-					// );
 					base.pivot.x = base.sprite.width / 2;
 					base.pivot.y = base.sprite.height / 2;
-					// base.sprite.width *= 0.5;
-					// base.sprite.height *= 0.5;
 				},
 				children: [
 					{
@@ -40,12 +31,8 @@ module.exports = function( PIXI, app ) {
 						options: {
 							tiling: true,
 							dimensions: { w: 128, h: 512 },
-							// basePosition: { x: 15, y: 0 },
 							rotationConstraints: { pos: 0, neg: 0 },
 							positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } }
-						},
-						init: ( child, parent) => {
-							// child.pivot.x = parent.width / 2;
 						}
 					}
 				]
@@ -56,7 +43,6 @@ module.exports = function( PIXI, app ) {
 					name: 'boards-right',
 					rotationConstraints: { pos: 0, neg: 0 },
 					positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
-					debug: true
 				},
 				init: ( base ) => {
 					base.sprite.hitArea = new CollisionPolygon(
@@ -67,8 +53,6 @@ module.exports = function( PIXI, app ) {
 					);
 					base.pivot.x = base.sprite.width / 2;
 					base.pivot.y = base.sprite.height / 2;
-					// base.sprite.width *= 0.5;
-					// base.sprite.height *= 0.5;
 				},
 				children: [
 					{
@@ -77,12 +61,8 @@ module.exports = function( PIXI, app ) {
 						options: {
 							tiling: true,
 							dimensions: { w: 128, h: 512 },
-							// basePosition: { x: 15, y: 0 },
 							rotationConstraints: { pos: 0, neg: 0 },
 							positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } }
-						},
-						init: ( child, parent) => {
-							// child.pivot.x = parent.width / 2;
 						}
 					}
 				]
@@ -93,7 +73,6 @@ module.exports = function( PIXI, app ) {
 					name: 'boards-top',
 					rotationConstraints: { pos: 0, neg: 0 },
 					positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
-					debug: true
 				},
 				init: ( base ) => {
 					base.sprite.hitArea = new CollisionPolygon(
@@ -112,7 +91,6 @@ module.exports = function( PIXI, app ) {
 						options: {
 							tiling: true,
 							dimensions: { w: 256, h: 128 },
-							// basePosition: { x: 15, y: 0 },
 							rotationConstraints: { pos: 0, neg: 0 },
 							positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } }
 						}
@@ -125,7 +103,6 @@ module.exports = function( PIXI, app ) {
 					name: 'boards-bottom-left',
 					rotationConstraints: { pos: 0, neg: 0 },
 					positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
-					debug: true
 				},
 				init: ( base ) => {
 					base.sprite.hitArea = new CollisionPolygon(
@@ -144,12 +121,8 @@ module.exports = function( PIXI, app ) {
 						options: {
 							tiling: true,
 							dimensions: { w: 64, h: 128 },
-							// basePosition: { x: 15, y: 0 },
 							rotationConstraints: { pos: 0, neg: 0 },
 							positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } }
-						},
-						init: ( child, parent) => {
-							// child.pivot.x = parent.width / 2;
 						}
 					}
 				]
@@ -160,7 +133,6 @@ module.exports = function( PIXI, app ) {
 					name: 'boards-bottom-right',
 					rotationConstraints: { pos: 0, neg: 0 },
 					positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
-					debug: true
 				},
 				init: ( base ) => {
 					base.sprite.hitArea = new CollisionPolygon(
@@ -179,91 +151,152 @@ module.exports = function( PIXI, app ) {
 						options: {
 							tiling: true,
 							dimensions: { w: 64, h: 128 },
-							// basePosition: { x: 15, y: 0 },
 							rotationConstraints: { pos: 0, neg: 0 },
 							positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } }
-						},
-						init: ( child, parent) => {
-							// child.pivot.x = parent.width / 2;
 						}
 					}
 				]
 			},
+			// duds
 			{
 				spriteSheet: 'ships.json',
 				options: {
 					name: 'dud',
-					// currentPosition: { x: 512, y: 512 },
-					basePosition: { x: 800, y: 300 },
-					// rotationConstraints: { pos: Infinity, neg: Infinity },
-					// positionConstraints: { pos: { x: Infinity, y: Infinity }, neg: { x: Infinity, y: Infinity } },
-					positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
+					currentPosition: { x: 800, y: 300 },
+					// positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
 					maxForwardVelocity: 4,
 					forwardVelocityIncrement: .05,
-					debug: true,
-					postUpdates: [
-						function( delta ) {
-							// console.log( this.children[ 'rudder' ].currentRotation );
-							// console.log( this.rotationVelocity );
-							// this.children[ 'rudder' ].currentRotation = -this.currentRotation;
-							// this.children[ 'rudder' ].rotationVelocity = -this.rotationVelocity;
-						}
-					]
 				},
 
 				init: ( base ) => {
-					// base.sprite.hitArea = new PIXI.Rectangle(
-					// 	0,
-					// 	0,
-					// 	base.sprite.width,
-					// 	base.sprite.height
-					// );
-					base.sprite.hitArea = new CollisionPolygon(
-						48,   0,
-						71,   7,
-						83,  33,
-						86,  58,
-						83,  87,
-						71, 113,
-						48, 120,
-						38, 120,
-						15, 113,
-						 3,  87,
-						 0,  58,
-						 3,  33,
-						15,   7,
-						38,   0
-					);
-					// base.sprite.hitArea = new CollisionPolygon(
-					// 	 0,   0,
-					// 	86,   0,
-					// 	86, 120,
-					// 	 0, 120
-					// );
-					base.sprite.interactive = true;
-					base.sprite.on( 'click', ( e ) => console.log( e ) );
+					base.sprite.hitArea = new CollisionPolygon( 48, 0, 71, 7, 83, 33, 86, 58, 83, 87, 71, 113, 48, 120,
+																38, 120, 15, 113, 3, 87 , 0, 58, 3, 33, 15, 7, 38, 0 );
+
 					base.pivot.x = base.sprite.width / 2;
 					base.pivot.y = base.sprite.height / 2;
-					// base.sprite.width *= 0.5;
-					// base.sprite.height *= 0.5;
-					// base.children.rudder.currentPosition.x = base.sprite.width / 2;
-					// base.children.rudder.basePosition.x = base.sprite.width / 2;
 				},
 				children: [
 					{
 						name: 'body',
 						id: 'turtle-body.png',
 						options: {
-							// basePosition: { x: 15, y: 0 },
-							rotationConstraints: { pos: 0, neg: 0 },
-							positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } }
 						},
-						init: ( child, parent) => {
-							// child.pivot.x = parent.width / 2;
-						}
 					}
 				]
 			},
+			{
+				spriteSheet: 'ships.json',
+				options: {
+					name: 'dud2',
+					currentPosition: { x: 1200, y: 380 },
+					// positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
+					maxForwardVelocity: 4,
+					forwardVelocityIncrement: .05,
+				},
+
+				init: ( base ) => {
+					base.sprite.hitArea = new CollisionPolygon( 48, 0, 71, 7, 83, 33, 86, 58, 83, 87, 71, 113, 48, 120,
+																38, 120, 15, 113, 3, 87 , 0, 58, 3, 33, 15, 7, 38, 0 );
+
+					base.pivot.x = base.sprite.width / 2;
+					base.pivot.y = base.sprite.height / 2;
+					base.sprite.width *= 0.5;
+					base.sprite.height *= 0.5;
+				},
+				children: [
+					{
+						name: 'body',
+						id: 'turtle-body.png',
+						options: {
+						},
+					}
+				]
+			},
+			{
+				spriteSheet: 'ships.json',
+				options: {
+					name: 'dud3',
+					currentPosition: { x: 468, y: 560 },
+					// positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
+					maxForwardVelocity: 4,
+					forwardVelocityIncrement: .05,
+				},
+
+				init: ( base ) => {
+					base.sprite.hitArea = new CollisionPolygon( 48, 0, 71, 7, 83, 33, 86, 58, 83, 87, 71, 113, 48, 120,
+																38, 120, 15, 113, 3, 87 , 0, 58, 3, 33, 15, 7, 38, 0 );
+
+					base.pivot.x = base.sprite.width / 2;
+					base.pivot.y = base.sprite.height / 2;
+					base.sprite.width *= 0.5;
+					base.sprite.height *= 0.5;
+				},
+				children: [
+					{
+						name: 'body',
+						id: 'turtle-body.png',
+						options: {
+						},
+					}
+				]
+			},
+			{
+				spriteSheet: 'ships.json',
+				options: {
+					name: 'dud4',
+					currentPosition: { x: 468, y: 560 },
+					// positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
+					maxForwardVelocity: 4,
+					forwardVelocityIncrement: .05,
+				},
+
+				init: ( base ) => {
+					base.sprite.hitArea = new CollisionPolygon( 48, 0, 71, 7, 83, 33, 86, 58, 83, 87, 71, 113, 48, 120,
+																38, 120, 15, 113, 3, 87 , 0, 58, 3, 33, 15, 7, 38, 0 );
+
+					base.pivot.x = base.sprite.width / 2;
+					base.pivot.y = base.sprite.height / 2;
+					base.sprite.width *= 0.5;
+					base.sprite.height *= 0.5;
+				},
+				children: [
+					{
+						name: 'body',
+						id: 'turtle-body.png',
+						options: {
+						},
+					}
+				]
+			},
+			{
+				spriteSheet: 'ships.json',
+				options: {
+					name: 'dud5',
+					currentPosition: { x: 468, y: 560 },
+					// positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
+					maxForwardVelocity: 4,
+					forwardVelocityIncrement: .05,
+				},
+
+				init: ( base ) => {
+					base.sprite.hitArea = new CollisionPolygon( 48, 0, 71, 7, 83, 33, 86, 58, 83, 87, 71, 113, 48, 120,
+																38, 120, 15, 113, 3, 87 , 0, 58, 3, 33, 15, 7, 38, 0 );
+
+					base.pivot.x = base.sprite.width / 2;
+					base.pivot.y = base.sprite.height / 2;
+					base.sprite.width *= 0.5;
+					base.sprite.height *= 0.5;
+				},
+				children: [
+					{
+						name: 'body',
+						id: 'turtle-body.png',
+						options: {
+						},
+					}
+				]
+			},
+			// turtle
 			{
 				spriteSheet: 'ships.json',
 				options: {
@@ -273,7 +306,7 @@ module.exports = function( PIXI, app ) {
 					// positionConstraints: { pos: { x: Infinity, y: Infinity }, neg: { x: Infinity, y: Infinity } },
 					maxForwardVelocity: 4,
 					forwardVelocityIncrement: .05,
-					debug: true,
+					// debug: true,
 					postUpdates: [
 						function( delta ) {
 							// console.log( this.children[ 'rudder' ].currentRotation );
