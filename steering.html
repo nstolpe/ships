@@ -17,20 +17,48 @@
 			.collision {
 				width: 300px;
 			}
+			.frame-rate::before {
+				content: 'frame rate: 'attr(data-framerate);
+			}
+			.debug-toggle {
+				position: absolute;
+				bottom: 0;
+				left: 0;
+				min-width: 100px;
+				background-color: white;
+			}
+			.debug-toggle::before {
+				content: 'debug 'attr(data-active);
+			}
 		</style>
 	</head>
 	<body>
 		<canvas id="view"></canvas>
+		<div class="debug-toggle" id="debug-toggle" data-active="on"></div>
 		<div class="feedback" id="feedback">
-			<div class="collision" id="collision" type="text">no collision<div>
+			<div class="frame-rate" id="frame-rate" data-framerate="1"><div>
 		</div>
 		<script src="assets/js/steering.js"></script>
 		<script type="text/javascript">
 			const collision = document.getElementById( 'collision' );
-			window.addEventListener( 'message', function( e ) {
+			const debugToggle = document.getElementById( 'debug-toggle' );
+
+			debugToggle.addEventListener( 'click', ( e ) => {
+				for ( let i = 0, l = window.gameModels.length; i < l; i++ ) {
+					if ( window.gameModels[ i ].base.debug ) {
+						window.gameModels[ i ].base.debug = false;
+						e.target.dataset.active = 'on';
+					} else {
+						window.gameModels[ i ].base.debug = true;
+						e.target.dataset.active = 'off';
+					}
+				}
+			}, false );
+
+			window.addEventListener( 'message', ( e ) => {
 				switch ( e.detail.type ) {
 					case 'update-collision':
-						collision.innerHTML = `${ e.detail.names }`;
+						// collision.innerHTML = `${ e.detail.names }`;
 						break;
 					default:
 						break;

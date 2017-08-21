@@ -97476,7 +97476,6 @@ module.exports = function( PIXI, app ) {
 					name: 'boards-left',
 					rotationConstraints: { pos: 0, neg: 0 },
 					positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
-					debug: true
 				},
 				init: ( base ) => {
 					base.sprite.hitArea = new CollisionPolygon(
@@ -97485,16 +97484,9 @@ module.exports = function( PIXI, app ) {
 						128, 512,
 						  0, 512
 					);
-					// base.sprite.hitArea = new CollisionPolygon(
-					// 	-64, -256,
-					// 	64, -256,
-					// 	64,  256,
-					// 	-64,  256
-					// );
 					base.pivot.x = base.sprite.width / 2;
 					base.pivot.y = base.sprite.height / 2;
-					// base.sprite.width *= 0.5;
-					// base.sprite.height *= 0.5;
+					// base.sprite.children[ 0 ].tint = 0x02d5ee;
 				},
 				children: [
 					{
@@ -97503,12 +97495,8 @@ module.exports = function( PIXI, app ) {
 						options: {
 							tiling: true,
 							dimensions: { w: 128, h: 512 },
-							// basePosition: { x: 15, y: 0 },
 							rotationConstraints: { pos: 0, neg: 0 },
 							positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } }
-						},
-						init: ( child, parent) => {
-							// child.pivot.x = parent.width / 2;
 						}
 					}
 				]
@@ -97519,7 +97507,6 @@ module.exports = function( PIXI, app ) {
 					name: 'boards-right',
 					rotationConstraints: { pos: 0, neg: 0 },
 					positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
-					debug: true
 				},
 				init: ( base ) => {
 					base.sprite.hitArea = new CollisionPolygon(
@@ -97530,8 +97517,7 @@ module.exports = function( PIXI, app ) {
 					);
 					base.pivot.x = base.sprite.width / 2;
 					base.pivot.y = base.sprite.height / 2;
-					base.sprite.width *= 0.5;
-					base.sprite.height *= 0.5;
+					// base.sprite.children[ 0 ].tint = 0x02d5ee;
 				},
 				children: [
 					{
@@ -97540,152 +97526,245 @@ module.exports = function( PIXI, app ) {
 						options: {
 							tiling: true,
 							dimensions: { w: 128, h: 512 },
-							// basePosition: { x: 15, y: 0 },
 							rotationConstraints: { pos: 0, neg: 0 },
 							positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } }
-						},
-						init: ( child, parent) => {
-							// child.pivot.x = parent.width / 2;
 						}
 					}
 				]
 			},
-			// {
-			// 	options: {
-			// 		basePosition: { x: 256, y: 128 },
-			// 		name: 'boards-top',
-			// 		rotationConstraints: { pos: 0, neg: 0 },
-			// 		positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
-			// 		debug: true
-			// 	},
-			// 	init: ( base ) => {
-			// 		base.sprite.hitArea = new CollisionPolygon(
-			// 			  0,   0,
-			// 			256,   0,
-			// 			256, 128,
-			// 			  0, 128
-			// 		);
-			// 	},
-			// 	children: [
-			// 		{
-			// 			texture: 'boards',
-			// 			tiling: true,
-			// 			options: {
-			// 				tiling: true,
-			// 				dimensions: { w: 256, h: 128 },
-			// 				// basePosition: { x: 15, y: 0 },
-			// 				rotationConstraints: { pos: 0, neg: 0 },
-			// 				positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } }
-			// 			}
-			// 		}
-			// 	]
-			// },
-			// {
-			// 	options: {
-			// 		basePosition: { x: 256, y: 512 },
-			// 		name: 'boards-bottom',
-			// 		rotationConstraints: { pos: 0, neg: 0 },
-			// 		positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
-			// 		debug: true
-			// 	},
-			// 	init: ( base ) => {
-			// 		base.sprite.hitArea = new CollisionPolygon(
-			// 			  0,   0,
-			// 			256,   0,
-			// 			256, 128,
-			// 			  0, 128
-			// 		);
-			// 	},
-			// 	children: [
-			// 		{
-			// 			texture: 'boards',
-			// 			tiling: true,
-			// 			options: {
-			// 				tiling: true,
-			// 				dimensions: { w: 256, h: 128 },
-			// 				// basePosition: { x: 15, y: 0 },
-			// 				rotationConstraints: { pos: 0, neg: 0 },
-			// 				positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } }
-			// 			},
-			// 			init: ( child, parent) => {
-			// 				// child.pivot.x = parent.width / 2;
-			// 			}
-			// 		}
-			// 	]
-			// },
 			{
-				spriteSheet: 'ships.json',
 				options: {
-					name: 'dud',
-					currentPosition: { x: 512, y: 512 },
-					// rotationConstraints: { pos: Infinity, neg: Infinity },
-					// positionConstraints: { pos: { x: Infinity, y: Infinity }, neg: { x: Infinity, y: Infinity } },
-					maxForwardVelocity: 4,
-					forwardVelocityIncrement: .05,
-					debug: true,
-					postUpdates: [
-						function( delta ) {
-							// console.log( this.children[ 'rudder' ].currentRotation );
-							// console.log( this.rotationVelocity );
-							// this.children[ 'rudder' ].currentRotation = -this.currentRotation;
-							// this.children[ 'rudder' ].rotationVelocity = -this.rotationVelocity;
-						}
-					]
+					basePosition: { x: 448, y: 192 },
+					name: 'boards-top',
+					rotationConstraints: { pos: 0, neg: 0 },
+					positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
 				},
-
 				init: ( base ) => {
-					// base.sprite.hitArea = new PIXI.Rectangle(
-					// 	0,
-					// 	0,
-					// 	base.sprite.width,
-					// 	base.sprite.height
-					// );
 					base.sprite.hitArea = new CollisionPolygon(
-						48,   0,
-						71,   7,
-						83,  33,
-						86,  58,
-						83,  87,
-						71, 113,
-						48, 120,
-						38, 120,
-						15, 113,
-						 3,  87,
-						 0,  58,
-						 3,  33,
-						15,   7,
-						38,   0
+						  0,   0,
+						256,   0,
+						256, 128,
+						  0, 128
 					);
-					// base.sprite.hitArea = new CollisionPolygon(
-					// 	 0,   0,
-					// 	86,   0,
-					// 	86, 120,
-					// 	 0, 120
-					// );
-					base.sprite.interactive = true;
-					base.sprite.on( 'click', ( e ) => console.log( e ) );
 					base.pivot.x = base.sprite.width / 2;
 					base.pivot.y = base.sprite.height / 2;
-					base.sprite.width *= 0.5;
-					base.sprite.height *= 0.5;
-					// base.children.rudder.currentPosition.x = base.sprite.width / 2;
-					// base.children.rudder.basePosition.x = base.sprite.width / 2;
+					// base.sprite.children[ 0 ].tint = 0x02d5ee;
 				},
 				children: [
 					{
-						name: 'body',
-						id: 'turtle-body.png',
+						texture: 'boards',
+						tiling: true,
 						options: {
-							// basePosition: { x: 15, y: 0 },
+							tiling: true,
+							dimensions: { w: 256, h: 128 },
 							rotationConstraints: { pos: 0, neg: 0 },
 							positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } }
-						},
-						init: ( child, parent) => {
-							// child.pivot.x = parent.width / 2;
 						}
 					}
 				]
 			},
+			{
+				options: {
+					basePosition: { x: 352, y: 576 },
+					name: 'boards-bottom-left',
+					rotationConstraints: { pos: 0, neg: 0 },
+					positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
+				},
+				init: ( base ) => {
+					base.sprite.hitArea = new CollisionPolygon(
+						 0,   0,
+						64,   0,
+						64, 128,
+						 0, 128
+					);
+					base.pivot.x = base.sprite.width / 2;
+					base.pivot.y = base.sprite.height / 2;
+					// base.sprite.children[ 0 ].tint = 0x02d5ee;
+				},
+				children: [
+					{
+						texture: 'boards',
+						tiling: true,
+						options: {
+							tiling: true,
+							dimensions: { w: 64, h: 128 },
+							rotationConstraints: { pos: 0, neg: 0 },
+							positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } }
+						}
+					}
+				]
+			},
+			{
+				options: {
+					basePosition: { x: 544, y: 576 },
+					name: 'boards-bottom-right',
+					rotationConstraints: { pos: 0, neg: 0 },
+					positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
+				},
+				init: ( base ) => {
+					base.sprite.hitArea = new CollisionPolygon(
+						 0,   0,
+						64,   0,
+						64, 128,
+						 0, 128
+					);
+					base.pivot.x = base.sprite.width / 2;
+					base.pivot.y = base.sprite.height / 2;
+					// base.sprite.children[ 0 ].tint = 0x02d5ee;
+				},
+				children: [
+					{
+						texture: 'boards',
+						tiling: true,
+						options: {
+							tiling: true,
+							dimensions: { w: 64, h: 128 },
+							rotationConstraints: { pos: 0, neg: 0 },
+							positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } }
+						}
+					}
+				]
+			},
+			// duds
+			// {
+			// 	spriteSheet: 'ships.json',
+			// 	options: {
+			// 		name: 'dud',
+			// 		currentPosition: { x: 800, y: 300 },
+			// 		// positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
+			// 		maxForwardVelocity: 4,
+			// 		forwardVelocityIncrement: .05,
+			// 	},
+
+			// 	init: ( base ) => {
+			// 		base.sprite.hitArea = new CollisionPolygon( 48, 0, 71, 7, 83, 33, 86, 58, 83, 87, 71, 113, 48, 120,
+			// 													38, 120, 15, 113, 3, 87 , 0, 58, 3, 33, 15, 7, 38, 0 );
+
+			// 		base.pivot.x = base.sprite.width / 2;
+			// 		base.pivot.y = base.sprite.height / 2;
+			// 	},
+			// 	children: [
+			// 		{
+			// 			name: 'body',
+			// 			id: 'turtle-body.png',
+			// 			options: {
+			// 			},
+			// 		}
+			// 	]
+			// },
+			// {
+			// 	spriteSheet: 'ships.json',
+			// 	options: {
+			// 		name: 'dud2',
+			// 		currentPosition: { x: 1200, y: 380 },
+			// 		// positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
+			// 		maxForwardVelocity: 4,
+			// 		forwardVelocityIncrement: .05,
+			// 	},
+
+			// 	init: ( base ) => {
+			// 		base.sprite.hitArea = new CollisionPolygon( 48, 0, 71, 7, 83, 33, 86, 58, 83, 87, 71, 113, 48, 120,
+			// 													38, 120, 15, 113, 3, 87 , 0, 58, 3, 33, 15, 7, 38, 0 );
+
+			// 		base.pivot.x = base.sprite.width / 2;
+			// 		base.pivot.y = base.sprite.height / 2;
+			// 		base.sprite.width *= 0.5;
+			// 		base.sprite.height *= 0.5;
+			// 	},
+			// 	children: [
+			// 		{
+			// 			name: 'body',
+			// 			id: 'turtle-body.png',
+			// 			options: {
+			// 			},
+			// 		}
+			// 	]
+			// },
+			// {
+			// 	spriteSheet: 'ships.json',
+			// 	options: {
+			// 		name: 'dud3',
+			// 		currentPosition: { x: 468, y: 560 },
+			// 		// positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
+			// 		maxForwardVelocity: 4,
+			// 		forwardVelocityIncrement: .05,
+			// 	},
+
+			// 	init: ( base ) => {
+			// 		base.sprite.hitArea = new CollisionPolygon( 48, 0, 71, 7, 83, 33, 86, 58, 83, 87, 71, 113, 48, 120,
+			// 													38, 120, 15, 113, 3, 87 , 0, 58, 3, 33, 15, 7, 38, 0 );
+
+			// 		base.pivot.x = base.sprite.width / 2;
+			// 		base.pivot.y = base.sprite.height / 2;
+			// 		base.sprite.width *= 0.5;
+			// 		base.sprite.height *= 0.5;
+			// 	},
+			// 	children: [
+			// 		{
+			// 			name: 'body',
+			// 			id: 'turtle-body.png',
+			// 			options: {
+			// 			},
+			// 		}
+			// 	]
+			// },
+			// {
+			// 	spriteSheet: 'ships.json',
+			// 	options: {
+			// 		name: 'dud4',
+			// 		currentPosition: { x: 468, y: 560 },
+			// 		// positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
+			// 		maxForwardVelocity: 4,
+			// 		forwardVelocityIncrement: .05,
+			// 	},
+
+			// 	init: ( base ) => {
+			// 		base.sprite.hitArea = new CollisionPolygon( 48, 0, 71, 7, 83, 33, 86, 58, 83, 87, 71, 113, 48, 120,
+			// 													38, 120, 15, 113, 3, 87 , 0, 58, 3, 33, 15, 7, 38, 0 );
+
+			// 		base.pivot.x = base.sprite.width / 2;
+			// 		base.pivot.y = base.sprite.height / 2;
+			// 		base.sprite.width *= 0.5;
+			// 		base.sprite.height *= 0.5;
+			// 	},
+			// 	children: [
+			// 		{
+			// 			name: 'body',
+			// 			id: 'turtle-body.png',
+			// 			options: {
+			// 			},
+			// 		}
+			// 	]
+			// },
+			// {
+			// 	spriteSheet: 'ships.json',
+			// 	options: {
+			// 		name: 'dud5',
+			// 		currentPosition: { x: 468, y: 560 },
+			// 		// positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
+			// 		maxForwardVelocity: 4,
+			// 		forwardVelocityIncrement: .05,
+			// 	},
+
+			// 	init: ( base ) => {
+			// 		base.sprite.hitArea = new CollisionPolygon( 48, 0, 71, 7, 83, 33, 86, 58, 83, 87, 71, 113, 48, 120,
+			// 													38, 120, 15, 113, 3, 87 , 0, 58, 3, 33, 15, 7, 38, 0 );
+
+			// 		base.pivot.x = base.sprite.width / 2;
+			// 		base.pivot.y = base.sprite.height / 2;
+			// 		base.sprite.width *= 0.5;
+			// 		base.sprite.height *= 0.5;
+			// 	},
+			// 	children: [
+			// 		{
+			// 			name: 'body',
+			// 			id: 'turtle-body.png',
+			// 			options: {
+			// 			},
+			// 		}
+			// 	]
+			// },
+			// turtle
 			{
 				spriteSheet: 'ships.json',
 				options: {
@@ -97695,7 +97774,7 @@ module.exports = function( PIXI, app ) {
 					// positionConstraints: { pos: { x: Infinity, y: Infinity }, neg: { x: Infinity, y: Infinity } },
 					maxForwardVelocity: 4,
 					forwardVelocityIncrement: .05,
-					debug: true,
+					// debug: true,
 					postUpdates: [
 						function( delta ) {
 							// console.log( this.children[ 'rudder' ].currentRotation );
@@ -97739,6 +97818,9 @@ module.exports = function( PIXI, app ) {
 					base.sprite.on( 'click', ( e ) => console.log( e ) );
 					base.pivot.x = base.sprite.width / 2;
 					base.pivot.y = base.sprite.height / 2;
+					base.sprite.width *= .5;
+					base.sprite.height *= .5;
+					// base.sprite.children[ 0 ].tint = 0xffff6b;
 					// base.children.rudder.currentPosition.x = base.sprite.width / 2;
 					// base.children.rudder.basePosition.x = base.sprite.width / 2;
 				},
@@ -98579,6 +98661,11 @@ const Vector2 = function( x, y ) {
 			}
 			return this;
 		},
+		reverse() {
+			this.x = -this.x;
+			this.y = -this.y;
+			return this;
+		},
 		/**
 		 * Returns the angle between this `vector` and the x axis.
 		 * If `radians` is true, the angle will be returned as radians between -Math.PI and Math.PI.
@@ -98626,6 +98713,9 @@ const Vector2 = function( x, y ) {
 
 			return Math.sqrt( dx * dx + dy * dy );
 		},
+		/**
+		 * Projects this vector on another vector
+		 */
 		project( target ) {
 			target = Vector2( target );
 			const amt = this.dot( target ) / target.len2();
@@ -98633,6 +98723,9 @@ const Vector2 = function( x, y ) {
 			this.y = amt * target.y;
 			return this;
 		},
+		/**
+		 * Reflects this vector on to an axis.
+		 */
 		reflect( axis ) {
 			const x = this.x;
 			const y = this.y;
@@ -98641,11 +98734,32 @@ const Vector2 = function( x, y ) {
 			this.y -= y;
 			return this;
 		},
+		/**
+		 * Converts this vector to it's perpendicular vector
+		 */
 		perp() {
 			let x = this.x;
 			this.x = this.y;
 			this.y = -x;
 			return this;
+		},
+		/**
+		 * @TODO use object create and getters/setters for the next few
+		 */
+		min() {
+			return this.x;
+		},
+		max() {
+			return this.y;
+		},
+		a() {
+			return this.x;
+		},
+		b() {
+			return this.y;
+		},
+		toString() {
+			return `[ x: ${ this.x}, y: ${ this.y } ]`;
 		}
 	};
 
@@ -98693,7 +98807,7 @@ loader
 window.gameModels = [];
 window.current = {
 	direction: 145,
-	force: .05
+	force: 1
 };
 
 window.friction = 0.98;
@@ -98710,7 +98824,7 @@ function setup( loader, resources ) {
 	emitterManager = EmitterManager(
 		resources.emitter.data,
 		emitterParent,
-		[ resources['particle'].texture ],
+		[ resources[ 'particle' ].texture ],
 		{ w: viewWidth, h: viewHeight },
 		17,
 		current.direction
@@ -98722,19 +98836,21 @@ function setup( loader, resources ) {
 		app.stage.addChild( gameModels[ i ].base.sprite );
 	}
 	app.stage.addChild( stageGraphics );
-
+// app.stage.width *= 0.5;
+// app.stage.height *= 0.5;
 	window.turtle = gameModels[ 0 ].base;
-	turtle.sprite.width *= .5;
-	turtle.sprite.height *= .5;
 	SteeringKeyboard();
 
 	app.ticker.add( animate );
 }
 
+window.animating = true;
+
 function animate( delta ) {
 	let collisions = [];
 	stageGraphics.clear();
 
+	document.getElementById( 'frame-rate' ).dataset.framerate = app.ticker.FPS.toPrecision( 4 );
 	for ( let i = 0, l = gameModels.length; i < l; i++ ) {
 		let model = gameModels[ i ];
 
@@ -98751,16 +98867,41 @@ function animate( delta ) {
 	}
 
 	// check collision between every game model. very inneficient.
-	for ( let i = 0, l = gameModels.length; i < l; i++ ) {
+	// for ( let i = 0, l = gameModels.length; i < l; i++ ) {
+	// 	for ( let ii = 0, ll = gameModels.length; ii < ll; ii++ ) {
+	// 		if ( i !== ii ) {
+	// 			let collision = checkCollision( gameModels[ i ], gameModels[ ii ] );
+	// 			collisions[ collisions.length ] = collision;
+	// 		}
+	// 	}
+	// }
+
+	// Check each moving (movable really) object for a collision with every other object.
+	// @TODO check only actually moving and check w/i same area. 
+	let collidables = gameModels.filter( ( model ) => {
+		return model.base.positionConstraints.neg.x !== 0 ||
+		model.base.positionConstraints.neg.y !== 0 ||
+		model.base.positionConstraints.pos.x !== 0 ||
+		model.base.positionConstraints.pos.y !== 0
+	} );
+
+	for ( let i = 0, l = collidables.length; i < l; i++ ) {
 		for ( let ii = 0, ll = gameModels.length; ii < ll; ii++ ) {
-			if ( i !== ii ) collisions[ collisions.length ] = checkCollision( gameModels[ i ], gameModels[ ii ] );
+			if ( i !== ii ) {
+				let collision = checkCollision( gameModels[ i ], gameModels[ ii ] );
+				collisions[ collisions.length ] = collision;
+				if ( collision ) {
+					// console.log( collision.overlapV.toString() + ' ' + collision.overlap );
+					collision.one.base.currentPosition.x -= collision.overlapV.x;
+					collision.one.base.currentPosition.y -= collision.overlapV.y;
+				}
+				// if ( collision && collision.twoInOne ) {
+				// 	collision.two.base.currentPosition.x += collision.overlapV.x;
+				// 	collision.two.base.currentPosition.y += collision.overlapV.y;
+				// }
+			}
 		}
 	}
-	// let t = gameModels.find((v) => v.base.name === 'turtle');
-	// for ( let i = 0, l = gameModels.length; i < l; i++ ) {
-	// 	if ( gameModels[ i ] !== t ) 
-	// 		collisions[ collisions.length ] = checkCollision( t, gameModels[ i ] );
-	// }
 
 	let compiled = collisions.reduce( ( sum, val ) => {
 		if ( val.active )
@@ -98768,12 +98909,14 @@ function animate( delta ) {
 		else
 			return sum;
 	}, '' );
+
 	window.dispatchEvent( new CustomEvent('message', {
 		detail: {
 			type: 'update-collision',
 			names: `<h3>collisions:</h3> ${ compiled }`
 		}
 	} ) );
+
 	emitterManager.update( delta, [ current ] );
 
 	// check if the turtle is leaving the screen bounds
@@ -98781,36 +98924,41 @@ function animate( delta ) {
 	// checkScreenBounds( turtle, { left: 0, right: app.view.offsetWidth, top: 0, bottom: app.view.offsetHeight } );
 }
 
+function applyTransformsToPoint( point, source ) {
+	point.sub( source.base.pivot.x, source.base.pivot.y )
+		// @TODO needs the mul( 2 ) of detection only works on objects
+		// with .5 scale. Figure out why.
+		.scale( Vec2( source.base.sprite.scale ).mul( 2 ) )
+		.rotate( source.base.currentRotation )
+		.add( source.base.currentPosition );
+}
+
 function checkCollision( one, two ) {
-	let positionOne = one.base.currentPosition;
-	let positionTwo = two.base.currentPosition;
 	let lengthOne = one.base.sprite.hitArea.points.length;
 	let lengthTwo = two.base.sprite.hitArea.points.length;
 	let pointsOne = [];
 	let pointsTwo = [];
 	let p;
-	let collision = { one: one, two: two };
+	let collision = {
+		one: one,
+		two: two,
+		active: true,
+		overlapN: Vec2(),
+		overlap: Number.MAX_VALUE,
+		oneInTwo: true,
+		twoInOne: true
+	};
 
 	// make vector arrays of the incoming points.
 	// points have the game object's transform applied
 	for ( let i = 0, l = lengthOne + lengthTwo; i < l; i += 2 ) {
 		if ( i < lengthOne ) {
-			p = Vec2(
-					one.base.sprite.hitArea.points[ i ],
-					one.base.sprite.hitArea.points[ i + 1 ]
-				).sub( one.base.pivot )
-				// .scale( one.base.sprite.scale )
-				.rotate( one.base.sprite.rotation )
-				.add( one.base.currentPosition );
+			p = Vec2( one.base.sprite.hitArea.points[ i ], one.base.sprite.hitArea.points[ i + 1 ] );
+			applyTransformsToPoint( p, one );
 			pointsOne.push( p );
 		} else {
-			p = Vec2(
-					two.base.sprite.hitArea.points[ Math.floor( i - lengthOne ) ],
-					two.base.sprite.hitArea.points[ Math.floor( i - lengthOne ) + 1 ]
-				).sub( two.base.pivot )
-				// .scale( two.base.sprite.scale )
-				.rotate( two.base.sprite.rotation )
-				.add( two.base.currentPosition );
+			p = Vec2( two.base.sprite.hitArea.points[ i - lengthOne ], two.base.sprite.hitArea.points[ i - lengthOne + 1 ] );
+			applyTransformsToPoint( p, two );
 			pointsTwo.push( p );
 		}
 	}
@@ -98819,49 +98967,34 @@ function checkCollision( one, two ) {
 	 * loop through the points of the first poly
 	 */
 	for ( let i = 0, l = pointsOne.length; i < l; i++ ) {
-		let normal = Vec2(
-			one.base.sprite.hitArea.normals[ i * 2 ],
-			one.base.sprite.hitArea.normals[ i * 2 + 1 ]
-		)//.sub( one.base.pivot )
-		// .scale( one.base.sprite.scale )
-		//.rotate( one.base.sprite.rotation )
-		// .add( one.base.currentPosition );
-		let p1 = pointsOne[ i ];
-		let p2 = pointsOne[ ( i + 1 ) % l ];
-		let edge = p2.copy().sub( p1 );
-		normal = edge.copy().perp().nor();
-		// normal = one.base.sprite.hitArea.normals[ i ];
-		let separating = separatingAxis( positionOne, positionTwo, pointsOne, pointsTwo, normal );
-		if ( separating ) {
-			collision.active = false;
-			return collision;
-		}
+		let normal = one.base.sprite.hitArea.normals[ i ];
+		let separating = isSeparatingAxis( one, two, pointsOne, pointsTwo, normal, collision );
+
+		// if ( collision )
+		// 	collision.overlapV = Vec2( collision.overlapN ).scale( collision.overlap );
+		if ( separating ) 
+			return false;
 	}
 
 	for ( let i = 0, l = pointsTwo.length; i < l; i++ ) {
-		let normal = Vec2(
-			two.base.sprite.hitArea.normals[ i * 2 ],
-			two.base.sprite.hitArea.normals[ i * 2 + 1 ]
-		)//.sub( two.base.pivot )
-		// .scale( two.base.sprite.scale )
-		//.rotate( two.base.sprite.rotation )
-		// .add( two.base.currentPosition );
-		let p1 = pointsTwo[ i ];
-		let p2 = pointsTwo[ (i + 1) % l ];
-		let edge = p1.copy().sub( p2 );
-		normal = edge.copy().perp().nor();
-		let separating = separatingAxis( positionOne, positionTwo, pointsOne, pointsTwo, normal );
-		if ( separating ) {
-			collision.active = false;
-			return collision;
-		}
+		let normal = two.base.sprite.hitArea.normals[ i ];
+		let separating = isSeparatingAxis( one, two, pointsOne, pointsTwo, normal, collision );
+
+		// if ( collision )
+		// 	collision.overlapV = Vec2( collision.overlapN ).scale( collision.overlap );
+		if ( separating ) 
+			return false;
 	}
 
-	collision.active = true;
-	return collision;
+	if ( collision )
+		collision.overlapV = Vec2( collision.overlapN ).scale( collision.overlap );
+
+	return collision || true;
 }
 
-function separatingAxis( positionOne, positionTwo, pointsOne, pointsTwo, normal ) {
+function isSeparatingAxis( one, two, pointsOne, pointsTwo, normal, collision ) {
+	let positionOne = one.base.currentPosition;
+	let positionTwo = two.base.currentPosition;
 	let rangeOne = projectPoints( pointsOne, normal );
 	let rangeTwo = projectPoints( pointsTwo, normal );
 	let offsetVec = Vec2( positionTwo ).sub( positionOne );
@@ -98870,9 +99003,55 @@ function separatingAxis( positionOne, positionTwo, pointsOne, pointsTwo, normal 
 	rangeTwo.min += offsetDot;
 	rangeTwo.max += offsetDot;
 
-	return rangeOne.min > rangeTwo.max || rangeTwo.min > rangeOne.max ? true : false;
+	if ( rangeOne.min > rangeTwo.max || rangeTwo.min > rangeOne.max ) return true;
+
+	if ( collision ) {
+		var overlap = 0;
+
+		// one starts further left than two
+		if ( rangeOne.min < rangeTwo.min ) {
+			collision.oneInTwo = false;
+			// one ends before two does. We have to pull one out of two
+			if ( rangeOne.max < rangeTwo.max ) { 
+				overlap = rangeOne.max - rangeTwo.min;
+				collision.twoInOne = false;
+			// two is fully inside one. Pick the shortest way out.
+			} else {
+				var option1 = rangeOne.max - rangeTwo.min;
+				var option2 = rangeTwo.max - rangeOne.min;
+				overlap = option1 < option2 ? option1 : -option2;
+			}
+		// two starts further left than one
+		} else {
+			collision.twoInOne = false;
+			// two ends before one ends. We have to push one out of two
+			if ( rangeOne.max > rangeTwo.max ) { 
+				overlap = rangeOne.min - rangeTwo.max;
+				collision.oneInTwo = false;
+			// one is fully inside two. Pick the shortest way out.
+			} else {
+				var option1 = rangeOne.max - rangeTwo.min;
+				var option2 = rangeTwo.max - rangeOne.min;
+				overlap = option1 < option2 ? option1 : -option2;
+			}
+		}
+		var absOverlap = Math.abs( overlap );
+		if ( absOverlap < collision.overlap ) {
+			collision.overlap = absOverlap;
+			collision.overlapN.set( normal );
+			if ( overlap < 0 ) {
+				collision.overlapN.reverse();
+			}
+		}
+	}
+
+	return false;
 }
 
+/**
+ * Projects a set of points onto an axis/normal.
+ * Returns the minimum/maximum range of the projected points.
+ */
 function projectPoints( points, normal ) {
 	let min = Number.MAX_VALUE;
 	let max = -Number.MAX_VALUE;
@@ -98889,8 +99068,9 @@ function projectPoints( points, normal ) {
 function drawDebug( model ) {
 	// draw the hitarea if it has it. only works for collision polygons.
 	if ( model.base.sprite.hitArea ) {
-		stageGraphics.lineStyle( 1, 0xf1ff32, 1 );
+		stageGraphics.lineStyle( 1, 0x00ff32, 1 );
 
+		// set the first point before the loop for moveTo
 		let p = Vec2(
 			model.base.sprite.hitArea.points[ 0 ] - model.base.pivot.x,
 			model.base.sprite.hitArea.points[ 1 ] - model.base.pivot.y
@@ -98900,29 +99080,33 @@ function drawDebug( model ) {
 
 		stageGraphics.moveTo( p.x, p.y );
 
+		// draw a line from each point to the one after it 
 		for ( let i = 2, l = model.base.sprite.hitArea.points.length; i < l; i += 2 ) {
 			p.set(
-				model.base.sprite.hitArea.points[ i ] - model.base.pivot.x,
-				model.base.sprite.hitArea.points[ i + 1 ] - model.base.pivot.y
-			).scale( model.base.sprite.scale )
+				model.base.sprite.hitArea.points[ i ],
+				model.base.sprite.hitArea.points[ i + 1 ]
+			).sub( model.base.pivot.x, model.base.pivot.y )
+			.scale( model.base.sprite.scale )
 			.rotate( model.base.sprite.rotation )
 			.add( model.base.currentPosition );
 
 			stageGraphics.lineTo( p.x, p.y );
 		}
 
+		// draw a final line back to the original point to close the polygon.
 		p.set(
-			model.base.sprite.hitArea.points[ 0 ] - model.base.pivot.x,
-			model.base.sprite.hitArea.points[ 1 ] - model.base.pivot.y
-		).scale( model.base.sprite.scale )
+			model.base.sprite.hitArea.points[ 0 ],
+			model.base.sprite.hitArea.points[ 1 ]
+		).sub( model.base.pivot.x, model.base.pivot.y )
+		.scale( model.base.sprite.scale )
 		.rotate( model.base.sprite.rotation )
 		.add( model.base.currentPosition );
 
 		stageGraphics.lineTo( p.x, p.y );
 
-		// start: draw normal lines
+		// draw the normal lines
 		for ( let i = 0, l = model.base.sprite.hitArea.points.length; i < l; i += 2 ) {
-			// get the point on the face half way down the edge
+			// get the point in the middle of the edge.
 			let halfEdge = Vec2(
 				model.base.sprite.hitArea.points[ i ] + ( model.base.sprite.hitArea.edges[ Math.ceil( i / 2 ) ].x / 2 ),
 				model.base.sprite.hitArea.points[ i + 1 ] + ( model.base.sprite.hitArea.edges[ Math.ceil( i / 2 ) ].y / 2 )
@@ -98947,7 +99131,6 @@ function drawDebug( model ) {
 			// draw a line to the half-way point rotated by the normal * 10
 			stageGraphics.lineTo( end.x, end.y );
 		}
-		// end: draw normal lines
 	}
 
 	// draw the AABB for the sprite.

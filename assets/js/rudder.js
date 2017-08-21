@@ -97409,6 +97409,7 @@ module.exports = {
 'use strict';
 
 const PIXI = require( 'pixi.js' );
+const Vec2 = require( './vector2.js' );
 
 function Vector( x, y ) {
 	const proto = {
@@ -97427,17 +97428,17 @@ module.exports = function ( ...points ) {
 		setEdges() {
 			// create an edge and normal between each set of points.
 			for ( let i = 0, l = this.points.length; i < l; i += 2 ) {
-				let p1 = { x: poly.points[ i ], y: poly.points[ i + 1 ] };
+				let p1 = Vec2( poly.points[ i ], poly.points[ i + 1 ] );
 				// need to start again and grab the original point's x and y
-				let p2 = i + 2 < l ? { x: poly.points[ i + 2 ], y: poly.points[ i + 3 ] } : { x: poly.points[ 0 ], y: poly.points[ 1 ] };
-				let edge = { x: p2.x - p1.x, y: p2.y - p1.y };
-				let perp = { x: edge.y, y: -edge.x };
-				let perpLength = Math.sqrt( perp.x * perp.x + perp.y * perp.y );
-				let normal = perpLength != 0 ? { x: perp.x / perpLength, y: perp.y / perpLength } : perp;
-				this.edges[ i ] = edge.x;
-				this.edges[ i + 1 ] = edge.y;
-				this.normals[ i ] = normal.x;
-				this.normals[ i + 1 ] = normal.y;
+				let p2 = i + 2 < l ? Vec2( poly.points[ i + 2 ], poly.points[ i + 3 ] ) : Vec2( poly.points[ 0 ], poly.points[ 1 ] );
+				let edge = Vec2( p2.x - p1.x, p2.y - p1.y );
+				let perp = edge.copy().perp();
+				let perpLength = perp.len();
+				let normal = perp.copy().nor();
+				this.edges[ Math.ceil( i / 2 ) ] = edge;
+				this.normals[ Math.ceil( i / 2 ) ] = normal;
+				// this.edges[ i ] = edge.x;
+				// this.edges[ i + 1 ] = edge.y;
 			}
 		}
 	};
@@ -97448,7 +97449,7 @@ module.exports = function ( ...points ) {
 	return poly;
 }
 
-},{"pixi.js":681}],733:[function(require,module,exports){
+},{"./vector2.js":737,"pixi.js":681}],733:[function(require,module,exports){
 'use strict'
 const Util = require( './util.js' );
 const CollisionPolygon = require( './collision-polygon.js' );
@@ -97464,7 +97465,6 @@ module.exports = function( PIXI, app ) {
 					name: 'boards-left',
 					rotationConstraints: { pos: 0, neg: 0 },
 					positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
-					debug: true
 				},
 				init: ( base ) => {
 					base.sprite.hitArea = new CollisionPolygon(
@@ -97473,16 +97473,9 @@ module.exports = function( PIXI, app ) {
 						128, 512,
 						  0, 512
 					);
-					// base.sprite.hitArea = new CollisionPolygon(
-					// 	-64, -256,
-					// 	64, -256,
-					// 	64,  256,
-					// 	-64,  256
-					// );
 					base.pivot.x = base.sprite.width / 2;
 					base.pivot.y = base.sprite.height / 2;
-					// base.sprite.width *= 0.5;
-					// base.sprite.height *= 0.5;
+					// base.sprite.children[ 0 ].tint = 0x02d5ee;
 				},
 				children: [
 					{
@@ -97491,12 +97484,8 @@ module.exports = function( PIXI, app ) {
 						options: {
 							tiling: true,
 							dimensions: { w: 128, h: 512 },
-							// basePosition: { x: 15, y: 0 },
 							rotationConstraints: { pos: 0, neg: 0 },
 							positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } }
-						},
-						init: ( child, parent) => {
-							// child.pivot.x = parent.width / 2;
 						}
 					}
 				]
@@ -97507,7 +97496,6 @@ module.exports = function( PIXI, app ) {
 					name: 'boards-right',
 					rotationConstraints: { pos: 0, neg: 0 },
 					positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
-					debug: true
 				},
 				init: ( base ) => {
 					base.sprite.hitArea = new CollisionPolygon(
@@ -97518,8 +97506,7 @@ module.exports = function( PIXI, app ) {
 					);
 					base.pivot.x = base.sprite.width / 2;
 					base.pivot.y = base.sprite.height / 2;
-					base.sprite.width *= 0.5;
-					base.sprite.height *= 0.5;
+					// base.sprite.children[ 0 ].tint = 0x02d5ee;
 				},
 				children: [
 					{
@@ -97528,152 +97515,245 @@ module.exports = function( PIXI, app ) {
 						options: {
 							tiling: true,
 							dimensions: { w: 128, h: 512 },
-							// basePosition: { x: 15, y: 0 },
 							rotationConstraints: { pos: 0, neg: 0 },
 							positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } }
-						},
-						init: ( child, parent) => {
-							// child.pivot.x = parent.width / 2;
 						}
 					}
 				]
 			},
-			// {
-			// 	options: {
-			// 		basePosition: { x: 256, y: 128 },
-			// 		name: 'boards-top',
-			// 		rotationConstraints: { pos: 0, neg: 0 },
-			// 		positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
-			// 		debug: true
-			// 	},
-			// 	init: ( base ) => {
-			// 		base.sprite.hitArea = new CollisionPolygon(
-			// 			  0,   0,
-			// 			256,   0,
-			// 			256, 128,
-			// 			  0, 128
-			// 		);
-			// 	},
-			// 	children: [
-			// 		{
-			// 			texture: 'boards',
-			// 			tiling: true,
-			// 			options: {
-			// 				tiling: true,
-			// 				dimensions: { w: 256, h: 128 },
-			// 				// basePosition: { x: 15, y: 0 },
-			// 				rotationConstraints: { pos: 0, neg: 0 },
-			// 				positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } }
-			// 			}
-			// 		}
-			// 	]
-			// },
-			// {
-			// 	options: {
-			// 		basePosition: { x: 256, y: 512 },
-			// 		name: 'boards-bottom',
-			// 		rotationConstraints: { pos: 0, neg: 0 },
-			// 		positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
-			// 		debug: true
-			// 	},
-			// 	init: ( base ) => {
-			// 		base.sprite.hitArea = new CollisionPolygon(
-			// 			  0,   0,
-			// 			256,   0,
-			// 			256, 128,
-			// 			  0, 128
-			// 		);
-			// 	},
-			// 	children: [
-			// 		{
-			// 			texture: 'boards',
-			// 			tiling: true,
-			// 			options: {
-			// 				tiling: true,
-			// 				dimensions: { w: 256, h: 128 },
-			// 				// basePosition: { x: 15, y: 0 },
-			// 				rotationConstraints: { pos: 0, neg: 0 },
-			// 				positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } }
-			// 			},
-			// 			init: ( child, parent) => {
-			// 				// child.pivot.x = parent.width / 2;
-			// 			}
-			// 		}
-			// 	]
-			// },
 			{
-				spriteSheet: 'ships.json',
 				options: {
-					name: 'dud',
-					currentPosition: { x: 512, y: 512 },
-					// rotationConstraints: { pos: Infinity, neg: Infinity },
-					// positionConstraints: { pos: { x: Infinity, y: Infinity }, neg: { x: Infinity, y: Infinity } },
-					maxForwardVelocity: 4,
-					forwardVelocityIncrement: .05,
-					debug: true,
-					postUpdates: [
-						function( delta ) {
-							// console.log( this.children[ 'rudder' ].currentRotation );
-							// console.log( this.rotationVelocity );
-							// this.children[ 'rudder' ].currentRotation = -this.currentRotation;
-							// this.children[ 'rudder' ].rotationVelocity = -this.rotationVelocity;
-						}
-					]
+					basePosition: { x: 448, y: 192 },
+					name: 'boards-top',
+					rotationConstraints: { pos: 0, neg: 0 },
+					positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
 				},
-
 				init: ( base ) => {
-					// base.sprite.hitArea = new PIXI.Rectangle(
-					// 	0,
-					// 	0,
-					// 	base.sprite.width,
-					// 	base.sprite.height
-					// );
 					base.sprite.hitArea = new CollisionPolygon(
-						48,   0,
-						71,   7,
-						83,  33,
-						86,  58,
-						83,  87,
-						71, 113,
-						48, 120,
-						38, 120,
-						15, 113,
-						 3,  87,
-						 0,  58,
-						 3,  33,
-						15,   7,
-						38,   0
+						  0,   0,
+						256,   0,
+						256, 128,
+						  0, 128
 					);
-					// base.sprite.hitArea = new CollisionPolygon(
-					// 	 0,   0,
-					// 	86,   0,
-					// 	86, 120,
-					// 	 0, 120
-					// );
-					base.sprite.interactive = true;
-					base.sprite.on( 'click', ( e ) => console.log( e ) );
 					base.pivot.x = base.sprite.width / 2;
 					base.pivot.y = base.sprite.height / 2;
-					base.sprite.width *= 0.5;
-					base.sprite.height *= 0.5;
-					// base.children.rudder.currentPosition.x = base.sprite.width / 2;
-					// base.children.rudder.basePosition.x = base.sprite.width / 2;
+					// base.sprite.children[ 0 ].tint = 0x02d5ee;
 				},
 				children: [
 					{
-						name: 'body',
-						id: 'turtle-body.png',
+						texture: 'boards',
+						tiling: true,
 						options: {
-							// basePosition: { x: 15, y: 0 },
+							tiling: true,
+							dimensions: { w: 256, h: 128 },
 							rotationConstraints: { pos: 0, neg: 0 },
 							positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } }
-						},
-						init: ( child, parent) => {
-							// child.pivot.x = parent.width / 2;
 						}
 					}
 				]
 			},
+			{
+				options: {
+					basePosition: { x: 352, y: 576 },
+					name: 'boards-bottom-left',
+					rotationConstraints: { pos: 0, neg: 0 },
+					positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
+				},
+				init: ( base ) => {
+					base.sprite.hitArea = new CollisionPolygon(
+						 0,   0,
+						64,   0,
+						64, 128,
+						 0, 128
+					);
+					base.pivot.x = base.sprite.width / 2;
+					base.pivot.y = base.sprite.height / 2;
+					// base.sprite.children[ 0 ].tint = 0x02d5ee;
+				},
+				children: [
+					{
+						texture: 'boards',
+						tiling: true,
+						options: {
+							tiling: true,
+							dimensions: { w: 64, h: 128 },
+							rotationConstraints: { pos: 0, neg: 0 },
+							positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } }
+						}
+					}
+				]
+			},
+			{
+				options: {
+					basePosition: { x: 544, y: 576 },
+					name: 'boards-bottom-right',
+					rotationConstraints: { pos: 0, neg: 0 },
+					positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
+				},
+				init: ( base ) => {
+					base.sprite.hitArea = new CollisionPolygon(
+						 0,   0,
+						64,   0,
+						64, 128,
+						 0, 128
+					);
+					base.pivot.x = base.sprite.width / 2;
+					base.pivot.y = base.sprite.height / 2;
+					// base.sprite.children[ 0 ].tint = 0x02d5ee;
+				},
+				children: [
+					{
+						texture: 'boards',
+						tiling: true,
+						options: {
+							tiling: true,
+							dimensions: { w: 64, h: 128 },
+							rotationConstraints: { pos: 0, neg: 0 },
+							positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } }
+						}
+					}
+				]
+			},
+			// duds
+			// {
+			// 	spriteSheet: 'ships.json',
+			// 	options: {
+			// 		name: 'dud',
+			// 		currentPosition: { x: 800, y: 300 },
+			// 		// positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
+			// 		maxForwardVelocity: 4,
+			// 		forwardVelocityIncrement: .05,
+			// 	},
+
+			// 	init: ( base ) => {
+			// 		base.sprite.hitArea = new CollisionPolygon( 48, 0, 71, 7, 83, 33, 86, 58, 83, 87, 71, 113, 48, 120,
+			// 													38, 120, 15, 113, 3, 87 , 0, 58, 3, 33, 15, 7, 38, 0 );
+
+			// 		base.pivot.x = base.sprite.width / 2;
+			// 		base.pivot.y = base.sprite.height / 2;
+			// 	},
+			// 	children: [
+			// 		{
+			// 			name: 'body',
+			// 			id: 'turtle-body.png',
+			// 			options: {
+			// 			},
+			// 		}
+			// 	]
+			// },
+			// {
+			// 	spriteSheet: 'ships.json',
+			// 	options: {
+			// 		name: 'dud2',
+			// 		currentPosition: { x: 1200, y: 380 },
+			// 		// positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
+			// 		maxForwardVelocity: 4,
+			// 		forwardVelocityIncrement: .05,
+			// 	},
+
+			// 	init: ( base ) => {
+			// 		base.sprite.hitArea = new CollisionPolygon( 48, 0, 71, 7, 83, 33, 86, 58, 83, 87, 71, 113, 48, 120,
+			// 													38, 120, 15, 113, 3, 87 , 0, 58, 3, 33, 15, 7, 38, 0 );
+
+			// 		base.pivot.x = base.sprite.width / 2;
+			// 		base.pivot.y = base.sprite.height / 2;
+			// 		base.sprite.width *= 0.5;
+			// 		base.sprite.height *= 0.5;
+			// 	},
+			// 	children: [
+			// 		{
+			// 			name: 'body',
+			// 			id: 'turtle-body.png',
+			// 			options: {
+			// 			},
+			// 		}
+			// 	]
+			// },
+			// {
+			// 	spriteSheet: 'ships.json',
+			// 	options: {
+			// 		name: 'dud3',
+			// 		currentPosition: { x: 468, y: 560 },
+			// 		// positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
+			// 		maxForwardVelocity: 4,
+			// 		forwardVelocityIncrement: .05,
+			// 	},
+
+			// 	init: ( base ) => {
+			// 		base.sprite.hitArea = new CollisionPolygon( 48, 0, 71, 7, 83, 33, 86, 58, 83, 87, 71, 113, 48, 120,
+			// 													38, 120, 15, 113, 3, 87 , 0, 58, 3, 33, 15, 7, 38, 0 );
+
+			// 		base.pivot.x = base.sprite.width / 2;
+			// 		base.pivot.y = base.sprite.height / 2;
+			// 		base.sprite.width *= 0.5;
+			// 		base.sprite.height *= 0.5;
+			// 	},
+			// 	children: [
+			// 		{
+			// 			name: 'body',
+			// 			id: 'turtle-body.png',
+			// 			options: {
+			// 			},
+			// 		}
+			// 	]
+			// },
+			// {
+			// 	spriteSheet: 'ships.json',
+			// 	options: {
+			// 		name: 'dud4',
+			// 		currentPosition: { x: 468, y: 560 },
+			// 		// positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
+			// 		maxForwardVelocity: 4,
+			// 		forwardVelocityIncrement: .05,
+			// 	},
+
+			// 	init: ( base ) => {
+			// 		base.sprite.hitArea = new CollisionPolygon( 48, 0, 71, 7, 83, 33, 86, 58, 83, 87, 71, 113, 48, 120,
+			// 													38, 120, 15, 113, 3, 87 , 0, 58, 3, 33, 15, 7, 38, 0 );
+
+			// 		base.pivot.x = base.sprite.width / 2;
+			// 		base.pivot.y = base.sprite.height / 2;
+			// 		base.sprite.width *= 0.5;
+			// 		base.sprite.height *= 0.5;
+			// 	},
+			// 	children: [
+			// 		{
+			// 			name: 'body',
+			// 			id: 'turtle-body.png',
+			// 			options: {
+			// 			},
+			// 		}
+			// 	]
+			// },
+			// {
+			// 	spriteSheet: 'ships.json',
+			// 	options: {
+			// 		name: 'dud5',
+			// 		currentPosition: { x: 468, y: 560 },
+			// 		// positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
+			// 		maxForwardVelocity: 4,
+			// 		forwardVelocityIncrement: .05,
+			// 	},
+
+			// 	init: ( base ) => {
+			// 		base.sprite.hitArea = new CollisionPolygon( 48, 0, 71, 7, 83, 33, 86, 58, 83, 87, 71, 113, 48, 120,
+			// 													38, 120, 15, 113, 3, 87 , 0, 58, 3, 33, 15, 7, 38, 0 );
+
+			// 		base.pivot.x = base.sprite.width / 2;
+			// 		base.pivot.y = base.sprite.height / 2;
+			// 		base.sprite.width *= 0.5;
+			// 		base.sprite.height *= 0.5;
+			// 	},
+			// 	children: [
+			// 		{
+			// 			name: 'body',
+			// 			id: 'turtle-body.png',
+			// 			options: {
+			// 			},
+			// 		}
+			// 	]
+			// },
+			// turtle
 			{
 				spriteSheet: 'ships.json',
 				options: {
@@ -97683,7 +97763,7 @@ module.exports = function( PIXI, app ) {
 					// positionConstraints: { pos: { x: Infinity, y: Infinity }, neg: { x: Infinity, y: Infinity } },
 					maxForwardVelocity: 4,
 					forwardVelocityIncrement: .05,
-					debug: true,
+					// debug: true,
 					postUpdates: [
 						function( delta ) {
 							// console.log( this.children[ 'rudder' ].currentRotation );
@@ -97727,6 +97807,9 @@ module.exports = function( PIXI, app ) {
 					base.sprite.on( 'click', ( e ) => console.log( e ) );
 					base.pivot.x = base.sprite.width / 2;
 					base.pivot.y = base.sprite.height / 2;
+					base.sprite.width *= .5;
+					base.sprite.height *= .5;
+					// base.sprite.children[ 0 ].tint = 0xffff6b;
 					// base.children.rudder.currentPosition.x = base.sprite.width / 2;
 					// base.children.rudder.basePosition.x = base.sprite.width / 2;
 				},
@@ -98353,6 +98436,248 @@ module.exports = {
 };
 
 },{}],737:[function(require,module,exports){
+'use strict';
+const Util = require( './util.js' );
+
+function Coords( x, y ) {
+	// no arguments returns zeroed.
+	if ( x == null && y == null ) {
+		return { x: 0, y: 0 };
+	// cascading approach if their are args. `x` Array or object takes presedence over `y`,
+	// objects take presedence over arrays. ex: {x: 1 }, [ undefined, 2 ] returns { x: 1, y: 2 }
+	} else {
+		let i = 0;
+		let xx = x != null ? Object.assign( x ) : NaN;
+		let yy = y != null ? Object.assign( y ) : NaN;
+
+		const solvers = {
+			// when iterated, solvers.x tries for x.x, x[0], and x
+			x: [
+				( x ) => Number( x.x ),
+				( x ) => Number( x[0] ),
+				( x ) => Number( x ),
+			],
+			// when iterated, solvers.y tries for x.y, x[1], y.y, y[1], y, and x
+			y: [
+				( y ) => Number( x != null ? x.y : undefined ),
+				( y ) => Number( x != null ? x[1] : undefined ),
+				( y ) => Number( y != null ? y.y : undefined ),
+				( y ) => Number( y != null ? y[1] : undefined ),
+				( y ) => Number( y != null ? y : undefined ),
+				( y ) => Number( x != null && !Array.isArray( x ) ? x : undefined ),
+			]
+		};
+
+		// run solvers on `x`
+		while ( !Util.isNumeric( xx ) && i < solvers.x.length ) {
+			xx = solvers.x[ i ]( x );
+			i++;
+		}
+
+		// reset `i`
+		i = 0;
+
+		// run solvers on `y`
+		while ( !Util.isNumeric( yy ) && i < solvers.y.length ) {
+			yy = solvers.y[ i ]( y );
+			i++;
+		}
+
+		return { x: xx.valueOf(), y: yy.valueOf() };
+	}
+}
+
+const Vector2 = function( x, y ) {
+	const coords = Coords( x, y );
+
+	const proto = {
+		valid() {
+			return Util.isNumeric( this.x ) && Util.isNumeric( this.y );
+		},
+		/**
+		 * Copies this vector onto another vector, `target`.
+		 * `target` is returned but can also be passed as an argument. 
+		 */
+		copy( target ) {
+			target = target || Vector2();
+			target.set( this );
+			return target;
+		},
+		/**
+		 * Sets the values of this vector to `x` and `y`, `x.x` and `x.y`, or `x[0]` and `x[1]`,
+		 * depending on what `x` is.
+		 * Returns this vector.
+		 */
+		set( x, y ) {
+			const coords = Coords( x, y );
+			this.x = coords.x;
+			this.y = coords.y;
+			return this;
+		},
+		/**
+		 * Adds the incoming object, array or values to this `vector`.
+		 */
+		add( x, y ) {
+			const coords = Coords( x, y );
+			this.x += coords.x;
+			this.y += coords.y;
+			return this;
+		},
+		/**
+		 * Subtracts the incoming object, array or values to this `vector`.
+		 */
+		sub( x, y ) {
+			const coords = Coords( x, y );
+			this.x -= coords.x;
+			this.y -= coords.y;
+			return this;
+		},
+		/**
+		 * Multiplies the incoming object, array or values to this `vector`.
+		 */
+		mul( x, y ) {
+			const coords = Coords( x, y );
+			this.x *= coords.x;
+			this.y *= coords.y;
+			return this;
+		},
+		/**
+		 * Alternate way to think-about/call multiply
+		 */
+		scale( x, y ) {
+			return this.mul( x, y );
+		},
+		dot( other ) {
+			return this.x * other.x + this.y * other.y;
+		},
+		/**
+		 * Returns the length of this `vector`
+		 */
+		len() {
+			return Math.sqrt( this.x * this.x + this.y * this.y );
+		},
+		len2() {
+			return this.dot( this );
+		},
+		/**
+		 * Normalizes this `vector`
+		 */
+		nor() {
+			const len = this.len();
+			if ( len != 0 ) {
+				this.x /= len;
+				this.y /= len;
+			}
+			return this;
+		},
+		reverse() {
+			this.x = -this.x;
+			this.y = -this.y;
+			return this;
+		},
+		/**
+		 * Returns the angle between this `vector` and the x axis.
+		 * If `radians` is true, the angle will be returned as radians between -Math.PI and Math.PI.
+		 * If not, the angle will be returned in degrees, between 0 and 360.
+		 */
+		angle( radians ) {
+			let angle;
+			if ( radians ) {
+				angle = Math.atan2( y, x );
+			} else {
+				angle = Util.toDegrees( Math.atan2( y, x ) );
+				return angle < 0 ? angle + 360 : angle;
+			}
+			return angle;
+		},
+		/**
+		 * Rotates the vector by `angle`
+		 * `angle` is expected to be in radians. 
+		 */
+		rotate( angle ) {
+			let cos = Math.cos( angle );
+			let sin = Math.sin( angle );
+			let x = this.x * cos - this.y * sin;
+			let y = this.x * sin + this.y * cos;
+
+			this.x = x;
+			this.y = y;
+
+			return this;
+		},
+		/**
+		 * Rotates the vector by `angle`
+		 * `angle` is expected to be in degrees. 
+		 */
+		rotateDeg( angle ) {
+			return rotate( Util.toRadians( angle ) );
+		},
+		/**
+		 * Returns the distance between this and another vector
+		 */
+		dist( x, y ) {
+			const coords = Coords( x, y );
+			const dx = this.x - x;
+			const dy = this.y - y;
+
+			return Math.sqrt( dx * dx + dy * dy );
+		},
+		/**
+		 * Projects this vector on another vector
+		 */
+		project( target ) {
+			target = Vector2( target );
+			const amt = this.dot( target ) / target.len2();
+			this.x = amt * target.x;
+			this.y = amt * target.y;
+			return this;
+		},
+		/**
+		 * Reflects this vector on to an axis.
+		 */
+		reflect( axis ) {
+			const x = this.x;
+			const y = this.y;
+			this.project( axis ).scale( 2 );
+			this.x -= x;
+			this.y -= y;
+			return this;
+		},
+		/**
+		 * Converts this vector to it's perpendicular vector
+		 */
+		perp() {
+			let x = this.x;
+			this.x = this.y;
+			this.y = -x;
+			return this;
+		},
+		/**
+		 * @TODO use object create and getters/setters for the next few
+		 */
+		min() {
+			return this.x;
+		},
+		max() {
+			return this.y;
+		},
+		a() {
+			return this.x;
+		},
+		b() {
+			return this.y;
+		},
+		toString() {
+			return `[ x: ${ this.x}, y: ${ this.y } ]`;
+		}
+	};
+
+	return Object.assign( Object.create( Object.prototype ), coords, proto );
+}
+
+module.exports = Vector2;
+
+},{"./util.js":736}],738:[function(require,module,exports){
 'use strict'
 
 const Config = require( './inc/config.js' );
@@ -98504,4 +98829,4 @@ function loadGameModel( model ) {
 	return { base: base }
 }
 
-},{"./inc/config.js":733,"./inc/game-models.js":734,"./inc/steering-keyboard.js":735,"./inc/util.js":736,"mathjs":10,"pixi.js":681}]},{},[737]);
+},{"./inc/config.js":733,"./inc/game-models.js":734,"./inc/steering-keyboard.js":735,"./inc/util.js":736,"mathjs":10,"pixi.js":681}]},{},[738]);
