@@ -23,6 +23,7 @@ module.exports = function( PIXI, app ) {
 					);
 					base.pivot.x = base.sprite.width / 2;
 					base.pivot.y = base.sprite.height / 2;
+					// base.sprite.children[ 0 ].tint = 0x02d5ee;
 				},
 				children: [
 					{
@@ -53,6 +54,7 @@ module.exports = function( PIXI, app ) {
 					);
 					base.pivot.x = base.sprite.width / 2;
 					base.pivot.y = base.sprite.height / 2;
+					// base.sprite.children[ 0 ].tint = 0x02d5ee;
 				},
 				children: [
 					{
@@ -83,6 +85,7 @@ module.exports = function( PIXI, app ) {
 					);
 					base.pivot.x = base.sprite.width / 2;
 					base.pivot.y = base.sprite.height / 2;
+					// base.sprite.children[ 0 ].tint = 0x02d5ee;
 				},
 				children: [
 					{
@@ -113,6 +116,7 @@ module.exports = function( PIXI, app ) {
 					);
 					base.pivot.x = base.sprite.width / 2;
 					base.pivot.y = base.sprite.height / 2;
+					// base.sprite.children[ 0 ].tint = 0x02d5ee;
 				},
 				children: [
 					{
@@ -143,6 +147,7 @@ module.exports = function( PIXI, app ) {
 					);
 					base.pivot.x = base.sprite.width / 2;
 					base.pivot.y = base.sprite.height / 2;
+					// base.sprite.children[ 0 ].tint = 0x02d5ee;
 				},
 				children: [
 					{
@@ -158,144 +163,144 @@ module.exports = function( PIXI, app ) {
 				]
 			},
 			// duds
-			{
-				spriteSheet: 'ships.json',
-				options: {
-					name: 'dud',
-					currentPosition: { x: 800, y: 300 },
-					// positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
-					maxForwardVelocity: 4,
-					forwardVelocityIncrement: .05,
-				},
+			// {
+			// 	spriteSheet: 'ships.json',
+			// 	options: {
+			// 		name: 'dud',
+			// 		currentPosition: { x: 800, y: 300 },
+			// 		// positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
+			// 		maxForwardVelocity: 4,
+			// 		forwardVelocityIncrement: .05,
+			// 	},
 
-				init: ( base ) => {
-					base.sprite.hitArea = new CollisionPolygon( 48, 0, 71, 7, 83, 33, 86, 58, 83, 87, 71, 113, 48, 120,
-																38, 120, 15, 113, 3, 87 , 0, 58, 3, 33, 15, 7, 38, 0 );
+			// 	init: ( base ) => {
+			// 		base.sprite.hitArea = new CollisionPolygon( 48, 0, 71, 7, 83, 33, 86, 58, 83, 87, 71, 113, 48, 120,
+			// 													38, 120, 15, 113, 3, 87 , 0, 58, 3, 33, 15, 7, 38, 0 );
 
-					base.pivot.x = base.sprite.width / 2;
-					base.pivot.y = base.sprite.height / 2;
-				},
-				children: [
-					{
-						name: 'body',
-						id: 'turtle-body.png',
-						options: {
-						},
-					}
-				]
-			},
-			{
-				spriteSheet: 'ships.json',
-				options: {
-					name: 'dud2',
-					currentPosition: { x: 1200, y: 380 },
-					// positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
-					maxForwardVelocity: 4,
-					forwardVelocityIncrement: .05,
-				},
+			// 		base.pivot.x = base.sprite.width / 2;
+			// 		base.pivot.y = base.sprite.height / 2;
+			// 	},
+			// 	children: [
+			// 		{
+			// 			name: 'body',
+			// 			id: 'turtle-body.png',
+			// 			options: {
+			// 			},
+			// 		}
+			// 	]
+			// },
+			// {
+			// 	spriteSheet: 'ships.json',
+			// 	options: {
+			// 		name: 'dud2',
+			// 		currentPosition: { x: 1200, y: 380 },
+			// 		// positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
+			// 		maxForwardVelocity: 4,
+			// 		forwardVelocityIncrement: .05,
+			// 	},
 
-				init: ( base ) => {
-					base.sprite.hitArea = new CollisionPolygon( 48, 0, 71, 7, 83, 33, 86, 58, 83, 87, 71, 113, 48, 120,
-																38, 120, 15, 113, 3, 87 , 0, 58, 3, 33, 15, 7, 38, 0 );
+			// 	init: ( base ) => {
+			// 		base.sprite.hitArea = new CollisionPolygon( 48, 0, 71, 7, 83, 33, 86, 58, 83, 87, 71, 113, 48, 120,
+			// 													38, 120, 15, 113, 3, 87 , 0, 58, 3, 33, 15, 7, 38, 0 );
 
-					base.pivot.x = base.sprite.width / 2;
-					base.pivot.y = base.sprite.height / 2;
-					base.sprite.width *= 0.5;
-					base.sprite.height *= 0.5;
-				},
-				children: [
-					{
-						name: 'body',
-						id: 'turtle-body.png',
-						options: {
-						},
-					}
-				]
-			},
-			{
-				spriteSheet: 'ships.json',
-				options: {
-					name: 'dud3',
-					currentPosition: { x: 468, y: 560 },
-					// positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
-					maxForwardVelocity: 4,
-					forwardVelocityIncrement: .05,
-				},
+			// 		base.pivot.x = base.sprite.width / 2;
+			// 		base.pivot.y = base.sprite.height / 2;
+			// 		base.sprite.width *= 0.5;
+			// 		base.sprite.height *= 0.5;
+			// 	},
+			// 	children: [
+			// 		{
+			// 			name: 'body',
+			// 			id: 'turtle-body.png',
+			// 			options: {
+			// 			},
+			// 		}
+			// 	]
+			// },
+			// {
+			// 	spriteSheet: 'ships.json',
+			// 	options: {
+			// 		name: 'dud3',
+			// 		currentPosition: { x: 468, y: 560 },
+			// 		// positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
+			// 		maxForwardVelocity: 4,
+			// 		forwardVelocityIncrement: .05,
+			// 	},
 
-				init: ( base ) => {
-					base.sprite.hitArea = new CollisionPolygon( 48, 0, 71, 7, 83, 33, 86, 58, 83, 87, 71, 113, 48, 120,
-																38, 120, 15, 113, 3, 87 , 0, 58, 3, 33, 15, 7, 38, 0 );
+			// 	init: ( base ) => {
+			// 		base.sprite.hitArea = new CollisionPolygon( 48, 0, 71, 7, 83, 33, 86, 58, 83, 87, 71, 113, 48, 120,
+			// 													38, 120, 15, 113, 3, 87 , 0, 58, 3, 33, 15, 7, 38, 0 );
 
-					base.pivot.x = base.sprite.width / 2;
-					base.pivot.y = base.sprite.height / 2;
-					base.sprite.width *= 0.5;
-					base.sprite.height *= 0.5;
-				},
-				children: [
-					{
-						name: 'body',
-						id: 'turtle-body.png',
-						options: {
-						},
-					}
-				]
-			},
-			{
-				spriteSheet: 'ships.json',
-				options: {
-					name: 'dud4',
-					currentPosition: { x: 468, y: 560 },
-					// positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
-					maxForwardVelocity: 4,
-					forwardVelocityIncrement: .05,
-				},
+			// 		base.pivot.x = base.sprite.width / 2;
+			// 		base.pivot.y = base.sprite.height / 2;
+			// 		base.sprite.width *= 0.5;
+			// 		base.sprite.height *= 0.5;
+			// 	},
+			// 	children: [
+			// 		{
+			// 			name: 'body',
+			// 			id: 'turtle-body.png',
+			// 			options: {
+			// 			},
+			// 		}
+			// 	]
+			// },
+			// {
+			// 	spriteSheet: 'ships.json',
+			// 	options: {
+			// 		name: 'dud4',
+			// 		currentPosition: { x: 468, y: 560 },
+			// 		// positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
+			// 		maxForwardVelocity: 4,
+			// 		forwardVelocityIncrement: .05,
+			// 	},
 
-				init: ( base ) => {
-					base.sprite.hitArea = new CollisionPolygon( 48, 0, 71, 7, 83, 33, 86, 58, 83, 87, 71, 113, 48, 120,
-																38, 120, 15, 113, 3, 87 , 0, 58, 3, 33, 15, 7, 38, 0 );
+			// 	init: ( base ) => {
+			// 		base.sprite.hitArea = new CollisionPolygon( 48, 0, 71, 7, 83, 33, 86, 58, 83, 87, 71, 113, 48, 120,
+			// 													38, 120, 15, 113, 3, 87 , 0, 58, 3, 33, 15, 7, 38, 0 );
 
-					base.pivot.x = base.sprite.width / 2;
-					base.pivot.y = base.sprite.height / 2;
-					base.sprite.width *= 0.5;
-					base.sprite.height *= 0.5;
-				},
-				children: [
-					{
-						name: 'body',
-						id: 'turtle-body.png',
-						options: {
-						},
-					}
-				]
-			},
-			{
-				spriteSheet: 'ships.json',
-				options: {
-					name: 'dud5',
-					currentPosition: { x: 468, y: 560 },
-					// positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
-					maxForwardVelocity: 4,
-					forwardVelocityIncrement: .05,
-				},
+			// 		base.pivot.x = base.sprite.width / 2;
+			// 		base.pivot.y = base.sprite.height / 2;
+			// 		base.sprite.width *= 0.5;
+			// 		base.sprite.height *= 0.5;
+			// 	},
+			// 	children: [
+			// 		{
+			// 			name: 'body',
+			// 			id: 'turtle-body.png',
+			// 			options: {
+			// 			},
+			// 		}
+			// 	]
+			// },
+			// {
+			// 	spriteSheet: 'ships.json',
+			// 	options: {
+			// 		name: 'dud5',
+			// 		currentPosition: { x: 468, y: 560 },
+			// 		// positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
+			// 		maxForwardVelocity: 4,
+			// 		forwardVelocityIncrement: .05,
+			// 	},
 
-				init: ( base ) => {
-					base.sprite.hitArea = new CollisionPolygon( 48, 0, 71, 7, 83, 33, 86, 58, 83, 87, 71, 113, 48, 120,
-																38, 120, 15, 113, 3, 87 , 0, 58, 3, 33, 15, 7, 38, 0 );
+			// 	init: ( base ) => {
+			// 		base.sprite.hitArea = new CollisionPolygon( 48, 0, 71, 7, 83, 33, 86, 58, 83, 87, 71, 113, 48, 120,
+			// 													38, 120, 15, 113, 3, 87 , 0, 58, 3, 33, 15, 7, 38, 0 );
 
-					base.pivot.x = base.sprite.width / 2;
-					base.pivot.y = base.sprite.height / 2;
-					base.sprite.width *= 0.5;
-					base.sprite.height *= 0.5;
-				},
-				children: [
-					{
-						name: 'body',
-						id: 'turtle-body.png',
-						options: {
-						},
-					}
-				]
-			},
+			// 		base.pivot.x = base.sprite.width / 2;
+			// 		base.pivot.y = base.sprite.height / 2;
+			// 		base.sprite.width *= 0.5;
+			// 		base.sprite.height *= 0.5;
+			// 	},
+			// 	children: [
+			// 		{
+			// 			name: 'body',
+			// 			id: 'turtle-body.png',
+			// 			options: {
+			// 			},
+			// 		}
+			// 	]
+			// },
 			// turtle
 			{
 				spriteSheet: 'ships.json',
@@ -352,6 +357,7 @@ module.exports = function( PIXI, app ) {
 					base.pivot.y = base.sprite.height / 2;
 					base.sprite.width *= .5;
 					base.sprite.height *= .5;
+					// base.sprite.children[ 0 ].tint = 0xffff6b;
 					// base.children.rudder.currentPosition.x = base.sprite.width / 2;
 					// base.children.rudder.basePosition.x = base.sprite.width / 2;
 				},

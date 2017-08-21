@@ -36,7 +36,7 @@ loader
 window.gameModels = [];
 window.current = {
 	direction: 145,
-	force: .05
+	force: 1
 };
 
 window.friction = 0.98;
@@ -65,17 +65,21 @@ function setup( loader, resources ) {
 		app.stage.addChild( gameModels[ i ].base.sprite );
 	}
 	app.stage.addChild( stageGraphics );
-
+// app.stage.width *= 0.5;
+// app.stage.height *= 0.5;
 	window.turtle = gameModels[ 0 ].base;
 	SteeringKeyboard();
 
 	app.ticker.add( animate );
 }
 
+window.animating = true;
+
 function animate( delta ) {
 	let collisions = [];
 	stageGraphics.clear();
 
+	document.getElementById( 'frame-rate' ).dataset.framerate = app.ticker.FPS.toPrecision( 4 );
 	for ( let i = 0, l = gameModels.length; i < l; i++ ) {
 		let model = gameModels[ i ];
 
@@ -116,7 +120,7 @@ function animate( delta ) {
 				let collision = checkCollision( gameModels[ i ], gameModels[ ii ] );
 				collisions[ collisions.length ] = collision;
 				if ( collision ) {
-					console.log( collision.overlapV.toString() + ' ' + collision.overlap );
+					// console.log( collision.overlapV.toString() + ' ' + collision.overlap );
 					collision.one.base.currentPosition.x -= collision.overlapV.x;
 					collision.one.base.currentPosition.y -= collision.overlapV.y;
 				}
@@ -127,12 +131,6 @@ function animate( delta ) {
 			}
 		}
 	}
-
-	// let t = gameModels.find((v) => v.base.name === 'turtle');
-	// for ( let i = 0, l = gameModels.length; i < l; i++ ) {
-	// 	if ( gameModels[ i ] !== t ) 
-	// 		collisions[ collisions.length ] = checkCollision( t, gameModels[ i ] );
-	// }
 
 	let compiled = collisions.reduce( ( sum, val ) => {
 		if ( val.active )
