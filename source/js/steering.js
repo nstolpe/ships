@@ -73,8 +73,8 @@ function setup( loader, resources ) {
 	window.turtle = gameModels[ 0 ].base;
 
 	// setup the camera to follow turtle/player.
-	app.stage.position.x = app.renderer.width / 2;
-	app.stage.position.y = app.renderer.height / 2;
+	app.stage.position.x = (app.renderer.width / scale) / 2;
+	app.stage.position.y = (app.renderer.height / scale) / 2;
 	app.stage.pivot.x = turtle.currentPosition.x;
 	app.stage.pivot.y = turtle.currentPosition.y;
 
