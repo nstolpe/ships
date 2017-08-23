@@ -67,7 +67,14 @@ function setup( loader, resources ) {
 	app.stage.addChild( stageGraphics );
 // app.stage.width *= 0.5;
 // app.stage.height *= 0.5;
+
 	window.turtle = gameModels[ 0 ].base;
+
+	app.stage.position.x = app.renderer.width / 2;
+	app.stage.position.y = app.renderer.height / 2;
+	app.stage.pivot.x = turtle.currentPosition.x;
+	app.stage.pivot.y = turtle.currentPosition.y;
+
 	SteeringKeyboard();
 
 	app.ticker.add( animate );
@@ -80,20 +87,6 @@ function animate( delta ) {
 	stageGraphics.clear();
 
 	document.getElementById( 'frame-rate' ).dataset.framerate = app.ticker.FPS.toPrecision( 4 );
-	for ( let i = 0, l = gameModels.length; i < l; i++ ) {
-		let model = gameModels[ i ];
-
-		model.base.update( delta, {
-			velocities: [ {
-				x: window.current.force * math.cos( math.unit( window.current.direction, 'deg' ) ),
-				y: window.current.force * math.sin( math.unit( window.current.direction, 'deg' ) )
-			} ],
-			frictions: [ window.friction ]
-		} );
-
-		if ( model.base.debug )
-			drawDebug( model );
-	}
 
 	// check collision between every game model. very inneficient.
 	// for ( let i = 0, l = gameModels.length; i < l; i++ ) {
@@ -146,13 +139,34 @@ function animate( delta ) {
 		}
 	} ) );
 
+	updateGameModels( delta );
+
 	emitterManager.update( delta, [ current ] );
 
+	if ( Math.abs( app.stage.pivot.x - turtle.currentPosition.x ) > 0.5 )
+		app.stage.pivot.x = turtle.currentPosition.x;
+	if ( Math.abs( app.stage.pivot.y - turtle.currentPosition.y ) > 0.5 )
+		app.stage.pivot.y = turtle.currentPosition.y;
 	// check if the turtle is leaving the screen bounds
 	// @TODO use better collision detection
 	// checkScreenBounds( turtle, { left: 0, right: app.view.offsetWidth, top: 0, bottom: app.view.offsetHeight } );
 }
+function updateGameModels( delta ) {
+	for ( let i = 0, l = gameModels.length; i < l; i++ ) {
+		let model = gameModels[ i ];
 
+		model.base.update( delta, {
+			velocities: [ {
+				x: window.current.force * math.cos( math.unit( window.current.direction, 'deg' ) ),
+				y: window.current.force * math.sin( math.unit( window.current.direction, 'deg' ) )
+			} ],
+			frictions: [ window.friction ]
+		} );
+
+		if ( model.base.debug )
+			drawDebug( model );
+	}
+}
 function applyTransformsToPoint( point, source ) {
 	point.sub( source.base.pivot.x, source.base.pivot.y )
 		// @TODO needs the mul( 2 ) of detection only works on objects
