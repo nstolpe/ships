@@ -35,24 +35,26 @@ loader
 
 window.gameModels = [];
 window.current = {
-	direction: 145,
+	direction: 36,
 	force: 1
 };
 
 window.friction = 0.98;
 
 let emitterManager;
-let emitterParent = new PIXI.Container();
+window.emitterParent = new PIXI.Container();
 let stageGraphics = new PIXI.Graphics();
 
 
 function setup( loader, resources ) {
-	emitterParent.width = viewWidth;
-	emitterParent.height = viewHeight;
-	app.stage.addChild( emitterParent );
+	window.emitterParent.width = viewWidth;
+	window.emitterParent.height = viewHeight;
+	window.emitterParent.pivot.x = viewWidth / 2;
+	window.emitterParent.pivot.y = viewHeight / 2;
+	app.stage.addChild( window.emitterParent );
 	emitterManager = EmitterManager(
 		resources.emitter.data,
-		emitterParent,
+		window.emitterParent,
 		[ resources[ 'particle' ].texture ],
 		{ w: viewWidth, h: viewHeight },
 		17,
@@ -70,6 +72,7 @@ function setup( loader, resources ) {
 
 	window.turtle = gameModels[ 0 ].base;
 
+	// setup the camera to follow turtle/player.
 	app.stage.position.x = app.renderer.width / 2;
 	app.stage.position.y = app.renderer.height / 2;
 	app.stage.pivot.x = turtle.currentPosition.x;
@@ -147,6 +150,21 @@ function animate( delta ) {
 		app.stage.pivot.x = turtle.currentPosition.x;
 	if ( Math.abs( app.stage.pivot.y - turtle.currentPosition.y ) > 0.5 )
 		app.stage.pivot.y = turtle.currentPosition.y;
+
+	let xDist = window.emitterParent.position.x - app.stage.pivot.x;
+	let yDist = window.emitterParent.position.y - app.stage.pivot.y;
+	if ( Math.abs( xDist ) !== 0 ) {
+		window.emitterParent.position.x = app.stage.pivot.x;
+		for ( let i = 0, l = window.emitterParent.children.length; i < l; i++ ) {
+			window.emitterParent.children[ i ].x += xDist;
+		}
+	}
+	if ( Math.abs( yDist ) !== 0 ) {
+		window.emitterParent.position.y = app.stage.pivot.y;
+		for ( let i = 0, l = window.emitterParent.children.length; i < l; i++ ) {
+			window.emitterParent.children[ i ].y += yDist;
+		}
+	}
 	// check if the turtle is leaving the screen bounds
 	// @TODO use better collision detection
 	// checkScreenBounds( turtle, { left: 0, right: app.view.offsetWidth, top: 0, bottom: app.view.offsetHeight } );
