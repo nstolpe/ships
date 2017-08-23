@@ -9,7 +9,7 @@ module.exports = function( PIXI, app ) {
 		gameModels: [
 			{
 				options: {
-					basePosition: { x: 256, y: 384 },
+					basePosition: { x: 384, y: 384 },
 					name: 'boards-left',
 					rotationConstraints: { pos: 0, neg: 0 },
 					positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
@@ -17,9 +17,9 @@ module.exports = function( PIXI, app ) {
 				init: ( base ) => {
 					base.sprite.hitArea = new CollisionPolygon(
 						  0,   0,
-						128,   0,
-						128, 512,
-						  0, 512
+						 64,   0,
+						 64, 256,
+						  0, 256
 					);
 					base.pivot.x = base.sprite.width / 2;
 					base.pivot.y = base.sprite.height / 2;
@@ -31,7 +31,7 @@ module.exports = function( PIXI, app ) {
 						tiling: true,
 						options: {
 							tiling: true,
-							dimensions: { w: 128, h: 512 },
+							dimensions: { w: 64, h: 256 },
 							rotationConstraints: { pos: 0, neg: 0 },
 							positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } }
 						}
@@ -40,7 +40,7 @@ module.exports = function( PIXI, app ) {
 			},
 			{
 				options: {
-					basePosition: { x: 640, y: 384 },
+					basePosition: { x: 576, y: 384 },
 					name: 'boards-right',
 					rotationConstraints: { pos: 0, neg: 0 },
 					positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
@@ -48,9 +48,9 @@ module.exports = function( PIXI, app ) {
 				init: ( base ) => {
 					base.sprite.hitArea = new CollisionPolygon(
 						  0,   0,
-						128,   0,
-						128, 512,
-						  0, 512
+						64,   0,
+						64, 256,
+						  0, 256
 					);
 					base.pivot.x = base.sprite.width / 2;
 					base.pivot.y = base.sprite.height / 2;
@@ -62,7 +62,7 @@ module.exports = function( PIXI, app ) {
 						tiling: true,
 						options: {
 							tiling: true,
-							dimensions: { w: 128, h: 512 },
+							dimensions: { w: 64, h: 256 },
 							rotationConstraints: { pos: 0, neg: 0 },
 							positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } }
 						}
@@ -71,7 +71,7 @@ module.exports = function( PIXI, app ) {
 			},
 			{
 				options: {
-					basePosition: { x: 448, y: 192 },
+					basePosition: { x: 480, y: 288 },
 					name: 'boards-top',
 					rotationConstraints: { pos: 0, neg: 0 },
 					positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
@@ -79,9 +79,9 @@ module.exports = function( PIXI, app ) {
 				init: ( base ) => {
 					base.sprite.hitArea = new CollisionPolygon(
 						  0,   0,
-						256,   0,
-						256, 128,
-						  0, 128
+						128,   0,
+						128, 64,
+						  0, 64
 					);
 					base.pivot.x = base.sprite.width / 2;
 					base.pivot.y = base.sprite.height / 2;
@@ -93,7 +93,7 @@ module.exports = function( PIXI, app ) {
 						tiling: true,
 						options: {
 							tiling: true,
-							dimensions: { w: 256, h: 128 },
+							dimensions: { w: 128, h: 64 },
 							rotationConstraints: { pos: 0, neg: 0 },
 							positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } }
 						}
@@ -102,7 +102,7 @@ module.exports = function( PIXI, app ) {
 			},
 			{
 				options: {
-					basePosition: { x: 352, y: 576 },
+					basePosition: { x: 432, y: 480 },
 					name: 'boards-bottom-left',
 					rotationConstraints: { pos: 0, neg: 0 },
 					positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
@@ -110,9 +110,9 @@ module.exports = function( PIXI, app ) {
 				init: ( base ) => {
 					base.sprite.hitArea = new CollisionPolygon(
 						 0,   0,
-						64,   0,
-						64, 128,
-						 0, 128
+						32,   0,
+						32, 64,
+						 0, 64
 					);
 					base.pivot.x = base.sprite.width / 2;
 					base.pivot.y = base.sprite.height / 2;
@@ -124,7 +124,7 @@ module.exports = function( PIXI, app ) {
 						tiling: true,
 						options: {
 							tiling: true,
-							dimensions: { w: 64, h: 128 },
+							dimensions: { w: 32, h: 64 },
 							rotationConstraints: { pos: 0, neg: 0 },
 							positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } }
 						}
@@ -133,7 +133,7 @@ module.exports = function( PIXI, app ) {
 			},
 			{
 				options: {
-					basePosition: { x: 544, y: 576 },
+					basePosition: { x: 528, y: 480 },
 					name: 'boards-bottom-right',
 					rotationConstraints: { pos: 0, neg: 0 },
 					positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
@@ -141,9 +141,9 @@ module.exports = function( PIXI, app ) {
 				init: ( base ) => {
 					base.sprite.hitArea = new CollisionPolygon(
 						 0,   0,
-						64,   0,
-						64, 128,
-						 0, 128
+						32,   0,
+						32, 64,
+						 0, 64
 					);
 					base.pivot.x = base.sprite.width / 2;
 					base.pivot.y = base.sprite.height / 2;
@@ -155,7 +155,7 @@ module.exports = function( PIXI, app ) {
 						tiling: true,
 						options: {
 							tiling: true,
-							dimensions: { w: 64, h: 128 },
+							dimensions: { w: 32, h: 64 },
 							rotationConstraints: { pos: 0, neg: 0 },
 							positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } }
 						}
