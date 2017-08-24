@@ -91,15 +91,7 @@ function animate( delta ) {
 
 	document.getElementById( 'frame-rate' ).dataset.framerate = app.ticker.FPS.toPrecision( 4 );
 
-	// check collision between every game model. very inneficient.
-	// for ( let i = 0, l = gameModels.length; i < l; i++ ) {
-	// 	for ( let ii = 0, ll = gameModels.length; ii < ll; ii++ ) {
-	// 		if ( i !== ii ) {
-	// 			let collision = checkCollision( gameModels[ i ], gameModels[ ii ] );
-	// 			collisions[ collisions.length ] = collision;
-	// 		}
-	// 	}
-	// }
+	updateGameModels( delta );
 
 	// Check each moving (movable really) object for a collision with every other object.
 	// @TODO check only actually moving and check w/i same area. 
@@ -142,17 +134,23 @@ function animate( delta ) {
 		}
 	} ) );
 
-	updateGameModels( delta );
-
 	emitterManager.update( delta, [ current ] );
 
-	if ( Math.abs( app.stage.pivot.x - turtle.currentPosition.x ) > 0.5 )
-		app.stage.pivot.x = turtle.currentPosition.x;
-	if ( Math.abs( app.stage.pivot.y - turtle.currentPosition.y ) > 0.5 )
-		app.stage.pivot.y = turtle.currentPosition.y;
+	// make the camera follow the turtle, but only once the turtle is a certain distance (50) on either axis.
+	let xDist = app.stage.pivot.x - turtle.currentPosition.x;
+	let yDist = app.stage.pivot.y - turtle.currentPosition.y;
 
-	let xDist = window.emitterParent.position.x - app.stage.pivot.x;
-	let yDist = window.emitterParent.position.y - app.stage.pivot.y;
+	if ( Math.abs( xDist ) > 50 ) {
+		app.stage.pivot.x -= xDist / 100 * delta;
+	}
+	if ( Math.abs( yDist ) > 50 ) {
+		app.stage.pivot.y -= yDist / 100 * delta;
+	}
+
+	// move the wave emitter parent with the camera, but keep the waves
+	// in position relative to the screen.
+	xDist = window.emitterParent.position.x - app.stage.pivot.x;
+	yDist = window.emitterParent.position.y - app.stage.pivot.y;
 	if ( Math.abs( xDist ) !== 0 ) {
 		window.emitterParent.position.x = app.stage.pivot.x;
 		for ( let i = 0, l = window.emitterParent.children.length; i < l; i++ ) {
