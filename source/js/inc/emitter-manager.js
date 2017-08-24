@@ -1,6 +1,7 @@
 'use strict';
 
 const Util = require( './util.js' );
+const Vec2 = require( './vector2.js' );
 
 module.exports = function( config, parent, textures, dimensions, emitterCount, direction ) {
 	return {
@@ -31,11 +32,11 @@ module.exports = function( config, parent, textures, dimensions, emitterCount, d
 			this.parent.addChild( emitterContainer );
 			emitterContainer.pivot.x = emitterContainer.width / 2;
 			emitterContainer.pivot.y = emitterContainer.height / 2;
-			emitterContainer.rotation = direction;
+			// emitterContainer.rotation = Util.toRadians( this.direction );
 			emitter.update( 0 );
 
-			emitterContainer.position.x = Math.floor( Math.random() * ( dimensions.w - 0 ) ) + 0;
-			emitterContainer.position.y = Math.floor( Math.random() * ( dimensions.h - 0 ) ) + 0;
+			emitterContainer.position.x = Math.floor( Math.random() * ( this.dimensions.w - 0 ) ) + 0;
+			emitterContainer.position.y = Math.floor( Math.random() * ( this.dimensions.h - 0 ) ) + 0;
 
 			return emitter;
 		},
@@ -60,7 +61,7 @@ module.exports = function( config, parent, textures, dimensions, emitterCount, d
 					accumulated.x += force.force * math.cos( math.unit( force.direction, 'deg' ) );
 					accumulated.y += force.force * math.sin( math.unit( force.direction, 'deg' ) );
 				}
-
+				emitter.rotation = Vec2( accumulated.x, accumulated.y ).angle();
 				emitter.ownerPos.x += accumulated.x * delta;
 				emitter.ownerPos.y += accumulated.y * delta;
 				if ( !emitter.emit && emitter.particleCount <= 0 ) {
