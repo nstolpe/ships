@@ -3,7 +3,7 @@
 const Util = require( './util.js' );
 const Vec2 = require( './vector2.js' );
 
-module.exports = function( config, parent, textures, dimensions, emitterCount, direction ) {
+module.exports = function( config, parent, bounds, textures, dimensions, emitterCount, direction ) {
 	return {
 		config: config,
 		parent: parent,
@@ -13,6 +13,8 @@ module.exports = function( config, parent, textures, dimensions, emitterCount, d
 		emitterCount: emitterCount,
 		direction: direction,
 		elapsed: 0,
+		bounds: bounds,
+		offset: 20,
 		createEmitterInstance( baseEmitterConfig, textures ) {
 			let emitterContainer = new PIXI.Container();
 			let emitterConfig = Object.assign( baseEmitterConfig, {
@@ -29,14 +31,15 @@ module.exports = function( config, parent, textures, dimensions, emitterCount, d
 				emitterConfig
 			);
 
+			let position = Vec2( Util.randomInt(-20, this.dimensions.w + 20 ), Util.randomInt( -20, this.dimensions.h + 20 ) );
 			this.parent.addChild( emitterContainer );
 			emitterContainer.pivot.x = emitterContainer.width / 2;
 			emitterContainer.pivot.y = emitterContainer.height / 2;
 			// emitterContainer.rotation = Util.toRadians( this.direction );
 			emitter.update( 0 );
 
-			emitterContainer.position.x = Math.floor( Math.random() * ( this.dimensions.w - 0 ) ) + 0;
-			emitterContainer.position.y = Math.floor( Math.random() * ( this.dimensions.h - 0 ) ) + 0;
+			emitterContainer.position.x = position.x;//Math.floor( Math.random() * ( this.dimensions.w - 0 ) ) + 0;
+			emitterContainer.position.y = position.y;//Math.floor( Math.random() * ( this.dimensions.h - 0 ) ) + 0;
 
 			return emitter;
 		},
@@ -64,9 +67,21 @@ module.exports = function( config, parent, textures, dimensions, emitterCount, d
 				emitter.rotation = Vec2( accumulated.x, accumulated.y ).angle();
 				emitter.ownerPos.x += accumulated.x * delta;
 				emitter.ownerPos.y += accumulated.y * delta;
+
 				if ( !emitter.emit && emitter.particleCount <= 0 ) {
 					this.parent.removeChild( emitter.parent );
 					emitter.destroy();
+					this.emitters[ i ] = this.createEmitterInstance( this.config, this.textures );
+					window.dispatchEvent( new Event( 'cleanup-emitters' ) );
+				} else if ( emitter.ownerPos.x + this.parent.position.x < this.parent.position.x - this.bounds.x - this.offset ||
+					 emitter.ownerPos.y + this.parent.position.y < this.parent.position.y - this.bounds.y - this.offset ||
+					 emitter.ownerPos.x + this.parent.position.x > this.parent.position.x + this.bounds.x + this.offset ||
+					 emitter.ownerPos.y + this.parent.position.y > this.parent.position.y + this.bounds.y + this.offset ) {
+					emitter.cleanup();
+					emitter.destroy();
+					this.parent.removeChild( emitter.parent );
+					// @TODO use messenger later.
+					window.dispatchEvent( new Event( 'cleanup-emitters' ) );
 					this.emitters[ i ] = this.createEmitterInstance( this.config, this.textures );
 				}
 			}

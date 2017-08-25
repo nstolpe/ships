@@ -20,6 +20,9 @@
 			.frame-rate::before {
 				content: 'frame rate: 'attr(data-framerate);
 			}
+			.cleanups::before {
+				content: 'cleanups: 'attr(data-cleanups);
+			}
 			.debug-toggle {
 				position: absolute;
 				bottom: 0;
@@ -37,6 +40,7 @@
 		<div class="debug-toggle" id="debug-toggle" data-active="on"></div>
 		<div class="feedback" id="feedback">
 			{{!-- <div class="collision" id="collision">no collision<div> --}}
+			{{!-- <div class="cleanups" id="cleanups" data-cleanups="0"><div> --}}
 			<div class="frame-rate" id="frame-rate" data-framerate="1"><div>
 		</div>
 		<script src="assets/js/steering.js"></script>
@@ -53,16 +57,6 @@
 						window.gameModels[ i ].base.debug = true;
 						e.target.dataset.active = 'off';
 					}
-				}
-			}, false );
-
-			window.addEventListener( 'message', ( e ) => {
-				switch ( e.detail.type ) {
-					case 'update-collision':
-						// collision.innerHTML = `${ e.detail.names }`;
-						break;
-					default:
-						break;
 				}
 			}, false );
 		</script>

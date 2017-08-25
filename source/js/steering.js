@@ -35,7 +35,7 @@ loader
 
 window.gameModels = [];
 window.current = {
-	direction: 36,
+	direction: 90,
 	force: 1
 };
 
@@ -55,6 +55,11 @@ function setup( loader, resources ) {
 	emitterManager = EmitterManager(
 		resources.emitter.data,
 		window.emitterParent,
+		// {
+		// 	min: Vec2(),
+		// 	max: Vec2( viewWidth / 2, viewHeight / 2 )
+		// },
+		Vec2( viewWidth / 2, viewHeight / 2 ),
 		[ resources[ 'particle' ].texture ],
 		{ w: viewWidth, h: viewHeight },
 		17,
@@ -133,6 +138,11 @@ function animate( delta ) {
 			names: `<h3>collisions:</h3> ${ compiled }`
 		}
 	} ) );
+
+	window.addEventListener( 'cleanup-emitters', function() {
+		// document.getElementById( 'cleanups' ).dataset.cleanups = parseInt( document.getElementById( 'cleanups' ).dataset.cleanups, 10 ) + 1;
+		app.renderer.plugins.sprite.sprites.length = 0;
+	}, false );
 
 	emitterManager.update( delta, [ current ] );
 
