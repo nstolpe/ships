@@ -97523,6 +97523,41 @@ module.exports = function( PIXI, app ) {
 					}
 				]
 			},
+			// {
+			// 	options: {
+			// 		basePosition: { x: 480, y: 360 },
+			// 		name: 'dock-one',
+			// 		rotationConstraints: { pos: 0, neg: 0 },
+			// 		positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
+			// 		solid: false,
+			// 		collideable: true
+			// 	},
+			// 	init: ( base ) => {
+			// 		base.sprite.hitArea = new CollisionPolygon(
+			// 			  0,   0,
+			// 			144,   0,
+			// 			144, 144,
+			// 			  0, 144
+			// 		);
+			// 		base.pivot.x = base.sprite.width / 2;
+			// 		base.pivot.y = base.sprite.height / 2;
+			// 		base.sprite.width *= .5;
+			// 		base.sprite.height *= .5;
+			// 	},
+			// 	children: [
+			// 		{
+			// 			texture: 'circle-target',
+			// 			tiling: true,
+			// 			options: {
+			// 				name: 'target',
+			// 				tiling: true,
+			// 				dimensions: { w: 144, h: 144 },
+			// 				rotationConstraints: { pos: 0, neg: 0 },
+			// 				positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } }
+			// 			}
+			// 		}
+			// 	]
+			// },
 			{
 				options: {
 					basePosition: { x: 480, y: 288 },
@@ -98081,9 +98116,9 @@ module.exports = function( PIXI, app ) {
 					// 	} 
 					// },
 					{
-						name: 'body',
 						id: 'turtle-body.png',
 						options: {
+							name: 'body',
 							// basePosition: { x: 15, y: 0 },
 							rotationConstraints: { pos: 0, neg: 0 },
 							positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } }
@@ -98112,7 +98147,40 @@ module.exports = function( PIXI, app ) {
 					// 	}
 					// }
 				]
-			}
+			},
+			{
+				options: {
+					basePosition: { x: 480, y: 360 },
+					name: 'dock-one',
+					rotationConstraints: { pos: 0, neg: 0 },
+					positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
+					solid: false,
+					collideable: true
+				},
+				init: ( base ) => {
+					base.sprite.hitArea = new CollisionPolygon(
+						  0,   0,
+						144,   0,
+						144, 144,
+						  0, 144
+					);
+					base.pivot.x = base.sprite.width / 2;
+					base.pivot.y = base.sprite.height / 2;
+					base.sprite.width *= .5;
+					base.sprite.height *= .5;
+				},
+				children: [
+					{
+						texture: 'circle-target',
+						options: {
+							name: 'target',
+							dimensions: { w: 144, h: 144 },
+							rotationConstraints: { pos: 0, neg: 0 },
+							positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } }
+						}
+					}
+				]
+			},
 		]
 	};
 };
@@ -98260,6 +98328,8 @@ module.exports = {
 			targetPosition: options.startPosition || options.basePosition || 0,
 			// activePositionAcceleration: TrinaryState.NEUTRAL,
 			// activeRotationAcceleration: TrinaryState.NEUTRAL,
+			solid: typeof options.solid === 'boolean' ? options.solid : true,
+			collideable: typeof options.collideable === 'boolean' ? options.collideable : true,
 			debug: options.debug || false,
 			/**
 			 * Calculates a new velocity based on a delta, a rate of acceleration, a current velocity, an increment multiplier and a velocity limit. 
@@ -98472,8 +98542,12 @@ function setupInput() {
 		H = keyboard( 72 ),
 		J = keyboard( 74 ),
 		K = keyboard( 75 ),
-		L = keyboard( 76 );
+		L = keyboard( 76 ),
+		X = keyboard( 88 );
 
+	X.release = () => {
+		window.dispatchEvent( new Event( 'dock' ) );
+	}
 	W.press = () => {
 		turtle.positionAcceleration = Util.TrinaryState.POSITIVE;
 		turtle.activePositionAcceleration = true;
@@ -98603,6 +98677,15 @@ module.exports = {
 	 */
 	isNumeric(n) {
 		return !isNaN(parseFloat(n)) && isFinite(n);
+	},
+	/**
+	 * Generates a random int between min and max, inclusive on both ends.
+	 * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random#Getting_a_random_integer_between_two_values_inclusive
+	 */
+	randomInt( min, max ) {
+		min = Math.ceil(min);
+		max = Math.floor(max);
+		return Math.floor( Math.random() * (max - min + 1) ) + min;
 	}
 };
 

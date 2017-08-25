@@ -20,6 +20,9 @@
 			.frame-rate::before {
 				content: 'frame rate: 'attr(data-framerate);
 			}
+			.cleanups::before {
+				content: 'cleanups: 'attr(data-cleanups);
+			}
 			.debug-toggle {
 				position: absolute;
 				bottom: 0;
@@ -52,16 +55,6 @@
 						window.gameModels[ i ].base.debug = true;
 						e.target.dataset.active = 'off';
 					}
-				}
-			}, false );
-
-			window.addEventListener( 'message', ( e ) => {
-				switch ( e.detail.type ) {
-					case 'update-collision':
-						// collision.innerHTML = `${ e.detail.names }`;
-						break;
-					default:
-						break;
 				}
 			}, false );
 		</script>
