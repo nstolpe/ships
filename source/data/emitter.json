@@ -13,8 +13,8 @@
 		"end": "#051224"
 	},
 	"speed": {
-		"start": 10,
-		"end": 8,
+		"start": 30,
+		"end": 28,
 		"minimumSpeedMultiplier": 1
 	},
 	"acceleration": {

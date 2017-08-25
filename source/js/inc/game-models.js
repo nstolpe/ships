@@ -140,6 +140,8 @@ module.exports = {
 			targetPosition: options.startPosition || options.basePosition || 0,
 			// activePositionAcceleration: TrinaryState.NEUTRAL,
 			// activeRotationAcceleration: TrinaryState.NEUTRAL,
+			solid: typeof options.solid === 'boolean' ? options.solid : true,
+			collideable: typeof options.collideable === 'boolean' ? options.collideable : true,
 			debug: options.debug || false,
 			/**
 			 * Calculates a new velocity based on a delta, a rate of acceleration, a current velocity, an increment multiplier and a velocity limit. 

@@ -31,11 +31,12 @@ loader
 	.add( 'emitter', 'assets/data/emitter.json' )
 	.add( 'particle', 'assets/images/pixel.png' )
 	.add( 'boards', 'assets/images/boards.png' )
+	.add( 'circle-target', 'assets/images/circle-target.png' )
 	.load( setup );
 
 window.gameModels = [];
 window.current = {
-	direction: 90,
+	direction: 163,
 	force: 1
 };
 
@@ -75,7 +76,7 @@ function setup( loader, resources ) {
 // app.stage.width *= 0.5;
 // app.stage.height *= 0.5;
 
-	window.turtle = gameModels[ 0 ].base;
+	window.turtle = gameModels.find( ( model ) => model.base.name === 'turtle' ).base;
 
 	// setup the camera to follow turtle/player.
 	app.stage.position.x = (app.renderer.width / scale) / 2;
@@ -90,6 +91,29 @@ function setup( loader, resources ) {
 
 window.animating = true;
 
+let activeTarget;
+let docked = false;
+
+window.addEventListener( 'dock', function() {
+	if ( activeTarget && !docked ) {
+		turtle.basePosition.x = activeTarget.base.basePosition.x;
+		turtle.basePosition.y = activeTarget.base.basePosition.y;
+		turtle.positionConstraints.pos = { x: 0, y: 0 };
+		turtle.positionConstraints.neg = { x: 0, y: 0 };
+		turtle.rotationConstraints.pos = 0;
+		turtle.rotationConstraints.neg = 0;
+		docked = true;
+	} else if ( docked ) {
+		turtle.basePosition.x = 0;
+		turtle.basePosition.y = 0;
+		turtle.positionConstraints.pos = { x: Infinity, y: Infinity };
+		turtle.positionConstraints.neg = { x: Infinity, y: Infinity };
+		turtle.rotationConstraints.pos = Infinity;
+		turtle.rotationConstraints.neg = Infinity;
+		docked = false;
+	}
+}, false );
+
 function animate( delta ) {
 	let collisions = [];
 	stageGraphics.clear();
@@ -100,22 +124,32 @@ function animate( delta ) {
 
 	// Check each moving (movable really) object for a collision with every other object.
 	// @TODO check only actually moving and check w/i same area. 
-	let collidables = gameModels.filter( ( model ) => {
+	let collideables = gameModels.filter( ( model ) => {
 		return model.base.positionConstraints.neg.x !== 0 ||
 		model.base.positionConstraints.neg.y !== 0 ||
 		model.base.positionConstraints.pos.x !== 0 ||
 		model.base.positionConstraints.pos.y !== 0
 	} );
 
-	for ( let i = 0, l = collidables.length; i < l; i++ ) {
+	for ( let i = 0, l = collideables.length; i < l; i++ ) {
 		for ( let ii = 0, ll = gameModels.length; ii < ll; ii++ ) {
-			if ( i !== ii ) {
-				let collision = checkCollision( gameModels[ i ], gameModels[ ii ] );
+			if ( collideables[ i ] !== gameModels[ ii ] ) {
+				let collision = checkCollision( collideables[ i ], gameModels[ ii ] );
 				collisions[ collisions.length ] = collision;
 				if ( collision ) {
-					// console.log( collision.overlapV.toString() + ' ' + collision.overlap );
-					collision.one.base.currentPosition.x -= collision.overlapV.x;
-					collision.one.base.currentPosition.y -= collision.overlapV.y;
+					if ( gameModels[ ii ].base.solid ) {
+						// console.log( collision.overlapV.toString() + ' ' + collision.overlap );
+						collision.one.base.currentPosition.x -= collision.overlapV.x;
+						collision.one.base.currentPosition.y -= collision.overlapV.y;
+					// make target interactable
+					} else {
+						gameModels[ ii ].base.sprite.children[ 0 ].tint = 0xff0000;
+						activeTarget = gameModels[ ii ];
+					}
+				// deactivate an activeTarget
+				} else if ( gameModels[ ii ] === activeTarget ) {
+					activeTarget = undefined;
+					gameModels[ ii ].base.sprite.children[ 0 ].tint = 0xffffff;
 				}
 				// if ( collision && collision.twoInOne ) {
 				// 	collision.two.base.currentPosition.x += collision.overlapV.x;
@@ -138,11 +172,6 @@ function animate( delta ) {
 			names: `<h3>collisions:</h3> ${ compiled }`
 		}
 	} ) );
-
-	window.addEventListener( 'cleanup-emitters', function() {
-		// document.getElementById( 'cleanups' ).dataset.cleanups = parseInt( document.getElementById( 'cleanups' ).dataset.cleanups, 10 ) + 1;
-		app.renderer.plugins.sprite.sprites.length = 0;
-	}, false );
 
 	emitterManager.update( delta, [ current ] );
 
@@ -505,7 +534,7 @@ function loadGameModel( model ) {
 		sprite = child.options.tiling ? new PIXI.extras.TilingSprite( texture, child.options.dimensions.w, child.options.dimensions.h ) : new Sprite( texture );
 		tr = GameModels.TransformableRenderable( Object.assign( { sprite: sprite }, child.options ) );
 
-		base.addChild( child.name, tr, child.init );
+		base.addChild( child.options.name, tr, child.init );
 	}
 
 	typeof model.init === 'function' && model.init( base );

@@ -44,8 +44,12 @@ function setupInput() {
 		H = keyboard( 72 ),
 		J = keyboard( 74 ),
 		K = keyboard( 75 ),
-		L = keyboard( 76 );
+		L = keyboard( 76 ),
+		X = keyboard( 88 );
 
+	X.release = () => {
+		window.dispatchEvent( new Event( 'dock' ) );
+	}
 	W.press = () => {
 		turtle.positionAcceleration = Util.TrinaryState.POSITIVE;
 		turtle.activePositionAcceleration = true;

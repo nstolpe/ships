@@ -72,7 +72,7 @@ module.exports = function( config, parent, bounds, textures, dimensions, emitter
 					this.parent.removeChild( emitter.parent );
 					emitter.destroy();
 					this.emitters[ i ] = this.createEmitterInstance( this.config, this.textures );
-					window.dispatchEvent( new Event( 'cleanup-emitters' ) );
+					// window.dispatchEvent( new Event( 'cleanup-emitters' ) );
 				} else if ( emitter.ownerPos.x + this.parent.position.x < this.parent.position.x - this.bounds.x - this.offset ||
 					 emitter.ownerPos.y + this.parent.position.y < this.parent.position.y - this.bounds.y - this.offset ||
 					 emitter.ownerPos.x + this.parent.position.x > this.parent.position.x + this.bounds.x + this.offset ||
@@ -81,7 +81,7 @@ module.exports = function( config, parent, bounds, textures, dimensions, emitter
 					emitter.destroy();
 					this.parent.removeChild( emitter.parent );
 					// @TODO use messenger later.
-					window.dispatchEvent( new Event( 'cleanup-emitters' ) );
+					// window.dispatchEvent( new Event( 'cleanup-emitters' ) );
 					this.emitters[ i ] = this.createEmitterInstance( this.config, this.textures );
 				}
 			}

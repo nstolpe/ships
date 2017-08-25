@@ -71,6 +71,41 @@ module.exports = function( PIXI, app ) {
 					}
 				]
 			},
+			// {
+			// 	options: {
+			// 		basePosition: { x: 480, y: 360 },
+			// 		name: 'dock-one',
+			// 		rotationConstraints: { pos: 0, neg: 0 },
+			// 		positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
+			// 		solid: false,
+			// 		collideable: true
+			// 	},
+			// 	init: ( base ) => {
+			// 		base.sprite.hitArea = new CollisionPolygon(
+			// 			  0,   0,
+			// 			144,   0,
+			// 			144, 144,
+			// 			  0, 144
+			// 		);
+			// 		base.pivot.x = base.sprite.width / 2;
+			// 		base.pivot.y = base.sprite.height / 2;
+			// 		base.sprite.width *= .5;
+			// 		base.sprite.height *= .5;
+			// 	},
+			// 	children: [
+			// 		{
+			// 			texture: 'circle-target',
+			// 			tiling: true,
+			// 			options: {
+			// 				name: 'target',
+			// 				tiling: true,
+			// 				dimensions: { w: 144, h: 144 },
+			// 				rotationConstraints: { pos: 0, neg: 0 },
+			// 				positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } }
+			// 			}
+			// 		}
+			// 	]
+			// },
 			{
 				options: {
 					basePosition: { x: 480, y: 288 },
@@ -629,9 +664,9 @@ module.exports = function( PIXI, app ) {
 					// 	} 
 					// },
 					{
-						name: 'body',
 						id: 'turtle-body.png',
 						options: {
+							name: 'body',
 							// basePosition: { x: 15, y: 0 },
 							rotationConstraints: { pos: 0, neg: 0 },
 							positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } }
@@ -660,7 +695,40 @@ module.exports = function( PIXI, app ) {
 					// 	}
 					// }
 				]
-			}
+			},
+			{
+				options: {
+					basePosition: { x: 480, y: 360 },
+					name: 'dock-one',
+					rotationConstraints: { pos: 0, neg: 0 },
+					positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
+					solid: false,
+					collideable: true
+				},
+				init: ( base ) => {
+					base.sprite.hitArea = new CollisionPolygon(
+						  0,   0,
+						144,   0,
+						144, 144,
+						  0, 144
+					);
+					base.pivot.x = base.sprite.width / 2;
+					base.pivot.y = base.sprite.height / 2;
+					base.sprite.width *= .5;
+					base.sprite.height *= .5;
+				},
+				children: [
+					{
+						texture: 'circle-target',
+						options: {
+							name: 'target',
+							dimensions: { w: 144, h: 144 },
+							rotationConstraints: { pos: 0, neg: 0 },
+							positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } }
+						}
+					}
+				]
+			},
 		]
 	};
 };
