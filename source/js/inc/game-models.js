@@ -22,6 +22,7 @@ module.exports = {
 				this.updateTransform( delta, influencers );
 				this.sprite.position.set( this.currentPosition.x, this.currentPosition.y );
 				this.sprite.rotation = this.currentRotation;
+				this.sprite.alpha = this.alpha;
 			}
 		}
 		return Object.assign( {}, transformable, renderable, o );
@@ -68,7 +69,8 @@ module.exports = {
 		if ( !options || !options.sprite ) throw new Error( 'No Sprite provided to renderable' );
 
 		return Object.assign( this.Group( options ), {
-			anchor: options.anchor || { x: options.sprite.anchor.x, y: options.sprite.anchor.y }
+			anchor: options.anchor || { x: options.sprite.anchor.x, y: options.sprite.anchor.y },
+			alpha: options.alpha || 1,
 		} );
 	},
 	/**

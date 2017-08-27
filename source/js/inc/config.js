@@ -724,11 +724,46 @@ module.exports = function( PIXI, app ) {
 							name: 'target',
 							dimensions: { w: 144, h: 144 },
 							rotationConstraints: { pos: 0, neg: 0 },
-							positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } }
+							positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
+							alpha: .25
 						}
 					}
 				]
 			},
+			{
+				options: {
+					basePosition: { x: 930, y: 960 },
+					name: 'dock-two',
+					rotationConstraints: { pos: 0, neg: 0 },
+					positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
+					solid: false,
+					collideable: true
+				},
+				init: ( base ) => {
+					base.sprite.hitArea = new CollisionPolygon(
+						  0,   0,
+						144,   0,
+						144, 144,
+						  0, 144
+					);
+					base.pivot.x = base.sprite.width / 2;
+					base.pivot.y = base.sprite.height / 2;
+					base.sprite.width *= .5;
+					base.sprite.height *= .5;
+				},
+				children: [
+					{
+						texture: 'circle-target',
+						options: {
+							name: 'target',
+							dimensions: { w: 144, h: 144 },
+							rotationConstraints: { pos: 0, neg: 0 },
+							positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
+							alpha: .25
+						}
+					}
+				]
+			}
 		]
 	};
 };
