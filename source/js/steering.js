@@ -143,13 +143,15 @@ function animate( delta ) {
 						collision.one.base.currentPosition.y -= collision.overlapV.y;
 					// make target interactable
 					} else {
-						gameModels[ ii ].base.sprite.children[ 0 ].tint = 0xff0000;
+						gameModels[ ii ].base.sprite.children[ 0 ].tint = 0x4ae9f9;
+						gameModels[ ii ].base.children.target.alpha = .5;
 						activeTarget = gameModels[ ii ];
 					}
 				// deactivate an activeTarget
 				} else if ( gameModels[ ii ] === activeTarget ) {
 					activeTarget = undefined;
 					gameModels[ ii ].base.sprite.children[ 0 ].tint = 0xffffff;
+					gameModels[ ii ].base.children.target.alpha = .1;
 				}
 				// if ( collision && collision.twoInOne ) {
 				// 	collision.two.base.currentPosition.x += collision.overlapV.x;
