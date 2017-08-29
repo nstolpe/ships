@@ -118,7 +118,7 @@ function animate( delta ) {
 	let collisions = [];
 	stageGraphics.clear();
 
-	document.getElementById( 'frame-rate' ).dataset.framerate = app.ticker.FPS.toPrecision( 4 );
+	document.getElementById( 'frame-rate' ).dataset.framerate = app.ticker.FPS.toPrecision( 2 );
 
 	updateGameModels( delta );
 
