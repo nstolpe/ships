@@ -115,13 +115,50 @@ window.addEventListener( 'dock', function() {
 }, false );
 
 function animate( delta ) {
-	let collisions = [];
 	stageGraphics.clear();
 
 	document.getElementById( 'frame-rate' ).dataset.framerate = app.ticker.FPS.toPrecision( 2 );
 
 	updateGameModels( delta );
 
+	checkCollisions( delta );
+
+	emitterManager.update( delta, [ current ] );
+
+	// make the camera follow the turtle, but only once the turtle is a certain distance (50) on either axis.
+	let xDist = app.stage.pivot.x - turtle.currentPosition.x;
+	let yDist = app.stage.pivot.y - turtle.currentPosition.y;
+
+	if ( Math.abs( xDist ) > 50 ) {
+		app.stage.pivot.x -= xDist / 100 * delta;
+	}
+	if ( Math.abs( yDist ) > 50 ) {
+		app.stage.pivot.y -= yDist / 100 * delta;
+	}
+
+	// move the wave emitter parent with the camera, but keep the waves
+	// in position relative to the screen.
+	xDist = window.emitterParent.position.x - app.stage.pivot.x;
+	yDist = window.emitterParent.position.y - app.stage.pivot.y;
+	if ( Math.abs( xDist ) !== 0 ) {
+		window.emitterParent.position.x = app.stage.pivot.x;
+		for ( let i = 0, l = window.emitterParent.children.length; i < l; i++ ) {
+			window.emitterParent.children[ i ].x += xDist;
+		}
+	}
+	if ( Math.abs( yDist ) !== 0 ) {
+		window.emitterParent.position.y = app.stage.pivot.y;
+		for ( let i = 0, l = window.emitterParent.children.length; i < l; i++ ) {
+			window.emitterParent.children[ i ].y += yDist;
+		}
+	}
+	// check if the turtle is leaving the screen bounds
+	// @TODO use better collision detection
+	// checkScreenBounds( turtle, { left: 0, right: app.view.offsetWidth, top: 0, bottom: app.view.offsetHeight } );
+}
+
+function checkCollisions() {
+	let collisions = [];
 	// Check each moving (movable really) object for a collision with every other object.
 	// @TODO check only actually moving and check w/i same area. 
 	let collideables = gameModels.filter( ( model ) => {
@@ -160,41 +197,7 @@ function animate( delta ) {
 			}
 		}
 	}
-
-	emitterManager.update( delta, [ current ] );
-
-	// make the camera follow the turtle, but only once the turtle is a certain distance (50) on either axis.
-	let xDist = app.stage.pivot.x - turtle.currentPosition.x;
-	let yDist = app.stage.pivot.y - turtle.currentPosition.y;
-
-	if ( Math.abs( xDist ) > 50 ) {
-		app.stage.pivot.x -= xDist / 100 * delta;
-	}
-	if ( Math.abs( yDist ) > 50 ) {
-		app.stage.pivot.y -= yDist / 100 * delta;
-	}
-
-	// move the wave emitter parent with the camera, but keep the waves
-	// in position relative to the screen.
-	xDist = window.emitterParent.position.x - app.stage.pivot.x;
-	yDist = window.emitterParent.position.y - app.stage.pivot.y;
-	if ( Math.abs( xDist ) !== 0 ) {
-		window.emitterParent.position.x = app.stage.pivot.x;
-		for ( let i = 0, l = window.emitterParent.children.length; i < l; i++ ) {
-			window.emitterParent.children[ i ].x += xDist;
-		}
-	}
-	if ( Math.abs( yDist ) !== 0 ) {
-		window.emitterParent.position.y = app.stage.pivot.y;
-		for ( let i = 0, l = window.emitterParent.children.length; i < l; i++ ) {
-			window.emitterParent.children[ i ].y += yDist;
-		}
-	}
-	// check if the turtle is leaving the screen bounds
-	// @TODO use better collision detection
-	// checkScreenBounds( turtle, { left: 0, right: app.view.offsetWidth, top: 0, bottom: app.view.offsetHeight } );
 }
-
 function updateGameModels( delta ) {
 	for ( let i = 0, l = gameModels.length; i < l; i++ ) {
 		let model = gameModels[ i ];
