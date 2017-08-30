@@ -151,7 +151,7 @@ function animate( delta ) {
 				} else if ( gameModels[ ii ] === activeTarget ) {
 					activeTarget = undefined;
 					gameModels[ ii ].base.sprite.children[ 0 ].tint = 0xffffff;
-					gameModels[ ii ].base.children.target.alpha = .1;
+					gameModels[ ii ].base.children.target.alpha = .25;
 				}
 				// if ( collision && collision.twoInOne ) {
 				// 	collision.two.base.currentPosition.x += collision.overlapV.x;
@@ -160,20 +160,6 @@ function animate( delta ) {
 			}
 		}
 	}
-
-	let compiled = collisions.reduce( ( sum, val ) => {
-		if ( val.active )
-			return sum + ( `<p>${ val.one.base.name } ${ val.two.base.name }</p>` );
-		else
-			return sum;
-	}, '' );
-
-	window.dispatchEvent( new CustomEvent('message', {
-		detail: {
-			type: 'update-collision',
-			names: `<h3>collisions:</h3> ${ compiled }`
-		}
-	} ) );
 
 	emitterManager.update( delta, [ current ] );
 
@@ -208,6 +194,7 @@ function animate( delta ) {
 	// @TODO use better collision detection
 	// checkScreenBounds( turtle, { left: 0, right: app.view.offsetWidth, top: 0, bottom: app.view.offsetHeight } );
 }
+
 function updateGameModels( delta ) {
 	for ( let i = 0, l = gameModels.length; i < l; i++ ) {
 		let model = gameModels[ i ];
@@ -224,6 +211,7 @@ function updateGameModels( delta ) {
 			drawDebug( model );
 	}
 }
+
 function applyTransformsToPoint( point, source ) {
 	point.sub( source.base.pivot.x, source.base.pivot.y )
 		// @TODO needs the mul( 2 ) of detection only works on objects

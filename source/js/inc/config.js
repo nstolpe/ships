@@ -512,7 +512,7 @@ module.exports = function( PIXI, app ) {
 				spriteSheet: 'ships.json',
 				options: {
 					name: 'turtle',
-					currentPosition: { x: 384, y: 384 },
+					currentPosition: { x: 683, y: 455 },
 					// rotationConstraints: { pos: Infinity, neg: Infinity },
 					// positionConstraints: { pos: { x: Infinity, y: Infinity }, neg: { x: Infinity, y: Infinity } },
 					maxForwardVelocity: 4,
