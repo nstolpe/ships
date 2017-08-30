@@ -129,6 +129,10 @@ function animate( delta ) {
 	updateWaveEmitterParent();
 }
 
+/**
+ * The parent of the wave emitter stays pinned to the stage.
+ * Emitter positions are adjusted to keep them moving with rest of the environment.
+ */
 function updateWaveEmitterParent() {
 	// move the wave emitter parent with the camera, but keep the waves
 	// in position relative to the screen.
