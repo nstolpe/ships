@@ -144,12 +144,14 @@ const Vector2 = function( x, y ) {
 		 */
 		angle( radians ) {
 			let angle;
+
 			if ( radians ) {
 				angle = Math.atan2( y, x );
 			} else {
 				angle = Util.toDegrees( Math.atan2( y, x ) );
-				return angle < 0 ? angle + 360 : angle;
+				angle += angle < 0 ? 360 : 0;
 			}
+
 			return angle;
 		},
 		/**
