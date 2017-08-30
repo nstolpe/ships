@@ -126,6 +126,10 @@ function animate( delta ) {
 
 	updateFollowCamera( delta );
 
+	updateWaveEmitterParent();
+}
+
+function updateWaveEmitterParent() {
 	// move the wave emitter parent with the camera, but keep the waves
 	// in position relative to the screen.
 	let xDist = window.emitterParent.position.x - app.stage.pivot.x;
@@ -142,9 +146,6 @@ function animate( delta ) {
 			window.emitterParent.children[ i ].y += yDist;
 		}
 	}
-	// check if the turtle is leaving the screen bounds
-	// @TODO use better collision detection
-	// checkScreenBounds( turtle, { left: 0, right: app.view.offsetWidth, top: 0, bottom: app.view.offsetHeight } );
 }
 
 function updateFollowCamera( delta ) {
@@ -438,71 +439,6 @@ function drawDebug( model ) {
 	stageGraphics.lineTo( bounds.x, bounds.y );
 
 	stageGraphics.endFill();
-}
-/**
- * Checks if an object is withing the screen bounds. Could have a better name.
- */
-function checkScreenBounds( rigidBody, bounds ) {
-	let lt = rigidBody.sprite.localTransform.apply( new PIXI.Point( rigidBody.sprite.hitArea.left, rigidBody.sprite.hitArea.top ), new PIXI.Point() );
-	let lb = rigidBody.sprite.localTransform.apply( new PIXI.Point( rigidBody.sprite.hitArea.left, rigidBody.sprite.hitArea.bottom ), new PIXI.Point() );
-	let rt = rigidBody.sprite.localTransform.apply( new PIXI.Point( rigidBody.sprite.hitArea.right, rigidBody.sprite.hitArea.top ), new PIXI.Point() );
-	let rb = rigidBody.sprite.localTransform.apply( new PIXI.Point( rigidBody.sprite.hitArea.right, rigidBody.sprite.hitArea.bottom ), new PIXI.Point() );
-
-	// left
-	if ( rigidBody.sprite.getBounds().x <= bounds.left ) {
-		if ( lt.x <= 0 || rb.x <= 0 ) {
-			let distance = Math.abs( lt.x - rb.x );
-			rigidBody.currentPosition.x = Math.ceil( distance / 2 );
-			rigidBody.forwardVelocity = 0;
-		}
-
-		if ( lb.x <= 0 || rt.x <= 0 ) {
-			let distance = Math.abs( lb.x - rt.x );
-			rigidBody.currentPosition.x = Math.ceil( distance / 2 );
-		}
-	}
-
-	// right
-	if ( rigidBody.sprite.getBounds().x + rigidBody.sprite.getBounds().width >= bounds.right ) {
-		if ( lt.x >= bounds.right || rb.x >= bounds.right ) {
-			let distance = Math.abs( lt.x - rb.x );
-			rigidBody.currentPosition.x = app.view.offsetWidth - Math.ceil( distance / 2 );
-			rigidBody.forwardVelocity = 0;
-		}
-
-		if ( lb.x >= app.view.offsetWidth || rt.x >= app.view.offsetWidth ) {
-			let distance = Math.abs( lb.x - rt.x );
-			rigidBody.currentPosition.x = app.view.offsetWidth - Math.ceil( distance / 2 );
-		}
-	}
-
-	// top
-	if ( rigidBody.sprite.getBounds().y <= bounds.top ) {
-		if ( lt.y <= bounds.top || rb.y <= bounds.top ) {
-			let distance = Math.abs( lt.y - rb.y );
-			rigidBody.currentPosition.y = Math.ceil( distance / 2 );
-			rigidBody.forwardVelocity = 0;
-		}
-
-		if ( lb.y <= bounds.top || rt.y <= bounds.top ) {
-			let distance = Math.abs( lb.y - rt.y );
-			rigidBody.currentPosition.y = Math.ceil( distance / 2 );
-		}
-	}
-
-	// bottom
-	if ( rigidBody.sprite.getBounds().y + rigidBody.sprite.getBounds().height >= bounds.bottom ) {
-		if ( lt.y >= bounds.bottom || rb.y >= bounds.bottom ) {
-			let distance = Math.abs( lt.y - rb.y );
-			rigidBody.currentPosition.y = app.view.offsetHeight - Math.ceil( distance / 2 );
-			rigidBody.forwardVelocity = 0;
-		}
-
-		if ( lb.y >= bounds.bottom || rt.y >= bounds.bottom ) {
-			let distance = Math.abs( lb.y - rt.y );
-			rigidBody.currentPosition.y = app.view.offsetHeight - Math.ceil( distance / 2 );
-		}
-	}
 }
 
 function loadGameModels() {
