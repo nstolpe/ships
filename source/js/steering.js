@@ -406,11 +406,26 @@ function drawDebug( model ) {
 	let bounds = model.base.sprite.getBounds();
 
 	stageGraphics.lineStyle( 1, 0xff4cc7, 1 );
-	stageGraphics.moveTo( bounds.x, bounds.y );
-	stageGraphics.lineTo( bounds.x, bounds.y + bounds.height );
-	stageGraphics.lineTo( bounds.x + bounds.width, bounds.y + bounds.height );
-	stageGraphics.lineTo( bounds.x + bounds.width, bounds.y );
-	stageGraphics.lineTo( bounds.x, bounds.y );
+	stageGraphics.moveTo(
+		bounds.x + app.stage.pivot.x - app.stage.position.x,
+	bounds.y + app.stage.pivot.y - app.stage.position.y
+	);
+	stageGraphics.lineTo(
+		bounds.x + app.stage.pivot.x - app.stage.position.x,
+		bounds.y + app.stage.pivot.y - app.stage.position.y + bounds.height
+	);
+	stageGraphics.lineTo(
+		bounds.x + app.stage.pivot.x - app.stage.position.x + bounds.width,
+		bounds.y + app.stage.pivot.y - app.stage.position.y + bounds.height
+	);
+	stageGraphics.lineTo(
+		bounds.x + app.stage.pivot.x - app.stage.position.x + bounds.width,
+		bounds.y + app.stage.pivot.y - app.stage.position.y
+	);
+	stageGraphics.lineTo(
+		bounds.x + app.stage.pivot.x - app.stage.position.x,
+		bounds.y + app.stage.pivot.y - app.stage.position.y
+	);
 
 	stageGraphics.endFill();
 }
