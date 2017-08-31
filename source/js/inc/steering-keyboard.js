@@ -11,23 +11,23 @@ function keyboard( which ) {
 	key.release = undefined;
 	
 	//The `downHandler`
-	key.downHandler = function( event ) {
-		if ( event.which === key.which ) {
-			if ( key.isUp && key.press ) key.press();
+	key.downHandler = function( e ) {
+		if ( e.which === key.which ) {
+			if ( key.isUp && key.press ) key.press( e );
 			key.isDown = true;
 			key.isUp = false;
 		}
-		event.preventDefault();
+		e.preventDefault();
 	};
 
 	//The `upHandler`
-	key.upHandler = function( event ) {
-		if ( event.which === key.which ) {
-			if ( key.isDown && key.release ) key.release();
+	key.upHandler = function( e ) {
+		if ( e.which === key.which ) {
+			if ( key.isDown && key.release ) key.release( e );
 			key.isDown = false;
 			key.isUp = true;
 		}
-		event.preventDefault();
+		e.preventDefault();
 	};
 
 	//Attach event listeners
@@ -37,15 +37,20 @@ function keyboard( which ) {
 }
 
 function setupInput() {
-	let W = keyboard( 87 ),
-		A = keyboard( 65 ),
-		S = keyboard( 83 ),
-		D = keyboard( 68 ),
-		H = keyboard( 72 ),
-		J = keyboard( 74 ),
-		K = keyboard( 75 ),
-		L = keyboard( 76 ),
-		X = keyboard( 88 );
+	let W = keyboard( 87 );
+	let A = keyboard( 65 );
+	let S = keyboard( 83 );
+	let D = keyboard( 68 );
+	let H = keyboard( 72 );
+	let J = keyboard( 74 );
+	let K = keyboard( 75 );
+	let L = keyboard( 76 );
+	let X = keyboard( 88 );
+	let R = keyboard( 82 );
+
+	R.press = e => {
+		if ( e.ctrlKey ) window.location.reload();
+	}
 
 	X.release = () => {
 		window.dispatchEvent( new Event( 'dock' ) );
