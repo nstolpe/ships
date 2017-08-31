@@ -98194,7 +98194,7 @@ module.exports = function( PIXI, app ) {
 				spriteSheet: 'ships.json',
 				options: {
 					name: 'turtle',
-					currentPosition: { x: 384, y: 384 },
+					currentPosition: { x: 683, y: 455 },
 					// rotationConstraints: { pos: Infinity, neg: Infinity },
 					// positionConstraints: { pos: { x: Infinity, y: Infinity }, neg: { x: Infinity, y: Infinity } },
 					maxForwardVelocity: 4,
@@ -98485,14 +98485,15 @@ module.exports = function( config, parent, bounds, textures, dimensions, emitter
 			);
 
 			let position = Vec2( Util.randomInt(-20, this.dimensions.w + 20 ), Util.randomInt( -20, this.dimensions.h + 20 ) );
+			
 			this.parent.addChild( emitterContainer );
+			
 			emitterContainer.pivot.x = emitterContainer.width / 2;
 			emitterContainer.pivot.y = emitterContainer.height / 2;
-			// emitterContainer.rotation = Util.toRadians( this.direction );
 			emitter.update( 0 );
 
-			emitterContainer.position.x = position.x;//Math.floor( Math.random() * ( this.dimensions.w - 0 ) ) + 0;
-			emitterContainer.position.y = position.y;//Math.floor( Math.random() * ( this.dimensions.h - 0 ) ) + 0;
+			emitterContainer.position.x = position.x;
+			emitterContainer.position.y = position.y;
 
 			return emitter;
 		},
@@ -98504,6 +98505,15 @@ module.exports = function( config, parent, bounds, textures, dimensions, emitter
 		},
 		update( delta, forces ) {
 			let now = Date.now();
+
+			// keep the parent centered on the camera view
+			// @TODO The wave emitter parent should be some type of game object that has this special behavior.
+ 			//       It and all other objects with the behavior should be updated where this is
+			let xDist = this.parent.position.x - this.parent.parent.pivot.x;
+			let yDist = this.parent.position.y - this.parent.parent.pivot.y;
+
+			this.parent.position.x = this.parent.parent.pivot.x;
+			this.parent.position.y = this.parent.parent.pivot.y;
 
 			for ( let i = 0, l = this.emitters.length; i < l; i ++ ) {
 				let emitter = this.emitters[ i ];
@@ -98522,6 +98532,7 @@ module.exports = function( config, parent, bounds, textures, dimensions, emitter
 				emitter.ownerPos.y += accumulated.y * delta;
 
 				if ( !emitter.emit && emitter.particleCount <= 0 ) {
+					// remove the emitter if it has completed its lifecycle.
 					this.parent.removeChild( emitter.parent );
 					emitter.destroy();
 					this.emitters[ i ] = this.createEmitterInstance( this.config, this.textures );
@@ -98530,12 +98541,18 @@ module.exports = function( config, parent, bounds, textures, dimensions, emitter
 					 emitter.ownerPos.y + this.parent.position.y < this.parent.position.y - this.bounds.y - this.offset ||
 					 emitter.ownerPos.x + this.parent.position.x > this.parent.position.x + this.bounds.x + this.offset ||
 					 emitter.ownerPos.y + this.parent.position.y > this.parent.position.y + this.bounds.y + this.offset ) {
+					// remove the emitter if it has passed outside of the camera's view.
 					emitter.cleanup();
 					emitter.destroy();
 					this.parent.removeChild( emitter.parent );
 					// @TODO use messenger later.
 					// window.dispatchEvent( new Event( 'cleanup-emitters' ) );
 					this.emitters[ i ] = this.createEmitterInstance( this.config, this.textures );
+				} else {
+					// if the emitter hasn' been removed, update it's position with distX and distY.
+					// see TODO above
+					emitter.parent.position.x += xDist;
+					emitter.parent.position.y += yDist;
 				}
 			}
 
@@ -99199,12 +99216,14 @@ const Vector2 = function( x, y ) {
 		 */
 		angle( radians ) {
 			let angle;
+
 			if ( radians ) {
 				angle = Math.atan2( y, x );
 			} else {
 				angle = Util.toDegrees( Math.atan2( y, x ) );
-				return angle < 0 ? angle + 360 : angle;
+				angle += angle < 0 ? 360 : 0;
 			}
+
 			return angle;
 		},
 		/**
@@ -99412,13 +99431,34 @@ window.addEventListener( 'dock', function() {
 }, false );
 
 function animate( delta ) {
-	let collisions = [];
 	stageGraphics.clear();
 
 	document.getElementById( 'frame-rate' ).dataset.framerate = app.ticker.FPS.toPrecision( 2 );
 
 	updateGameModels( delta );
+	checkCollisions( delta );
 
+	emitterManager.update( delta, [ current ] );
+
+	updateFollowCamera( delta );
+
+}
+
+function updateFollowCamera( delta ) {
+	// make the camera follow the turtle, but only once the turtle is a certain distance (50) on either axis.
+	let xDist = app.stage.pivot.x - turtle.currentPosition.x;
+	let yDist = app.stage.pivot.y - turtle.currentPosition.y;
+
+	if ( Math.abs( xDist ) > 50 ) {
+		app.stage.pivot.x -= xDist / 100 * delta;
+	}
+	if ( Math.abs( yDist ) > 50 ) {
+		app.stage.pivot.y -= yDist / 100 * delta;
+	}
+}
+
+function checkCollisions() {
+	let collisions = [];
 	// Check each moving (movable really) object for a collision with every other object.
 	// @TODO check only actually moving and check w/i same area. 
 	let collideables = gameModels.filter( ( model ) => {
@@ -99448,7 +99488,7 @@ function animate( delta ) {
 				} else if ( gameModels[ ii ] === activeTarget ) {
 					activeTarget = undefined;
 					gameModels[ ii ].base.sprite.children[ 0 ].tint = 0xffffff;
-					gameModels[ ii ].base.children.target.alpha = .1;
+					gameModels[ ii ].base.children.target.alpha = .25;
 				}
 				// if ( collision && collision.twoInOne ) {
 				// 	collision.two.base.currentPosition.x += collision.overlapV.x;
@@ -99457,53 +99497,6 @@ function animate( delta ) {
 			}
 		}
 	}
-
-	let compiled = collisions.reduce( ( sum, val ) => {
-		if ( val.active )
-			return sum + ( `<p>${ val.one.base.name } ${ val.two.base.name }</p>` );
-		else
-			return sum;
-	}, '' );
-
-	window.dispatchEvent( new CustomEvent('message', {
-		detail: {
-			type: 'update-collision',
-			names: `<h3>collisions:</h3> ${ compiled }`
-		}
-	} ) );
-
-	emitterManager.update( delta, [ current ] );
-
-	// make the camera follow the turtle, but only once the turtle is a certain distance (50) on either axis.
-	let xDist = app.stage.pivot.x - turtle.currentPosition.x;
-	let yDist = app.stage.pivot.y - turtle.currentPosition.y;
-
-	if ( Math.abs( xDist ) > 50 ) {
-		app.stage.pivot.x -= xDist / 100 * delta;
-	}
-	if ( Math.abs( yDist ) > 50 ) {
-		app.stage.pivot.y -= yDist / 100 * delta;
-	}
-
-	// move the wave emitter parent with the camera, but keep the waves
-	// in position relative to the screen.
-	xDist = window.emitterParent.position.x - app.stage.pivot.x;
-	yDist = window.emitterParent.position.y - app.stage.pivot.y;
-	if ( Math.abs( xDist ) !== 0 ) {
-		window.emitterParent.position.x = app.stage.pivot.x;
-		for ( let i = 0, l = window.emitterParent.children.length; i < l; i++ ) {
-			window.emitterParent.children[ i ].x += xDist;
-		}
-	}
-	if ( Math.abs( yDist ) !== 0 ) {
-		window.emitterParent.position.y = app.stage.pivot.y;
-		for ( let i = 0, l = window.emitterParent.children.length; i < l; i++ ) {
-			window.emitterParent.children[ i ].y += yDist;
-		}
-	}
-	// check if the turtle is leaving the screen bounds
-	// @TODO use better collision detection
-	// checkScreenBounds( turtle, { left: 0, right: app.view.offsetWidth, top: 0, bottom: app.view.offsetHeight } );
 }
 function updateGameModels( delta ) {
 	for ( let i = 0, l = gameModels.length; i < l; i++ ) {
@@ -99521,9 +99514,10 @@ function updateGameModels( delta ) {
 			drawDebug( model );
 	}
 }
+
 function applyTransformsToPoint( point, source ) {
 	point.sub( source.base.pivot.x, source.base.pivot.y )
-		// @TODO needs the mul( 2 ) of detection only works on objects
+		// @TODO needs the mul( 2 ) or detection only works on objects
 		// with .5 scale. Figure out why.
 		.scale( Vec2( source.base.sprite.scale ).mul( 2 ) )
 		.rotate( source.base.currentRotation )
@@ -99567,20 +99561,14 @@ function checkCollision( one, two ) {
 		let normal = one.base.sprite.hitArea.normals[ i ];
 		let separating = isSeparatingAxis( one, two, pointsOne, pointsTwo, normal, collision );
 
-		// if ( collision )
-		// 	collision.overlapV = Vec2( collision.overlapN ).scale( collision.overlap );
-		if ( separating ) 
-			return false;
+		if ( separating ) return false;
 	}
 
 	for ( let i = 0, l = pointsTwo.length; i < l; i++ ) {
 		let normal = two.base.sprite.hitArea.normals[ i ];
 		let separating = isSeparatingAxis( one, two, pointsOne, pointsTwo, normal, collision );
 
-		// if ( collision )
-		// 	collision.overlapV = Vec2( collision.overlapN ).scale( collision.overlap );
-		if ( separating ) 
-			return false;
+		if ( separating ) return false;
 	}
 
 	if ( collision )
@@ -99734,78 +99722,28 @@ function drawDebug( model ) {
 	let bounds = model.base.sprite.getBounds();
 
 	stageGraphics.lineStyle( 1, 0xff4cc7, 1 );
-	stageGraphics.moveTo( bounds.x, bounds.y );
-	stageGraphics.lineTo( bounds.x, bounds.y + bounds.height );
-	stageGraphics.lineTo( bounds.x + bounds.width, bounds.y + bounds.height );
-	stageGraphics.lineTo( bounds.x + bounds.width, bounds.y );
-	stageGraphics.lineTo( bounds.x, bounds.y );
+	stageGraphics.moveTo(
+		bounds.x + app.stage.pivot.x - app.stage.position.x,
+	bounds.y + app.stage.pivot.y - app.stage.position.y
+	);
+	stageGraphics.lineTo(
+		bounds.x + app.stage.pivot.x - app.stage.position.x,
+		bounds.y + app.stage.pivot.y - app.stage.position.y + bounds.height
+	);
+	stageGraphics.lineTo(
+		bounds.x + app.stage.pivot.x - app.stage.position.x + bounds.width,
+		bounds.y + app.stage.pivot.y - app.stage.position.y + bounds.height
+	);
+	stageGraphics.lineTo(
+		bounds.x + app.stage.pivot.x - app.stage.position.x + bounds.width,
+		bounds.y + app.stage.pivot.y - app.stage.position.y
+	);
+	stageGraphics.lineTo(
+		bounds.x + app.stage.pivot.x - app.stage.position.x,
+		bounds.y + app.stage.pivot.y - app.stage.position.y
+	);
 
 	stageGraphics.endFill();
-}
-/**
- * Checks if an object is withing the screen bounds. Could have a better name.
- */
-function checkScreenBounds( rigidBody, bounds ) {
-	let lt = rigidBody.sprite.localTransform.apply( new PIXI.Point( rigidBody.sprite.hitArea.left, rigidBody.sprite.hitArea.top ), new PIXI.Point() );
-	let lb = rigidBody.sprite.localTransform.apply( new PIXI.Point( rigidBody.sprite.hitArea.left, rigidBody.sprite.hitArea.bottom ), new PIXI.Point() );
-	let rt = rigidBody.sprite.localTransform.apply( new PIXI.Point( rigidBody.sprite.hitArea.right, rigidBody.sprite.hitArea.top ), new PIXI.Point() );
-	let rb = rigidBody.sprite.localTransform.apply( new PIXI.Point( rigidBody.sprite.hitArea.right, rigidBody.sprite.hitArea.bottom ), new PIXI.Point() );
-
-	// left
-	if ( rigidBody.sprite.getBounds().x <= bounds.left ) {
-		if ( lt.x <= 0 || rb.x <= 0 ) {
-			let distance = Math.abs( lt.x - rb.x );
-			rigidBody.currentPosition.x = Math.ceil( distance / 2 );
-			rigidBody.forwardVelocity = 0;
-		}
-
-		if ( lb.x <= 0 || rt.x <= 0 ) {
-			let distance = Math.abs( lb.x - rt.x );
-			rigidBody.currentPosition.x = Math.ceil( distance / 2 );
-		}
-	}
-
-	// right
-	if ( rigidBody.sprite.getBounds().x + rigidBody.sprite.getBounds().width >= bounds.right ) {
-		if ( lt.x >= bounds.right || rb.x >= bounds.right ) {
-			let distance = Math.abs( lt.x - rb.x );
-			rigidBody.currentPosition.x = app.view.offsetWidth - Math.ceil( distance / 2 );
-			rigidBody.forwardVelocity = 0;
-		}
-
-		if ( lb.x >= app.view.offsetWidth || rt.x >= app.view.offsetWidth ) {
-			let distance = Math.abs( lb.x - rt.x );
-			rigidBody.currentPosition.x = app.view.offsetWidth - Math.ceil( distance / 2 );
-		}
-	}
-
-	// top
-	if ( rigidBody.sprite.getBounds().y <= bounds.top ) {
-		if ( lt.y <= bounds.top || rb.y <= bounds.top ) {
-			let distance = Math.abs( lt.y - rb.y );
-			rigidBody.currentPosition.y = Math.ceil( distance / 2 );
-			rigidBody.forwardVelocity = 0;
-		}
-
-		if ( lb.y <= bounds.top || rt.y <= bounds.top ) {
-			let distance = Math.abs( lb.y - rt.y );
-			rigidBody.currentPosition.y = Math.ceil( distance / 2 );
-		}
-	}
-
-	// bottom
-	if ( rigidBody.sprite.getBounds().y + rigidBody.sprite.getBounds().height >= bounds.bottom ) {
-		if ( lt.y >= bounds.bottom || rb.y >= bounds.bottom ) {
-			let distance = Math.abs( lt.y - rb.y );
-			rigidBody.currentPosition.y = app.view.offsetHeight - Math.ceil( distance / 2 );
-			rigidBody.forwardVelocity = 0;
-		}
-
-		if ( lb.y >= bounds.bottom || rt.y >= bounds.bottom ) {
-			let distance = Math.abs( lb.y - rt.y );
-			rigidBody.currentPosition.y = app.view.offsetHeight - Math.ceil( distance / 2 );
-		}
-	}
 }
 
 function loadGameModels() {

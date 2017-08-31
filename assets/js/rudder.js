@@ -98183,7 +98183,7 @@ module.exports = function( PIXI, app ) {
 				spriteSheet: 'ships.json',
 				options: {
 					name: 'turtle',
-					currentPosition: { x: 384, y: 384 },
+					currentPosition: { x: 683, y: 455 },
 					// rotationConstraints: { pos: Infinity, neg: Infinity },
 					// positionConstraints: { pos: { x: Infinity, y: Infinity }, neg: { x: Infinity, y: Infinity } },
 					maxForwardVelocity: 4,
@@ -99092,12 +99092,14 @@ const Vector2 = function( x, y ) {
 		 */
 		angle( radians ) {
 			let angle;
+
 			if ( radians ) {
 				angle = Math.atan2( y, x );
 			} else {
 				angle = Util.toDegrees( Math.atan2( y, x ) );
-				return angle < 0 ? angle + 360 : angle;
+				angle += angle < 0 ? 360 : 0;
 			}
+
 			return angle;
 		},
 		/**
