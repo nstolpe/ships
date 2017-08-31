@@ -37,7 +37,7 @@ loader
 window.gameModels = [];
 window.current = {
 	direction: 163,
-	force: 1
+	force: 4
 };
 
 window.friction = 0.98;
@@ -123,18 +123,18 @@ function animate( delta ) {
 
 	document.getElementById( 'frame-rate' ).dataset.framerate = app.ticker.FPS.toPrecision( 2 );
 
-	accumulator += delta;
+	accumulator += app.ticker.elapsedMS / 100;
 	while ( accumulator > dt ) {
 		// console.log( 'physics' );
 		accumulator -= dt;
 	}
 	// console.log( delta );
-	updateGameModels( delta );
-	checkCollisions( delta );
+	updateGameModels( app.ticker.elapsedMS / 100 );
+	checkCollisions( app.ticker.elapsedMS / 100 );
 
-	emitterManager.update( delta, [ current ] );
+	emitterManager.update( app.ticker.elapsedMS / 100, [ current ] );
 
-	updateFollowCamera( delta );
+	updateFollowCamera( app.ticker.elapsedMS / 100 );
 
 }
 
@@ -169,21 +169,22 @@ function checkCollisions() {
 				collisions[ collisions.length ] = collision;
 				if ( collision ) {
 					if ( gameModels[ ii ].base.solid ) {
-						// console.log( collision.overlapV.toString() + ' ' + collision.overlap );
+						// Just pushes one away. Should be better.
 						collision.one.base.currentPosition.x -= collision.overlapV.x;
 						collision.one.base.currentPosition.y -= collision.overlapV.y;
-					// make target interactable
 					} else {
+						// non-solid game models are the dock targets, make them interactable
 						gameModels[ ii ].base.sprite.children[ 0 ].tint = 0x4ae9f9;
 						gameModels[ ii ].base.children.target.alpha = .5;
 						activeTarget = gameModels[ ii ];
 					}
-				// deactivate an activeTarget
 				} else if ( gameModels[ ii ] === activeTarget ) {
+					// deactivate activeTarget if it's become inactive
 					activeTarget = undefined;
 					gameModels[ ii ].base.sprite.children[ 0 ].tint = 0xffffff;
 					gameModels[ ii ].base.children.target.alpha = .25;
 				}
+				// do something with different collisions here.
 				// if ( collision && collision.twoInOne ) {
 				// 	collision.two.base.currentPosition.x += collision.overlapV.x;
 				// 	collision.two.base.currentPosition.y += collision.overlapV.y;

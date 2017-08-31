@@ -515,8 +515,10 @@ module.exports = function( PIXI, app ) {
 					currentPosition: { x: 683, y: 455 },
 					// rotationConstraints: { pos: Infinity, neg: Infinity },
 					// positionConstraints: { pos: { x: Infinity, y: Infinity }, neg: { x: Infinity, y: Infinity } },
-					maxForwardVelocity: 4,
-					forwardVelocityIncrement: .05,
+					maxForwardVelocity: 50,
+					forwardVelocityIncrement: 2,
+					maxRotationVelocity: .3,
+					rotationVelocityIncrement: .01,
 					// debug: true,
 					postUpdates: [
 						function( delta ) {
