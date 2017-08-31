@@ -32,14 +32,15 @@ module.exports = function( config, parent, bounds, textures, dimensions, emitter
 			);
 
 			let position = Vec2( Util.randomInt(-20, this.dimensions.w + 20 ), Util.randomInt( -20, this.dimensions.h + 20 ) );
+			
 			this.parent.addChild( emitterContainer );
+			
 			emitterContainer.pivot.x = emitterContainer.width / 2;
 			emitterContainer.pivot.y = emitterContainer.height / 2;
-			// emitterContainer.rotation = Util.toRadians( this.direction );
 			emitter.update( 0 );
 
-			emitterContainer.position.x = position.x;//Math.floor( Math.random() * ( this.dimensions.w - 0 ) ) + 0;
-			emitterContainer.position.y = position.y;//Math.floor( Math.random() * ( this.dimensions.h - 0 ) ) + 0;
+			emitterContainer.position.x = position.x;
+			emitterContainer.position.y = position.y;
 
 			return emitter;
 		},
@@ -96,6 +97,7 @@ module.exports = function( config, parent, bounds, textures, dimensions, emitter
 					this.emitters[ i ] = this.createEmitterInstance( this.config, this.textures );
 				} else {
 					// if the emitter hasn' been removed, update it's position with distX and distY.
+					// see TODO above
 					emitter.parent.position.x += xDist;
 					emitter.parent.position.y += yDist;
 				}

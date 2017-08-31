@@ -201,7 +201,7 @@ function updateGameModels( delta ) {
 
 function applyTransformsToPoint( point, source ) {
 	point.sub( source.base.pivot.x, source.base.pivot.y )
-		// @TODO needs the mul( 2 ) of detection only works on objects
+		// @TODO needs the mul( 2 ) or detection only works on objects
 		// with .5 scale. Figure out why.
 		.scale( Vec2( source.base.sprite.scale ).mul( 2 ) )
 		.rotate( source.base.currentRotation )
@@ -245,20 +245,14 @@ function checkCollision( one, two ) {
 		let normal = one.base.sprite.hitArea.normals[ i ];
 		let separating = isSeparatingAxis( one, two, pointsOne, pointsTwo, normal, collision );
 
-		// if ( collision )
-		// 	collision.overlapV = Vec2( collision.overlapN ).scale( collision.overlap );
-		if ( separating ) 
-			return false;
+		if ( separating ) return false;
 	}
 
 	for ( let i = 0, l = pointsTwo.length; i < l; i++ ) {
 		let normal = two.base.sprite.hitArea.normals[ i ];
 		let separating = isSeparatingAxis( one, two, pointsOne, pointsTwo, normal, collision );
 
-		// if ( collision )
-		// 	collision.overlapV = Vec2( collision.overlapN ).scale( collision.overlap );
-		if ( separating ) 
-			return false;
+		if ( separating ) return false;
 	}
 
 	if ( collision )
