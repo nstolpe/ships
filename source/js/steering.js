@@ -114,11 +114,21 @@ window.addEventListener( 'dock', function() {
 	}
 }, false );
 
+let fps = 30;
+let dt = 1 / fps;
+let accumulator = 0;
+
 function animate( delta ) {
 	stageGraphics.clear();
 
 	document.getElementById( 'frame-rate' ).dataset.framerate = app.ticker.FPS.toPrecision( 2 );
 
+	accumulator += delta;
+	while ( accumulator > dt ) {
+		// console.log( 'physics' );
+		accumulator -= dt;
+	}
+	// console.log( delta );
 	updateGameModels( delta );
 	checkCollisions( delta );
 
