@@ -52,6 +52,15 @@ module.exports = function( config, parent, bounds, textures, dimensions, emitter
 		update( delta, forces ) {
 			let now = Date.now();
 
+			// keep the parent centered on the camera view
+			// @TODO The wave emitter parent should be some type of game object that has this special behavior.
+ 			//       It and all other objects with the behavior should be updated where this is
+			let xDist = this.parent.position.x - this.parent.parent.pivot.x;
+			let yDist = this.parent.position.y - this.parent.parent.pivot.y;
+
+			this.parent.position.x = this.parent.parent.pivot.x;
+			this.parent.position.y = this.parent.parent.pivot.y;
+
 			for ( let i = 0, l = this.emitters.length; i < l; i ++ ) {
 				let emitter = this.emitters[ i ];
 				let accumulated = { x: 0, y: 0 };
@@ -69,6 +78,7 @@ module.exports = function( config, parent, bounds, textures, dimensions, emitter
 				emitter.ownerPos.y += accumulated.y * delta;
 
 				if ( !emitter.emit && emitter.particleCount <= 0 ) {
+					// remove the emitter if it has completed its lifecycle.
 					this.parent.removeChild( emitter.parent );
 					emitter.destroy();
 					this.emitters[ i ] = this.createEmitterInstance( this.config, this.textures );
@@ -77,12 +87,17 @@ module.exports = function( config, parent, bounds, textures, dimensions, emitter
 					 emitter.ownerPos.y + this.parent.position.y < this.parent.position.y - this.bounds.y - this.offset ||
 					 emitter.ownerPos.x + this.parent.position.x > this.parent.position.x + this.bounds.x + this.offset ||
 					 emitter.ownerPos.y + this.parent.position.y > this.parent.position.y + this.bounds.y + this.offset ) {
+					// remove the emitter if it has passed outside of the camera's view.
 					emitter.cleanup();
 					emitter.destroy();
 					this.parent.removeChild( emitter.parent );
 					// @TODO use messenger later.
 					// window.dispatchEvent( new Event( 'cleanup-emitters' ) );
 					this.emitters[ i ] = this.createEmitterInstance( this.config, this.textures );
+				} else {
+					// if the emitter hasn' been removed, update it's position with distX and distY.
+					emitter.parent.position.x += xDist;
+					emitter.parent.position.y += yDist;
 				}
 			}
 

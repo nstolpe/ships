@@ -126,32 +126,6 @@ function animate( delta ) {
 
 	updateFollowCamera( delta );
 
-	updateWaveEmitterParent();
-}
-
-/**
- * The parent of the wave emitter stays pinned to the stage.
- * Emitter positions are adjusted to keep them moving with rest of the environment.
- * @TODO The wave emitter parent should be some type of game object that has this special behavior.
- *       It and all other objects with the behavior should be updated where this is
- */
-function updateWaveEmitterParent() {
-	// move the wave emitter parent with the camera, but keep the waves
-	// in position relative to the screen.
-	let xDist = window.emitterParent.position.x - app.stage.pivot.x;
-	let yDist = window.emitterParent.position.y - app.stage.pivot.y;
-	if ( Math.abs( xDist ) !== 0 ) {
-		window.emitterParent.position.x = app.stage.pivot.x;
-		for ( let i = 0, l = window.emitterParent.children.length; i < l; i++ ) {
-			window.emitterParent.children[ i ].x += xDist;
-		}
-	}
-	if ( Math.abs( yDist ) !== 0 ) {
-		window.emitterParent.position.y = app.stage.pivot.y;
-		for ( let i = 0, l = window.emitterParent.children.length; i < l; i++ ) {
-			window.emitterParent.children[ i ].y += yDist;
-		}
-	}
 }
 
 function updateFollowCamera( delta ) {
