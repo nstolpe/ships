@@ -1,9 +1,9 @@
 'use strict'
 
 const math = require( 'mathjs' );
-const Vec = require( 'victor' );
 const PIXI = require( 'pixi.js' );
 const Util = require( './inc/util.js' );
+const Vec2 = require( './inc/vector2.js');
 const Shapes = require( './inc/shapes.js' );
 const Sprite = PIXI.Sprite;
 const loader = PIXI.loader;
@@ -63,13 +63,13 @@ let circles = [
 			{
 				name: 'anti-gravity',
 				magnitude: .2,
-				direction: Vec( 0, 0 ),
+				direction: Vec2( 0, 0 ),
 				mass: false
 			},
 			{
 				name: 'east-wind',
 				magnitude: .002,
-				direction: Vec( 0, 0 ),
+				direction: Vec2( 0, 0 ),
 				mass: true
 			}
 		],
@@ -146,13 +146,13 @@ let forces = [
 	{
 		name: 'gravity',
 		magnitude: .1,
-		direction: Vec( 0, 1 ),
+		direction: Vec2( 0, 1 ),
 		mass: false
 	},
 	{
 		name: 'west wind',
 		magnitude: .001,
-		direction: Vec( 1, 0 ),
+		direction: Vec2( 1, 0 ),
 		mass: true
 	}
 ];
@@ -163,8 +163,8 @@ function animate( delta ) {
 	circles.forEach( ( circle, idx ) => {
 		let allForces = forces.concat( circle.forces );
 		let accumulatedForces = accumulateForces( circle, delta );
-		let velocity = circle.velocity.clone().add( accumulatedForces );
-		let position = circle.position.clone().add( velocity.clone().multiplyScalar( delta ) );
+		let velocity = circle.velocity.copy().add( accumulatedForces );
+		let position = circle.position.copy().add( velocity.copy().mul( delta ) );
 		velocity.add( accumulatedForces );
 
 		circle.update( {
@@ -185,17 +185,16 @@ function updateVelocity( body, delta ) {
  */
 function accumulateForces( body, delta ) {
 	let allForces = forces.concat( body.forces );
-	let accumulated = Vec( 0, 0 );
+	let accumulated = Vec2( 0, 0 );
 
 	for ( let i = 0, l = allForces.length; i < l; i++ ) {
 		let force = allForces[ i ];
 
-		// Don't normalize a 0,0 vector. Victor returns 1,0. Replace w/ home built vectors soon.
-		let v = force.direction.isZero() ? force.direction.clone() : force.direction.clone().norm().multiplyScalar( force.magnitude * delta / 2 );
+		let v = force.direction.copy().nor().mul( force.magnitude * delta / 2 );
 
 		// divide by mass if this force is influenced by mass (gravity isn't)
 		if ( force.mass )
-			v.divideScalar( body.mass );
+			v.mul( 1 / body.mass );
 
 		accumulated.add( v );
 	}

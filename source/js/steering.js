@@ -132,6 +132,8 @@ function animate( delta ) {
 /**
  * The parent of the wave emitter stays pinned to the stage.
  * Emitter positions are adjusted to keep them moving with rest of the environment.
+ * @TODO The wave emitter parent should be some type of game object that has this special behavior.
+ *       It and all other objects with the behavior should be updated where this is
  */
 function updateWaveEmitterParent() {
 	// move the wave emitter parent with the camera, but keep the waves

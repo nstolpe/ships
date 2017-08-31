@@ -1,5 +1,5 @@
 'use strict';
-const Vec = require( 'victor' );
+const Vec2 = require( './vector2.js');
 
 function Shape( options ) {
 	const propsData = {
@@ -8,7 +8,7 @@ function Shape( options ) {
 		forces: [],
 		preUpdates: [],
 		postUpdates: [],
-		position: Vec()
+		position: Vec2()
 	};
 
 	const props = {
@@ -16,10 +16,7 @@ function Shape( options ) {
 			enumerable: true,
 			get: () => propsData.position,
 			set: ( position ) => {
-				propsData.position = Vec.prototype.isPrototypeOf( position ) ? position :
-									Array.isArray( position ) ? Vec.fromArray( position ) :
-									typeof position === 'object' ? Vec.fromObject( position ) :
-									Vec( 0, 0 )
+				propsData.position.set( position );
 			}
 		},
 		color: {
@@ -33,7 +30,7 @@ function Shape( options ) {
 			set: ( mass ) => propsData.mass = isNaN( mass ) ? propsData.mass : parseFloat( mass )
 		},
 		velocity: {
-			value: Vec( 0, 0 ),
+			value: Vec2( 0, 0 ),
 			enumerable: true,
 			writable: true
 		},
@@ -125,7 +122,7 @@ module.exports = {
 			update: {
 				value: function( options, delta ) {
 					this.preUpdate( delta );
-					Object.getPrototypeOf( this ).update( options, delta );
+					base.update( options, delta );
 					this.postUpdate( delta );
 				}
 			}
@@ -158,7 +155,7 @@ module.exports = {
 			update: {
 				value: function( options, delta ) {
 					this.preUpdate( delta );
-					Object.getPrototypeOf( this ).update( options, delta );
+					base.update( options, delta );
 					this.postUpdate( delta );
 				}
 			}
