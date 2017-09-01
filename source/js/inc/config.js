@@ -518,7 +518,7 @@ module.exports = function( PIXI, app ) {
 					maxForwardVelocity: 8000,
 					forwardVelocityIncrement: 100,
 					maxRotationVelocity: 5,
-					rotationVelocityIncrement: 1,
+					rotationVelocityIncrement: 2,
 					// debug: true,
 					postUpdates: [
 						function( delta ) {

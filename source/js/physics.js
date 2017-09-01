@@ -162,15 +162,15 @@ function animate( delta ) {
 
 	circles.forEach( ( circle, idx ) => {
 		let allForces = forces.concat( circle.forces );
-		let accumulatedForces = accumulateForces( circle, delta );
+		let accumulatedForces = accumulateForces( circle, app.ticker.elapsedMS / 10 );
 		let velocity = circle.velocity.copy().add( accumulatedForces );
-		let position = circle.position.copy().add( velocity.copy().mul( delta ) );
+		let position = circle.position.copy().add( velocity.copy().mul( app.ticker.elapsedMS / 10 ) );
 		velocity.add( accumulatedForces );
 
 		circle.update( {
 			velocity: velocity,
 			position: position
-		}, delta );
+		}, app.ticker.elapsedMS / 10 );
 	} );
 
 	GraphicsManager.draw();

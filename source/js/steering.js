@@ -37,7 +37,7 @@ loader
 window.gameModels = [];
 window.current = {
 	direction: 163,
-	force: 4
+	force: 40
 };
 
 window.friction = 0.98;
@@ -129,6 +129,8 @@ function animate( delta ) {
 		accumulator -= dt;
 		updateGameModels( dt );
 		checkCollisions( dt );
+		updateFollowCamera( dt );
+		emitterManager.update( dt, [ current ] );
 		if (++numUpdateSteps >= 240) {
 			accumulator = 0;
 			break;
@@ -139,9 +141,9 @@ function animate( delta ) {
 	// updateGameModels( app.ticker.elapsedMS / 100 );
 	// checkCollisions( app.ticker.elapsedMS / 100 );
 
-	emitterManager.update( app.ticker.elapsedMS / 100, [ current ] );
+	// emitterManager.update( app.ticker.elapsedMS / 100, [ current ] );
 
-	updateFollowCamera( app.ticker.elapsedMS / 100 );
+	// updateFollowCamera( app.ticker.elapsedMS / 100 );
 
 }
 
@@ -151,10 +153,10 @@ function updateFollowCamera( delta ) {
 	let yDist = app.stage.pivot.y - turtle.currentPosition.y;
 
 	if ( Math.abs( xDist ) > 50 ) {
-		app.stage.pivot.x -= xDist / 100 * delta;
+		app.stage.pivot.x -= xDist / 1 * delta;
 	}
 	if ( Math.abs( yDist ) > 50 ) {
-		app.stage.pivot.y -= yDist / 100 * delta;
+		app.stage.pivot.y -= yDist / 1 * delta;
 	}
 }
 
