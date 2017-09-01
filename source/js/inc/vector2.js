@@ -9,11 +9,12 @@ function Coords( x, y ) {
 	// objects take presedence over arrays. ex: {x: 1 }, [ undefined, 2 ] returns { x: 1, y: 2 }
 	} else {
 		let i = 0;
+		// set the intermediary x and y. null or undefined gets NaN
 		let xx = x != null ? Object.assign( x ) : NaN;
 		let yy = y != null ? Object.assign( y ) : NaN;
 
 		const solvers = {
-			// when iterated, solvers.x tries for x.x, x[0], and x
+			// when iterated, solvers.x tries for x.x, x[0], then x
 			x: [
 				( x ) => Number( x.x ),
 				( x ) => Number( x[0] ),
@@ -30,7 +31,7 @@ function Coords( x, y ) {
 			]
 		};
 
-		// run solvers on `x`
+		// run solvers on `x` until `xx` is a number of solvers run out
 		while ( !Util.isNumeric( xx ) && i < solvers.x.length ) {
 			xx = solvers.x[ i ]( x );
 			i++;
@@ -39,7 +40,7 @@ function Coords( x, y ) {
 		// reset `i`
 		i = 0;
 
-		// run solvers on `y`
+		// run solvers on `y` until `yy` is a number of solvers run out
 		while ( !Util.isNumeric( yy ) && i < solvers.y.length ) {
 			yy = solvers.y[ i ]( y );
 			i++;
