@@ -123,14 +123,21 @@ function animate( delta ) {
 
 	document.getElementById( 'frame-rate' ).dataset.framerate = app.ticker.FPS.toPrecision( 2 );
 
-	accumulator += app.ticker.elapsedMS / 100;
+	accumulator += app.ticker.elapsedMS / 1000;
+	var numUpdateSteps = 0;
 	while ( accumulator > dt ) {
-		// console.log( 'physics' );
 		accumulator -= dt;
+		updateGameModels( dt );
+		checkCollisions( dt );
+		if (++numUpdateSteps >= 240) {
+			accumulator = 0;
+			break;
+		}
+		// if ( accumulator >= dt) console.log( accumulator );
 	}
 	// console.log( delta );
-	updateGameModels( app.ticker.elapsedMS / 100 );
-	checkCollisions( app.ticker.elapsedMS / 100 );
+	// updateGameModels( app.ticker.elapsedMS / 100 );
+	// checkCollisions( app.ticker.elapsedMS / 100 );
 
 	emitterManager.update( app.ticker.elapsedMS / 100, [ current ] );
 
