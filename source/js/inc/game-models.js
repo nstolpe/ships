@@ -116,6 +116,7 @@ module.exports = {
 	Transformable( options, o = {} ) {
 		return Object.assign( o, {
 			name: options.name || '',
+			mass: options.mass || 1,
 			// "zeroed" settings
 			baseRotation: options.baseRotation || 0,
 			basePosition: options.basePosition || { x: 0, y: 0 },
@@ -180,8 +181,11 @@ module.exports = {
 			stabilizing() {
 				return this.stabilizeRotation && this.rotationAcceleration === Util.TrinaryState.NEUTRAL;
 			},
+			update( delta, frictions ) {
+
+			},
 			// setRotation
-			update( delta, influencers ) {
+			updated( delta, influencers ) {
 				// if the Transformable will rotate back to its baseRotation and no rotationAcceleration is being applied
 				if ( this.stabilizing() ) {
 					// set rotation velocity
