@@ -8,9 +8,9 @@ const Shapes = require( './inc/shapes.js' );
 const Sprite = PIXI.Sprite;
 const loader = PIXI.loader;
 const view = document.getElementById('view');
-const viewWidth = 1000;
-const viewHeight = 800;
 const scale = window.devicePixelRatio;
+const viewWidth = document.body.offsetWidth;
+const viewHeight = document.body.offsetHeight;
 const app = new PIXI.Application( viewWidth, viewHeight, { view: view, backgroundColor : 0x000000 } );
 
 const graphics = new PIXI.Graphics();
@@ -157,9 +157,25 @@ let forces = [
 	}
 ];
 
+let fps = 30;
+let dt = 1 / fps;
+let accumulator = 0;
+
 function animate( delta ) {
 	graphics.clear();
 
+	accumulator += app.ticker.elapsedMS / 1000;
+	if ( accumulator > 0.2 ) accumulator = 0.2;
+	while ( accumulator > dt ) {
+		accumulator -= dt;
+		updateCircles( dt );
+	}
+	// updateCircles( app.ticker.elapsedMS / 100 );
+
+	GraphicsManager.draw();
+	// oscillatorManager.update();
+}
+function updateCircles( delta ) {
 	circles.forEach( ( circle, idx ) => {
 		let allForces = forces.concat( circle.forces );
 		let accumulatedForces = accumulateForces( circle, app.ticker.elapsedMS / 10 );
@@ -172,11 +188,7 @@ function animate( delta ) {
 			position: position
 		}, app.ticker.elapsedMS / 10 );
 	} );
-
-	GraphicsManager.draw();
-	// oscillatorManager.update();
 }
-
 function updateVelocity( body, delta ) {
 
 }
