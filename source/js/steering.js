@@ -114,7 +114,7 @@ window.addEventListener( 'dock', function() {
 	}
 }, false );
 
-let fps = 30;
+let fps = 60;
 let dt = 1 / fps;
 let accumulator = 0;
 
@@ -125,16 +125,17 @@ function animate( delta ) {
 
 	accumulator += app.ticker.elapsedMS / 1000;
 	var numUpdateSteps = 0;
+	if ( accumulator > 0.1 ) accumulator = 0.1;
 	while ( accumulator > dt ) {
 		accumulator -= dt;
 		updateGameModels( dt );
-		checkCollisions( dt );
+		// checkCollisions( dt );
 		updateFollowCamera( dt );
-		emitterManager.update( dt, [ current ] );
-		if (++numUpdateSteps >= 240) {
-			accumulator = 0;
-			break;
-		}
+		// emitterManager.update( dt, [ current ] );
+		// if (++numUpdateSteps >= 240) {
+		// 	accumulator = 0;
+		// 	break;
+		// }
 		// if ( accumulator >= dt) console.log( accumulator );
 	}
 	// console.log( delta );
@@ -208,6 +209,10 @@ function updateGameModels( delta ) {
 
 		model.base.update( delta, {
 			velocities: [ {
+				x: window.current.force * math.cos( math.unit( window.current.direction, 'deg' ) ),
+				y: window.current.force * math.sin( math.unit( window.current.direction, 'deg' ) )
+			} ],
+			forces: [ {
 				x: window.current.force * math.cos( math.unit( window.current.direction, 'deg' ) ),
 				y: window.current.force * math.sin( math.unit( window.current.direction, 'deg' ) )
 			} ],
