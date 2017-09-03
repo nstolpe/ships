@@ -3,6 +3,7 @@ const PIXI = require( 'pixi.js' );
 const Sprite = PIXI.Sprite;
 const Container = PIXI.Container;
 const Util = require( './util.js' );
+const Vec2 = require( './vector2.js' );
 const math = require( 'mathjs' );
 
 module.exports = {
@@ -123,7 +124,8 @@ module.exports = {
 			// current settings, updated each render
 			currentRotation: options.currentRotation || options.baseRotation || 0,
 			// currentPosition: options.currentPosition || options.basePosition || { x: 0, y: 0 },
-			currentPosition: options.currentPosition ? options.currentPosition : options.basePosition ? Object.assign( {}, options.basePosition ) : { x: 0, y: 0 },
+			currentPosition: Vec2( options.currentPosition || options.basePosition ),
+			// currentPosition: options.currentPosition ? options.currentPosition : options.basePosition ? Object.assign( {}, options.basePosition ) : { x: 0, y: 0 },
 			rotationConstraints: options.rotationConstraints || { pos: Infinity, neg: Infinity },
 			positionConstraints: options.positionConstraints || { pos: { x: Infinity, y: Infinity }, neg: { x: Infinity, y: Infinity } },
 			// position velocity/acceleration settings
@@ -181,8 +183,28 @@ module.exports = {
 			stabilizing() {
 				return this.stabilizeRotation && this.rotationAcceleration === Util.TrinaryState.NEUTRAL;
 			},
-			update( delta, frictions ) {
+			update( delta, influencers ) {
+				if ( influencers && influencers.forces ) {
+					let accumulated = Vec2();
+					for ( let i = 0, l = influencers.forces.length; i < l; i++ ) {
+						let force = influencers.forces[ i ];
 
+						let v = Vec2(
+							force.magnitude * math.cos( math.unit( force.direction, 'deg' ) ),
+							force.magnitude * math.sin( math.unit( force.direction, 'deg' ) )
+						);
+
+						// let v = force.direction.copy().nor().mul( force.magnitude * delta / 2 );
+
+						// divide by mass if this force is influenced by mass (gravity isn't)
+						if ( force.mass )
+							v.mul( 1 / this.mass );
+
+						accumulated.add( v );
+					}
+
+					this.currentPosition.add( accumulated );
+				}
 			},
 			// setRotation
 			updated( delta, influencers ) {
