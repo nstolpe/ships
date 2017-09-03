@@ -15,6 +15,7 @@ module.exports = function( PIXI, app ) {
 					name: 'boards-left',
 					rotationConstraints: { pos: 0, neg: 0 },
 					positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
+					mass: Infinity
 				},
 				init: ( base ) => {
 					base.sprite.hitArea = new CollisionPolygon(
@@ -46,6 +47,7 @@ module.exports = function( PIXI, app ) {
 					name: 'boards-right',
 					rotationConstraints: { pos: 0, neg: 0 },
 					positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
+					mass: Infinity
 				},
 				init: ( base ) => {
 					base.sprite.hitArea = new CollisionPolygon(
@@ -112,6 +114,7 @@ module.exports = function( PIXI, app ) {
 					name: 'boards-top',
 					rotationConstraints: { pos: 0, neg: 0 },
 					positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
+					mass: Infinity
 				},
 				init: ( base ) => {
 					base.sprite.hitArea = new CollisionPolygon(
@@ -143,6 +146,7 @@ module.exports = function( PIXI, app ) {
 					name: 'boards-bottom-left',
 					rotationConstraints: { pos: 0, neg: 0 },
 					positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
+					mass: Infinity
 				},
 				init: ( base ) => {
 					base.sprite.hitArea = new CollisionPolygon(
@@ -174,6 +178,7 @@ module.exports = function( PIXI, app ) {
 					name: 'boards-bottom-right',
 					rotationConstraints: { pos: 0, neg: 0 },
 					positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
+					mass: Infinity
 				},
 				init: ( base ) => {
 					base.sprite.hitArea = new CollisionPolygon(
@@ -208,6 +213,7 @@ module.exports = function( PIXI, app ) {
 					name: 'boards-left',
 					rotationConstraints: { pos: 0, neg: 0 },
 					positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
+					mass: Infinity
 				},
 				init: ( base ) => {
 					base.sprite.hitArea = new CollisionPolygon(
@@ -221,6 +227,8 @@ module.exports = function( PIXI, app ) {
 					// base.sprite.children[ 0 ].tint = 0x02d5ee;
 					base.basePosition.x += 450;
 					base.basePosition.y += 600;
+					base.currentPosition.x += 450;
+					base.currentPosition.y += 600;
 				},
 				children: [
 					{
@@ -241,6 +249,7 @@ module.exports = function( PIXI, app ) {
 					name: 'boards-right',
 					rotationConstraints: { pos: 0, neg: 0 },
 					positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
+					mass: Infinity
 				},
 				init: ( base ) => {
 					base.sprite.hitArea = new CollisionPolygon(
@@ -254,6 +263,8 @@ module.exports = function( PIXI, app ) {
 					// base.sprite.children[ 0 ].tint = 0x02d5ee;
 					base.basePosition.x += 450;
 					base.basePosition.y += 600;
+					base.currentPosition.x += 450;
+					base.currentPosition.y += 600;
 				},
 				children: [
 					{
@@ -274,6 +285,7 @@ module.exports = function( PIXI, app ) {
 					name: 'boards-top',
 					rotationConstraints: { pos: 0, neg: 0 },
 					positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
+					mass: Infinity
 				},
 				init: ( base ) => {
 					base.sprite.hitArea = new CollisionPolygon(
@@ -287,6 +299,8 @@ module.exports = function( PIXI, app ) {
 					// base.sprite.children[ 0 ].tint = 0x02d5ee;
 					base.basePosition.x += 450;
 					base.basePosition.y += 600;
+					base.currentPosition.x += 450;
+					base.currentPosition.y += 600;
 				},
 				children: [
 					{
@@ -307,6 +321,7 @@ module.exports = function( PIXI, app ) {
 					name: 'boards-bottom-left',
 					rotationConstraints: { pos: 0, neg: 0 },
 					positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
+					mass: Infinity
 				},
 				init: ( base ) => {
 					base.sprite.hitArea = new CollisionPolygon(
@@ -320,6 +335,8 @@ module.exports = function( PIXI, app ) {
 					// base.sprite.children[ 0 ].tint = 0x02d5ee;
 					base.basePosition.x += 450;
 					base.basePosition.y += 600;
+					base.currentPosition.x += 450;
+					base.currentPosition.y += 600;
 				},
 				children: [
 					{
@@ -340,6 +357,7 @@ module.exports = function( PIXI, app ) {
 					name: 'boards-bottom-right',
 					rotationConstraints: { pos: 0, neg: 0 },
 					positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
+					mass: Infinity
 				},
 				init: ( base ) => {
 					base.sprite.hitArea = new CollisionPolygon(
@@ -353,6 +371,8 @@ module.exports = function( PIXI, app ) {
 					// base.sprite.children[ 0 ].tint = 0x02d5ee;
 					base.basePosition.x += 450;
 					base.basePosition.y += 600;
+					base.currentPosition.x += 450;
+					base.currentPosition.y += 600;
 				},
 				children: [
 					{
@@ -520,6 +540,7 @@ module.exports = function( PIXI, app ) {
 					maxRotationVelocity: 5,
 					rotationVelocityIncrement: 2,
 					// debug: true,
+					mass: 10,
 					postUpdates: [
 						function( delta ) {
 							// console.log( this.children[ 'rudder' ].currentRotation );
@@ -707,7 +728,8 @@ module.exports = function( PIXI, app ) {
 					rotationConstraints: { pos: 0, neg: 0 },
 					positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
 					solid: false,
-					collideable: true
+					collideable: true,
+					mass: Infinity
 				},
 				init: ( base ) => {
 					base.sprite.hitArea = new CollisionPolygon(
@@ -741,7 +763,8 @@ module.exports = function( PIXI, app ) {
 					rotationConstraints: { pos: 0, neg: 0 },
 					positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
 					solid: false,
-					collideable: true
+					collideable: true,
+					mass: Infinity
 				},
 				init: ( base ) => {
 					base.sprite.hitArea = new CollisionPolygon(
