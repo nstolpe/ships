@@ -37,7 +37,9 @@ loader
 window.gameModels = [];
 window.current = {
 	direction: 163,
-	force: 40
+	force: 40,
+	mass: true,
+	magnitude: 4
 };
 
 window.friction = 0.98;
@@ -213,10 +215,7 @@ function updateGameModels( delta ) {
 				x: window.current.force * math.cos( math.unit( window.current.direction, 'deg' ) ),
 				y: window.current.force * math.sin( math.unit( window.current.direction, 'deg' ) )
 			} ],
-			forces: [ {
-				x: window.current.force * math.cos( math.unit( window.current.direction, 'deg' ) ),
-				y: window.current.force * math.sin( math.unit( window.current.direction, 'deg' ) )
-			} ],
+			forces: [ window.current ],
 			frictions: [ window.friction ]
 		} );
 
