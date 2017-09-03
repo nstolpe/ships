@@ -38,7 +38,7 @@
 	"blendMode": "normal",
 	"frequency": 0.01,
 	"emitterLifetime": 0,
-	"maxParticles": 67,
+	"maxParticles": 27,
 	"pos": {
 		"x": 0,
 		"y": 0

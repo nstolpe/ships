@@ -560,7 +560,9 @@ module.exports = function( PIXI, app ) {
 					// 	 0, 120
 					// );
 					base.sprite.interactive = true;
-					base.sprite.on( 'click', ( e ) => console.log( e ) );
+					base.sprite.on( 'click', e => {
+						console.log( e );
+					} ),
 					base.pivot.x = base.sprite.width / 2;
 					base.pivot.y = base.sprite.height / 2;
 					base.sprite.width *= .5;

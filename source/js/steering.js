@@ -131,13 +131,14 @@ function animate( delta ) {
 		updateGameModels( dt );
 		// checkCollisions( dt );
 		updateFollowCamera( dt );
-		// emitterManager.update( dt, [ current ] );
+		emitterManager.update( dt, [ current ] );
 		// if (++numUpdateSteps >= 240) {
 		// 	accumulator = 0;
 		// 	break;
 		// }
 		// if ( accumulator >= dt) console.log( accumulator );
 	}
+
 	// console.log( delta );
 	// updateGameModels( app.ticker.elapsedMS / 100 );
 	// checkCollisions( app.ticker.elapsedMS / 100 );
