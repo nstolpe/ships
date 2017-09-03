@@ -561,7 +561,7 @@ module.exports = function( PIXI, app ) {
 					// );
 					base.sprite.interactive = true;
 					base.sprite.on( 'click', e => {
-						console.log( e );
+						e.target.children[0].tint = '0x' + Math.floor(Math.random()*16777215).toString(16);
 					} ),
 					base.pivot.x = base.sprite.width / 2;
 					base.pivot.y = base.sprite.height / 2;
