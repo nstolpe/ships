@@ -121,6 +121,7 @@ module.exports = {
 			// "zeroed" settings
 			baseRotation: options.baseRotation || 0,
 			basePosition: options.basePosition || { x: 0, y: 0 },
+			currentVelocity: Vec2(),
 			// current settings, updated each render
 			currentRotation: options.currentRotation || options.baseRotation || 0,
 			// currentPosition: options.currentPosition || options.basePosition || { x: 0, y: 0 },
@@ -184,27 +185,38 @@ module.exports = {
 				return this.stabilizeRotation && this.rotationAcceleration === Util.TrinaryState.NEUTRAL;
 			},
 			update( delta, influencers ) {
-				if ( influencers && influencers.forces ) {
-					let accumulated = Vec2();
-					for ( let i = 0, l = influencers.forces.length; i < l; i++ ) {
-						let force = influencers.forces[ i ];
+				let accumulated = Vec2();
 
-						let v = Vec2(
-							force.magnitude * math.cos( math.unit( force.direction, 'deg' ) ),
-							force.magnitude * math.sin( math.unit( force.direction, 'deg' ) )
-						);
+				influencers = Object.assign( {
+					forces: [],
+					frictions: []
+				}, influencers );
 
-						// let v = force.direction.copy().nor().mul( force.magnitude * delta / 2 );
 
-						// divide by mass if this force is influenced by mass (gravity isn't)
-						if ( force.mass )
-							v.mul( 1 / this.mass );
+				for ( let i = 0, l = influencers.forces.length; i < l; i++ ) {
+					let force = influencers.forces[ i ];
 
-						accumulated.add( v );
-					}
+					let v = Vec2(
+						force.magnitude * math.cos( math.unit( force.direction, 'deg' ) ),
+						force.magnitude * math.sin( math.unit( force.direction, 'deg' ) )
+					);
 
-					this.currentPosition.add( accumulated );
+					// divide by mass if this force is influenced by mass (gravity isn't)
+					if ( force.mass )
+						v.mul( 1 / this.mass );
+
+					accumulated.add( v );
 				}
+
+				this.currentVelocity.add( accumulated.mul( delta ) );
+
+				for ( let i = 0, l = influencers.frictions.length; i < l; i++ ) {
+					let friction = influencers.frictions[ i ];
+					this.currentVelocity.mul( friction );
+				}
+
+				this.currentPosition.add( this.currentVelocity );
+
 			},
 			// setRotation
 			updated( delta, influencers ) {
