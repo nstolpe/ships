@@ -118,10 +118,12 @@ module.exports = {
 		return Object.assign( o, {
 			name: options.name || '',
 			mass: options.mass || 1,
+			inverseMass: options.mass ? 1 / options.mass : 1,
 			// "zeroed" settings
 			baseRotation: options.baseRotation || 0,
 			basePosition: options.basePosition || { x: 0, y: 0 },
-			currentVelocity: Vec2(),
+			velocity: Vec2(),
+			angularVelocity: 0,
 			// current settings, updated each render
 			currentRotation: options.currentRotation || options.baseRotation || 0,
 			// currentPosition: options.currentPosition || options.basePosition || { x: 0, y: 0 },
@@ -187,12 +189,14 @@ module.exports = {
 			update( delta, influencers ) {
 				let accumulated = Vec2();
 
+				// set defaults for empty props
 				influencers = Object.assign( {
 					forces: [],
 					frictions: []
 				}, influencers );
 
 
+				// add all influencers.
 				for ( let i = 0, l = influencers.forces.length; i < l; i++ ) {
 					let force = influencers.forces[ i ];
 
@@ -203,20 +207,22 @@ module.exports = {
 
 					// divide by mass if this force is influenced by mass (gravity isn't)
 					if ( force.mass )
-						v.mul( 1 / this.mass );
+						v.mul( this.inverseMass );
 
 					accumulated.add( v );
 				}
 
-				this.currentVelocity.add( accumulated.mul( delta ) );
+				// add accumulated velocities scaled by delta.
+				this.velocity.add( accumulated.mul( delta ) );
 
+				// multiply the post-update velocity by each friction
 				for ( let i = 0, l = influencers.frictions.length; i < l; i++ ) {
 					let friction = influencers.frictions[ i ];
-					this.currentVelocity.mul( friction );
+					this.velocity.mul( friction );
 				}
 
-				this.currentPosition.add( this.currentVelocity );
-
+				// add the velocity to the position.
+				this.currentPosition.add( this.velocity );
 			},
 			// setRotation
 			updated( delta, influencers ) {
