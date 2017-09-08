@@ -187,7 +187,7 @@ module.exports = {
 				return this.stabilizeRotation && this.rotationAcceleration === Util.TrinaryState.NEUTRAL;
 			},
 			update( delta, influencers ) {
-				let accumulated = Vec2();
+				let acceleration = Vec2();
 
 				// set defaults for empty props
 				influencers = Object.assign( {
@@ -196,24 +196,25 @@ module.exports = {
 				}, influencers );
 
 
-				// add all influencers.
+				// accumulate all forces.
 				for ( let i = 0, l = influencers.forces.length; i < l; i++ ) {
 					let force = influencers.forces[ i ];
 
-					let v = Vec2(
+					// forces come in as polar now. Make cartesian or polar options?
+					let accumulated = Vec2(
 						force.magnitude * math.cos( math.unit( force.direction, 'deg' ) ),
 						force.magnitude * math.sin( math.unit( force.direction, 'deg' ) )
 					);
 
-					// divide by mass if this force is influenced by mass (gravity isn't)
+					// multiply by inverse mass if this force is influenced by mass (gravity isn't)
 					if ( force.mass )
-						v.mul( this.inverseMass );
+						accumulated.mul( this.inverseMass );
 
-					accumulated.add( v );
+					acceleration.add( accumulated );
 				}
 
-				// add accumulated velocities scaled by delta.
-				this.velocity.add( accumulated.mul( delta ) );
+				// add accumulated acceleration scaled by delta. verlet integration
+				this.velocity.add( acceleration.mul( delta / 2 ) );
 
 				// multiply the post-update velocity by each friction
 				for ( let i = 0, l = influencers.frictions.length; i < l; i++ ) {
@@ -222,7 +223,9 @@ module.exports = {
 				}
 
 				// add the velocity to the position.
-				this.currentPosition.add( this.velocity );
+				this.currentPosition.add( this.velocity.copy().mul( delta ) );
+				// add 2nd half of accumulated acceleration
+				this.velocity.add( acceleration.mul( delta / 2 ) );
 			},
 			// setRotation
 			updated( delta, influencers ) {
