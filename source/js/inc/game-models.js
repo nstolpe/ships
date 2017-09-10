@@ -215,19 +215,24 @@ module.exports = {
 					acceleration.add( accumulated );
 				}
 
-				// add accumulated acceleration scaled by delta. verlet integration
-				this.velocity.add( acceleration.mul( delta / 2 ) );
-
-				// multiply the post-update velocity by each friction
+				// multiply the pre-update velocity by each friction
+				// @TODO friction/drag should be based on properties of game objects/settings
+				// coefficient of drag, attached to game-model (this). area/silhouette calculated. rho/density set in env.
+				// https://www.burakkanber.com/blog/modeling-physics-javascript-gravity-and-drag/
+				// https://stackoverflow.com/questions/667034/simple-physics-based-movement
 				for ( let i = 0, l = influencers.frictions.length; i < l; i++ ) {
 					let friction = influencers.frictions[ i ];
 					this.velocity.mul( friction );
 				}
 
-				// add the velocity to the position.
-				this.currentPosition.add( this.velocity.copy().mul( delta ) );
-				// add 2nd half of accumulated acceleration
-				this.velocity.add( acceleration.mul( delta / 2 ) );
+
+				// better integration Symplectic Euler
+				// htmlhttps://web.archive.org/web/20120614044757/https://www.niksula.hut.fi/~hkankaan/Homepages/gravity.html
+				// https://gamedevelopment.tutsplus.com/tutorials/how-to-create-a-custom-2d-physics-engine-the-core-engine--gamedev-7493
+				this.currentPosition.add( acceleration.copy().mul( 0.5 * delta * delta ) ).add( this.velocity.copy().mul( delta ) );
+				this.velocity.add( acceleration.mul( delta ) );
+
+
 			},
 			// setRotation
 			updated( delta, influencers ) {
