@@ -119,11 +119,13 @@ module.exports = {
 			name: options.name || '',
 			mass: options.mass || 1,
 			inverseMass: options.mass ? 1 / options.mass : 1,
+			inertia: options.inertia || 1,
+			inverseInertion: options.inertia ? 1 / options.inertia : 1,
 			// "zeroed" settings
 			baseRotation: options.baseRotation || 0,
 			basePosition: options.basePosition || { x: 0, y: 0 },
-			velocity: Vec2(),
-			angularVelocity: 0,
+			velocity: Vec2( options.velocity ) || Vec2(),
+			angularVelocity: options.angularVelocity || 0,
 			// current settings, updated each render
 			currentRotation: options.currentRotation || options.baseRotation || 0,
 			// currentPosition: options.currentPosition || options.basePosition || { x: 0, y: 0 },
