@@ -69,36 +69,36 @@ const proto = {
 	 * Returns this vector.
 	 */
 	set( x, y ) {
-		const coords = Coords( x, y );
-		this.x = coords.x;
-		this.y = coords.y;
+		const other = Coords( x, y );
+		this.x = other.x;
+		this.y = other.y;
 		return this;
 	},
 	/**
 	 * Adds the incoming object, array or values to this `vector`.
 	 */
 	add( x, y ) {
-		const coords = Coords( x, y );
-		this.x += coords.x;
-		this.y += coords.y;
+		const other = Coords( x, y );
+		this.x += other.x;
+		this.y += other.y;
 		return this;
 	},
 	/**
 	 * Subtracts the incoming object, array or values to this `vector`.
 	 */
 	sub( x, y ) {
-		const coords = Coords( x, y );
-		this.x -= coords.x;
-		this.y -= coords.y;
+		const other = Coords( x, y );
+		this.x -= other.x;
+		this.y -= other.y;
 		return this;
 	},
 	/**
 	 * Multiplies the incoming object, array or values to this `vector`.
 	 */
 	mul( x, y ) {
-		const coords = Coords( x, y );
-		this.x *= coords.x;
-		this.y *= coords.y;
+		const other = Coords( x, y );
+		this.x *= other.x;
+		this.y *= other.y;
 		return this;
 	},
 	/**
@@ -112,8 +112,8 @@ const proto = {
 		return this.x * other.x + this.y * other.y;
 	},
 	cross( x, y ) {
-		const coords = Coords( x, y );
-		return this.x * coords.y - this.y * other.x;
+		const other = Coords( x, y );
+		return this.x * other.y - this.y * other.x;
 	},
 	/**
 	 * Returns the length of this `vector`
