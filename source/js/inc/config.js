@@ -559,20 +559,20 @@ module.exports = function( PIXI, app ) {
 					// 	base.sprite.height
 					// );
 					base.sprite.hitArea = new CollisionPolygon(
-						48,   0,
-						71,   7,
-						83,  33,
-						86,  58,
-						83,  87,
-						71, 113,
-						48, 120,
-						38, 120,
-						15, 113,
-						 3,  87,
-						 0,  58,
-						 3,  33,
+						38,   0,
 						15,   7,
-						38,   0
+						 3,  33,
+						 0,  58,
+						 3,  87,
+						15, 113,
+						38, 120,
+						48, 120,
+						71, 113,
+						83,  87,
+						86,  58,
+						83,  33,
+						71,   7,
+						48,   0
 					);
 					// base.sprite.hitArea = new CollisionPolygon(
 					// 	 0,   0,
