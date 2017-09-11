@@ -512,7 +512,7 @@ function drawDebug( model ) {
 			);
 
 			// get the endpoint for the normal line.
-			let end = halfEdge.copy().add( model.base.sprite.hitArea.normals[ Math.ceil( i / 2 ) ].copy().mul( 10 ) )
+			let end = halfEdge.copy().add( model.base.sprite.hitArea.normals[ Math.ceil( i / 2 ) ].copy().reverse().mul( 10 ) )
 				.sub( model.base.pivot )
 				.scale( model.base.sprite.scale.x, model.base.sprite.scale.y )
 				.rotate( model.base.sprite.rotation )
