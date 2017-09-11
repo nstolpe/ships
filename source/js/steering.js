@@ -331,14 +331,50 @@ function doClipping( one, two, normal ) {
 		flip = true;
 	}
 
-	refv.set( ref ).nor();
+	refv.set( ref.edge ).nor();
 
 	let o1 = refv.dot( ref.v1 );
 	let cp = clip( inc.v1, inc.v2, refv, o1 );
+
+	if ( cp.length < 2 ) return;
+
+	let o2 = refv.dot( ref.v2 );
+
+	cp = clip( cp[0], cp[1], refv.copy().reverse(), -o2 );
+
+	if ( cp.length < 2 ) return;
+
+	let refNorm = Vec2(ref.edge.y, -ref.edge.x );
+
+	if ( flip ) refNorm.reverse();
+
+	let max = refNorm.dot( ref.max );
+
+	// check 1 first so it doesn't fall back if 0 is spliced.
+	if ( refNorm.dot( cp[1] ) - max < 0.0) cp.splice( 1, 1 );
+	if ( refNorm.dot( cp[0] ) - max < 0.0) cp.splice( 0, 1 );
+console.log( cp.length );
+	return cp;
 }
 
 function clip( v1, v2, normal, o ) {
+	let points = [];
 
+	let d1 = normal.dot( v1 ) - o;
+	let d2 = normal.dot( v2 ) - o;
+
+	if ( d1 >= 0 ) points.push( v1 );
+	if ( d2 >= 0 ) points.push( v2 );
+
+	if ( d1 * d2  < 0 ) {
+		let e = v2.copy().sub( v1 );
+		let u = d1 / ( d1 - d2 );
+		e.mul( u );
+		e.add( v1 );
+		points.push( e );
+	}
+
+	return points;
 }
 function getFeature( points, normal ) {
 	let vertex = farthestVertex( points, normal );
