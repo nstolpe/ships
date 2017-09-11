@@ -180,17 +180,19 @@ function checkCollisions() {
 				let collision = checkCollision( collideables[ i ], gameModels[ ii ] );
 				if ( collision ) {
 					if ( gameModels[ ii ].base.solid ) {
-						// Just pushes one away. Should be better.
+						// Just pushes one away. Should be better.@TODO better
 						collision.one.base.currentPosition.x -= collision.overlapV.x;
 						collision.one.base.currentPosition.y -= collision.overlapV.y;
 					} else {
 						// non-solid game models are the dock targets, make them interactable
+						// @TODO this does not belong. Move.
 						gameModels[ ii ].base.sprite.children[ 0 ].tint = 0x4ae9f9;
 						gameModels[ ii ].base.children.target.alpha = .5;
 						activeTarget = gameModels[ ii ];
 					}
 				} else if ( gameModels[ ii ] === activeTarget ) {
 					// deactivate activeTarget if it's become inactive
+					// @TODO this doesn't belong here, move it somewhere better.
 					activeTarget = undefined;
 					gameModels[ ii ].base.sprite.children[ 0 ].tint = 0xffffff;
 					gameModels[ ii ].base.children.target.alpha = .25;
@@ -204,6 +206,7 @@ function checkCollisions() {
 		}
 	}
 }
+
 function updateGameModels( delta ) {
 	for ( let i = 0, l = gameModels.length; i < l; i++ ) {
 		let model = gameModels[ i ];
@@ -246,6 +249,8 @@ function checkCollision( one, two ) {
 		oneInTwo: true,
 		twoInOne: true
 	};
+	let featureOne;
+	let featureTwo;
 
 	// make vector arrays of the incoming points.
 	// points have the game object's transform applied
@@ -273,7 +278,7 @@ function checkCollision( one, two ) {
 
 		if ( rangesOverlap( rangeOne, rangeTwo) ) {
 			// if the ranges overlap, it's not a separating axis. get the collision
-			setCollision( rangeOne, rangeTwo, normal, collision );
+			collision = setCollision( rangeOne, rangeTwo, normal, collision );
 		} else {
 			// if not, it is a separating axis. only one is necessary, so exit.
 			return false;
@@ -292,7 +297,7 @@ function checkCollision( one, two ) {
 
 		if ( rangesOverlap( rangeOne, rangeTwo) ) {
 			// if the ranges overlap, it's not a separating axis. get the collision
-			setCollision( rangeOne, rangeTwo, normal, collision );
+			collision = setCollision( rangeOne, rangeTwo, normal, collision );
 		} else {
 			// if not, it is a separating axis. only one is necessary, so exit.
 			return false;
@@ -301,15 +306,92 @@ function checkCollision( one, two ) {
 
 	collision.overlapV = Vec2( collision.overlapN ).scale( collision.overlap );
 
+	// wrap in an if cause it will likely be turned on/off
+	if ( 1 === 1 ) {
+		featureOne = getFeature( pointsOne, collision.overlapN );
+		featureTwo = getFeature( pointsTwo, collision.overlapN.copy().reverse() );
+
+		doClipping( featureOne, featureTwo, collision.overlapN )
+	}
 	return collision;
 }
 
+function doClipping( one, two, normal ) {
+	let ref;
+	let inc;
+	let flip = false;
+	let refv = Vec2();
+
+	if ( Math.abs( one.edge.dot( normal ) ) <= Math.abs( two.edge.dot( normal ) ) ) {
+		ref = one;
+		inc = two;
+	} else {
+		ref = two;
+		inc = one;
+		flip = true;
+	}
+
+	refv.set( ref ).nor();
+
+	let o1 = refv.dot( ref.v1 );
+	let cp = clip( inc.v1, inc.v2, refv, o1 );
+}
+
+function clip( v1, v2, normal, o ) {
+
+}
+function getFeature( points, normal ) {
+	let vertex = farthestVertex( points, normal );
+	let index = points.indexOf( vertex );
+	let prev = points[ ( index - 1 ) % points.length ];
+	let next = points[ ( index + 1 ) % points.length ];
+	let l = vertex.copy().sub( next ).nor();
+	let r = vertex.copy().sub( prev ).nor();
+
+	if ( r.dot( normal ) <= l.dot( normal ) ) {
+		// prev (right) is closer to perp
+		// max, 1st, last
+		return {
+			max: vertex,
+			edge: vertex.copy().sub( prev ),
+			v1: prev,
+			v2: vertex
+		};
+	} else {
+		// next (left) is closer to per
+		// max, 1st, last
+		return {
+			max: vertex,
+			edge: next.copy().sub( vertex ),
+			v1: vertex,
+			v2: next
+		};
+	}
+}
+
+function farthestVertex( points, direction ) {
+	let farthestProjection = -Number.MAX_VALUE;
+	let farthestVertex;
+
+	for ( let i = 0, l = points.length; i < l; i++ ) {
+		let projection = direction.dot( points[ i ] );
+
+		if ( projection > farthestProjection ) {
+			farthestProjection = projection;
+			farthestVertex = points[ i ];
+			// console.log( 'a: ' + farthestProjection );
+			// console.log( 'b: ' + points[ i ].dot( direction ) );
+		}
+	}
+
+	return farthestVertex;
+}
+// populates a collision object.
 function setCollision( rangeOne, rangeTwo, normal, collision ) {
 	let overlap = 0;
 	let overlap1;
 	let overlap2;
 	let absOverlap;
-
 	// collision = Object.assign( {
 	// 	one: one,
 	// 	two: two,
@@ -319,8 +401,6 @@ function setCollision( rangeOne, rangeTwo, normal, collision ) {
 	// 	oneInTwo: true,
 	// 	twoInOne: true
 	// }, collision );
-
-
 	// one starts lower than two
 	if ( rangeOne.min < rangeTwo.min ) {
 		collision.oneInTwo = false;
