@@ -19,10 +19,10 @@ module.exports = function( PIXI, app ) {
 				},
 				init: ( base ) => {
 					base.sprite.hitArea = new CollisionPolygon(
-						  0,   0,
-						 64,   0,
+						  0, 256,
 						 64, 256,
-						  0, 256
+						 64,   0,
+						  0,   0
 					);
 					base.pivot.x = base.sprite.width / 2;
 					base.pivot.y = base.sprite.height / 2;
@@ -51,10 +51,10 @@ module.exports = function( PIXI, app ) {
 				},
 				init: ( base ) => {
 					base.sprite.hitArea = new CollisionPolygon(
-						  0,   0,
-						64,   0,
+						 0, 256,
 						64, 256,
-						  0, 256
+						64,   0,
+						 0,   0
 					);
 					base.pivot.x = base.sprite.width / 2;
 					base.pivot.y = base.sprite.height / 2;
@@ -118,10 +118,10 @@ module.exports = function( PIXI, app ) {
 				},
 				init: ( base ) => {
 					base.sprite.hitArea = new CollisionPolygon(
-						  0,   0,
-						128,   0,
+						  0, 64,
 						128, 64,
-						  0, 64
+						128,  0,
+						  0,  0
 					);
 					base.pivot.x = base.sprite.width / 2;
 					base.pivot.y = base.sprite.height / 2;
@@ -150,10 +150,10 @@ module.exports = function( PIXI, app ) {
 				},
 				init: ( base ) => {
 					base.sprite.hitArea = new CollisionPolygon(
-						 0,   0,
-						32,   0,
+						 0, 64,
 						32, 64,
-						 0, 64
+						32,  0,
+						 0,  0
 					);
 					base.pivot.x = base.sprite.width / 2;
 					base.pivot.y = base.sprite.height / 2;
@@ -182,10 +182,10 @@ module.exports = function( PIXI, app ) {
 				},
 				init: ( base ) => {
 					base.sprite.hitArea = new CollisionPolygon(
-						 0,   0,
-						32,   0,
+						 0, 64,
 						32, 64,
-						 0, 64
+						32,  0,
+						 0,  0
 					);
 					base.pivot.x = base.sprite.width / 2;
 					base.pivot.y = base.sprite.height / 2;
@@ -217,10 +217,10 @@ module.exports = function( PIXI, app ) {
 				},
 				init: ( base ) => {
 					base.sprite.hitArea = new CollisionPolygon(
-						  0,   0,
-						 64,   0,
+						  0, 256,
 						 64, 256,
-						  0, 256
+						 64,   0,
+						  0,   0
 					);
 					base.pivot.x = base.sprite.width / 2;
 					base.pivot.y = base.sprite.height / 2;
@@ -253,10 +253,10 @@ module.exports = function( PIXI, app ) {
 				},
 				init: ( base ) => {
 					base.sprite.hitArea = new CollisionPolygon(
-						  0,   0,
-						64,   0,
-						64, 256,
-						  0, 256
+						  0, 256,
+						 64, 256,
+						 64,   0,
+						  0,   0
 					);
 					base.pivot.x = base.sprite.width / 2;
 					base.pivot.y = base.sprite.height / 2;
@@ -289,10 +289,10 @@ module.exports = function( PIXI, app ) {
 				},
 				init: ( base ) => {
 					base.sprite.hitArea = new CollisionPolygon(
-						  0,   0,
-						128,   0,
+						  0, 64,
 						128, 64,
-						  0, 64
+						128,  0,
+						  0,  0
 					);
 					base.pivot.x = base.sprite.width / 2;
 					base.pivot.y = base.sprite.height / 2;
@@ -325,10 +325,10 @@ module.exports = function( PIXI, app ) {
 				},
 				init: ( base ) => {
 					base.sprite.hitArea = new CollisionPolygon(
-						 0,   0,
-						32,   0,
+						 0, 64,
 						32, 64,
-						 0, 64
+						32,  0,
+						 0,  0
 					);
 					base.pivot.x = base.sprite.width / 2;
 					base.pivot.y = base.sprite.height / 2;
@@ -361,10 +361,10 @@ module.exports = function( PIXI, app ) {
 				},
 				init: ( base ) => {
 					base.sprite.hitArea = new CollisionPolygon(
-						 0,   0,
-						32,   0,
+						 0, 64,
 						32, 64,
-						 0, 64
+						32,   0,
+						 0,   0
 					);
 					base.pivot.x = base.sprite.width / 2;
 					base.pivot.y = base.sprite.height / 2;
@@ -733,10 +733,10 @@ module.exports = function( PIXI, app ) {
 				},
 				init: ( base ) => {
 					base.sprite.hitArea = new CollisionPolygon(
-						  0,   0,
-						144,   0,
+						  0, 144,
 						144, 144,
-						  0, 144
+						144,   0,
+						  0,   0
 					);
 					base.pivot.x = base.sprite.width / 2;
 					base.pivot.y = base.sprite.height / 2;
@@ -768,10 +768,10 @@ module.exports = function( PIXI, app ) {
 				},
 				init: ( base ) => {
 					base.sprite.hitArea = new CollisionPolygon(
-						  0,   0,
-						144,   0,
+						  0, 144,
 						144, 144,
-						  0, 144
+						144,   0,
+						  0,   0
 					);
 					base.pivot.x = base.sprite.width / 2;
 					base.pivot.y = base.sprite.height / 2;
