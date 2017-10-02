@@ -20,8 +20,6 @@ const Particles = require( 'pixi-particles' );
 
 const Config = require( './inc/config.js' )( PIXI, app );
 
-let graphics;
-
 window.app = app;
 view.style.width = viewWidth + 'px';
 view.style.height = viewHeight + 'px';
@@ -95,6 +93,13 @@ window.animating = true;
 
 let activeTarget;
 let docked = false;
+
+window.addEventListener( 'draw-clip-point', e => {
+	stageGraphics.beginFill( 0xff0000 );
+	stageGraphics.drawCircle( e.detail.x, e.detail.y, 2.5 );
+	stageGraphics.endFill();
+	console.log('received');
+} );
 
 window.addEventListener( 'dock', function() {
 	if ( activeTarget && !docked ) {
@@ -181,8 +186,8 @@ function checkCollisions() {
 				if ( collision ) {
 					if ( gameModels[ ii ].base.solid ) {
 						// Just pushes one away. Should be better.@TODO better
-						collision.one.base.currentPosition.x -= collision.overlapV.x;
-						collision.one.base.currentPosition.y -= collision.overlapV.y;
+						// collision.one.base.currentPosition.x -= collision.overlapV.x;
+						// collision.one.base.currentPosition.y -= collision.overlapV.y;
 					} else {
 						// non-solid game models are the dock targets, make them interactable
 						// @TODO this does not belong. Move.
@@ -310,7 +315,18 @@ function checkCollision( one, two ) {
 	if ( 1 === 1 ) {
 		featureOne = getFeature( pointsOne, collision.overlapN );
 		featureTwo = getFeature( pointsTwo, collision.overlapN.copy().reverse() );
-
+		featureOne.edge
+				// .sub( one.base.pivot )
+				// .scale( one.base.sprite.scale )
+				// .rotate( one.base.sprite.rotation )
+				// .add( one.base.currentPosition );
+		featureTwo.edge
+				// .sub( two.base.pivot )
+				// .scale( two.base.sprite.scale )
+				// .rotate( two.base.sprite.rotation )
+				// .add( two.base.currentPosition );
+		// console.log( "one " + pointsOne.indexOf( featureOne.max ) );
+		// console.log( "two " + pointsTwo.indexOf( featureTwo.max ) );
 		doClipping( featureOne, featureTwo, collision.overlapN )
 	}
 	return collision;
@@ -344,16 +360,26 @@ function doClipping( one, two, normal ) {
 
 	if ( cp.length < 2 ) return;
 
-	let refNorm = Vec2(ref.edge.y, -ref.edge.x );
+	// let refNorm = Vec2( ref.edge.y, -ref.edge.x );
+	let refNorm = ref.edge.copy().perp();
+	// refNorm = ref.v2.copy().sub( ref.v1 ).perp();
 
 	if ( flip ) refNorm.reverse();
 
 	let max = refNorm.dot( ref.max );
 
 	// check 1 first so it doesn't fall back if 0 is spliced.
-	if ( refNorm.dot( cp[1] ) - max < 0.0) cp.splice( 1, 1 );
-	if ( refNorm.dot( cp[0] ) - max < 0.0) cp.splice( 0, 1 );
-console.log( cp.length );
+	if ( refNorm.dot( cp[ 1 ] ) - max < 0.0 )
+		cp.splice( 1, 1 );
+
+	if ( refNorm.dot( cp[ 0 ] ) - max < 0.0 )
+		cp.splice( 0, 1 );
+
+	for ( let i = 0, l = cp.length; i < l; i++ ) {
+		let e = new CustomEvent('draw-clip-point', { detail: cp[ i ] } );
+		window.dispatchEvent( e );
+	}
+
 	return cp;
 }
 
@@ -379,7 +405,7 @@ function clip( v1, v2, normal, o ) {
 function getFeature( points, normal ) {
 	let vertex = farthestVertex( points, normal );
 	let index = points.indexOf( vertex );
-	let prev = points[ ( index - 1 ) % points.length ];
+	let prev = points[ ( index + points.length - 1 ) % points.length ];
 	let next = points[ ( index + 1 ) % points.length ];
 	let l = vertex.copy().sub( next ).nor();
 	let r = vertex.copy().sub( prev ).nor();
@@ -408,15 +434,14 @@ function getFeature( points, normal ) {
 function farthestVertex( points, direction ) {
 	let farthestProjection = -Number.MAX_VALUE;
 	let farthestVertex;
+	let projection;
 
 	for ( let i = 0, l = points.length; i < l; i++ ) {
-		let projection = direction.dot( points[ i ] );
+		projection = direction.dot( points[ i ] );
 
 		if ( projection > farthestProjection ) {
 			farthestProjection = projection;
 			farthestVertex = points[ i ];
-			// console.log( 'a: ' + farthestProjection );
-			// console.log( 'b: ' + points[ i ].dot( direction ) );
 		}
 	}
 
