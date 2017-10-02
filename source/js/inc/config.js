@@ -532,7 +532,7 @@ module.exports = function( PIXI, app ) {
 				spriteSheet: 'ships.json',
 				options: {
 					name: 'turtle',
-					currentPosition: { x: 683, y: 455 },
+					currentPosition: { x: 500, y: 400 },
 					// rotationConstraints: { pos: Infinity, neg: Infinity },
 					// positionConstraints: { pos: { x: Infinity, y: Infinity }, neg: { x: Infinity, y: Infinity } },
 					maxForwardVelocity: 8000,
@@ -726,41 +726,41 @@ module.exports = function( PIXI, app ) {
 					// }
 				]
 			},
-			{
-				options: {
-					basePosition: { x: 480, y: 360 },
-					name: 'dock-one',
-					rotationConstraints: { pos: 0, neg: 0 },
-					positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
-					solid: false,
-					collideable: true,
-					mass: Infinity
-				},
-				init: ( base ) => {
-					base.sprite.hitArea = new CollisionPolygon(
-						  0, 144,
-						144, 144,
-						144,   0,
-						  0,   0
-					);
-					base.pivot.x = base.sprite.width / 2;
-					base.pivot.y = base.sprite.height / 2;
-					base.sprite.width *= .5;
-					base.sprite.height *= .5;
-				},
-				children: [
-					{
-						texture: 'circle-target',
-						options: {
-							name: 'target',
-							dimensions: { w: 144, h: 144 },
-							rotationConstraints: { pos: 0, neg: 0 },
-							positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
-							alpha: .25
-						}
-					}
-				]
-			},
+			// {
+			// 	options: {
+			// 		basePosition: { x: 480, y: 360 },
+			// 		name: 'dock-one',
+			// 		rotationConstraints: { pos: 0, neg: 0 },
+			// 		positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
+			// 		solid: false,
+			// 		collideable: true,
+			// 		mass: Infinity
+			// 	},
+			// 	init: ( base ) => {
+			// 		base.sprite.hitArea = new CollisionPolygon(
+			// 			  0, 144,
+			// 			144, 144,
+			// 			144,   0,
+			// 			  0,   0
+			// 		);
+			// 		base.pivot.x = base.sprite.width / 2;
+			// 		base.pivot.y = base.sprite.height / 2;
+			// 		base.sprite.width *= .5;
+			// 		base.sprite.height *= .5;
+			// 	},
+			// 	children: [
+			// 		{
+			// 			texture: 'circle-target',
+			// 			options: {
+			// 				name: 'target',
+			// 				dimensions: { w: 144, h: 144 },
+			// 				rotationConstraints: { pos: 0, neg: 0 },
+			// 				positionConstraints: { pos: { x: 0, y: 0 }, neg: { x: 0, y: 0 } },
+			// 				alpha: .25
+			// 			}
+			// 		}
+			// 	]
+			// },
 			{
 				options: {
 					basePosition: { x: 930, y: 960 },
