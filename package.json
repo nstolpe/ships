@@ -20,8 +20,11 @@
     "express": "^4.14.0",
     "express-handlebars": "^3.0.0",
     "mathjs": "^3.13.3",
+    "matter-attractors": "^0.1.6",
+    "matter-js": "^0.13.0",
     "pixi-particles": "^2.1.5",
-    "pixi.js": "^4.3.5"
+    "pixi.js": "^4.3.5",
+    "poly-decomp": "^0.2.1"
   },
   "devDependencies": {
     "chokidar": "^1.6.1"
