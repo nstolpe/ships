@@ -46,11 +46,17 @@ var app = new PIXI.Application(
 );
 
 let graphics = new PIXI.Graphics()
-
-app.stage.addChild( graphics );
+window.turtle = PIXI.Sprite.fromImage( 'assets/images/turtle.png' );
+// app.stage.addChild( graphics );
+app.stage.addChild( turtle );
 
 function animate() {
     graphics.clear();
+    turtle.position.x = shipShape.position.x;
+    turtle.position.y = shipShape.position.y;
+    turtle.pivot.x = turtle.width / 2;
+    turtle.pivot.y = turtle.height / 2;
+    turtle.rotation = shipShape.angle;
     graphics.lineStyle( 1, 0x00ff32, 1 );
 
     for ( let i = 0, l = shipShape.vertices.length; i < l; i++ ) {
