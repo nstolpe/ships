@@ -22,23 +22,58 @@ var engine = Engine.create( { world: world } );
 // create a renderer
 var render = Render.create({
     canvas: document.getElementById( 'view' ),
-    engine: engine
+    engine: engine,
+    options: {
+        showDebug: true,
+        showInternalEdges: true,
+        showAngleIndicator: true,
+        // showAxes: true,
+        showVertexNumbers: true,
+    }
 });
+
+var scale = window.devicePixelRatio;
+
+var app = new PIXI.Application(
+    800,
+    800,
+    {
+        view: document.getElementById( 'pixi' ),
+        backgroundColor: 0x051224,
+        resolution: scale,
+        autoResize: true
+    }
+);
+
+let graphics = new PIXI.Graphics()
+
+app.stage.addChild( graphics );
+
+function animate() {
+    graphics.clear();
+    graphics.lineStyle( 1, 0x00ff32, 1 );
+
+    for ( let i = 0, l = shipShape.vertices.length; i < l; i++ ) {
+        let vertex = shipShape.vertices[ i ];
+        if ( i === 0 )
+            graphics.moveTo( vertex.x, vertex.y );
+        else  if ( i === l - 1 )
+            graphics.lineTo( shipShape.vertices[ 0 ].x, shipShape.vertices[ 0 ].y );
+        else
+            graphics.lineTo( vertex.x, vertex.y );
+    }
+}
+
+app.ticker.add( animate );
 
 var forces = [ { x: 0.0001, y: 0.00004 } ];
 
-var current = function( a, b ) {
-    Matter.Body.applyForce( a, { x: a.position.x * .8, y: a.position.x * .8 }, { x: 0.001, y: 0.003 } );
-}
 // create two boxes and a ground
 var boxA = Bodies.rectangle(400, 200, 120, 120, {
     // restitution: 1,
     label: 'BoxA',
     // density: .2,
     plugin: {
-        attractors: [
-            current
-        ],
         forces: forces
     }
 } );
@@ -48,37 +83,31 @@ var boxB = Bodies.rectangle(450, 50, 80, 80, {
     label: 'BoxB',
     // density: .1,
     plugin: {
-        attractors: [
-            current
-        ],
         forces: forces
     }
 } );
 
 var shipShape = Bodies.fromVertices( 450, 300,
     [
-        { x: 38, y: 0 },
-        { x: 15, y: 7 },
-        { x: 3, y: 33 },
-        { x: 0, y: 58 },
-        { x: 3, y: 87 },
-        { x: 15, y: 113 },
-        { x: 38, y: 120 },
-        { x: 48, y: 120 },
-        { x: 71, y: 113 },
-        { x: 83, y: 87 },
-        { x: 86, y: 58 },
-        { x: 83, y: 33 },
-        { x: 71, y: 7 },
-        { x: 48, y: 0 }
+        { x: 0, y: 38 },
+        { x: -7, y: 15 },
+        { x: -33, y: 3 },
+        { x: -58, y: 0 },
+        { x: -87, y: 3 },
+        { x: -113, y: 15 },
+        { x: -120, y: 38 },
+        { x: -120, y: 48 },
+        { x: -113, y: 71 },
+        { x: -87, y: 83 },
+        { x: -58, y: 86 },
+        { x: -33, y: 83 },
+        { x: -7, y: 71 },
+        { x: 0, y: 48 },
     ], {
         // restitution: 1,
         // density: .1,
         label: 'ShipShape',
         plugin: {
-            attractors: [
-                current
-            ],
             forces: forces
         }
     }
@@ -86,10 +115,11 @@ var shipShape = Bodies.fromVertices( 450, 300,
 
 var ground = Bodies.rectangle(400, 610, 810, 60, { isStatic: true });
 var ceiling = Bodies.rectangle(400, -10, 810, 60, { isStatic: true });
-var left = Bodies.rectangle(810, 300, 60, 610, { isStatic: true });
-var right = Bodies.rectangle(-10, 300, 60, 610, { isStatic: true });
+var right = Bodies.rectangle(890, 300, 200, 610, { isStatic: true });
+var left = Bodies.rectangle(-10, 300, 200, 610, { isStatic: true });
 window.boxA = boxA;
 window.boxB = boxB;
+window.shipShape = shipShape;
 window.Matter = Matter;
 
 // add all of the bodies to the world
