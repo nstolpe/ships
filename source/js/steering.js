@@ -18,7 +18,7 @@ const viewHeight = document.body.offsetHeight;
 const app = new PIXI.Application( viewWidth, viewHeight, { view: view, backgroundColor : 0x051224, resolution: scale, autoResize: true } );
 const Particles = require( 'pixi-particles' );
 
-const Config = require( './inc/config.js' )( PIXI, app );
+const Config = require( './inc/config-old.js' )( PIXI, app );
 
 window.app = app;
 view.style.width = viewWidth + 'px';
@@ -171,7 +171,7 @@ function updateFollowCamera( delta ) {
 
 function checkCollisions() {
 	// Check each moving (movable really) object for a collision with every other object.
-	// @TODO check only actually moving and check w/i same area. 
+	// @TODO check only actually moving and check w/i same area.
 	let collideables = gameModels.filter( ( model ) => {
 		return model.base.positionConstraints.neg.x !== 0 ||
 		model.base.positionConstraints.neg.y !== 0 ||
@@ -290,7 +290,7 @@ function checkCollision( one, two ) {
 		}
 	}
 
-	// then the second 
+	// then the second
 	for ( let i = 0, l = pointsTwo.length; i < l; i++ ) {
 		let normal = two.base.sprite.hitArea.normals[ i ];
 		let rangeOne = projectPoints( pointsOne, normal );
@@ -540,7 +540,7 @@ function drawDebug( model ) {
 
 		stageGraphics.moveTo( p.x, p.y );
 
-		// draw a line from each point to the one after it 
+		// draw a line from each point to the one after it
 		for ( let i = 2, l = model.base.sprite.hitArea.points.length; i < l; i += 2 ) {
 			p.set(
 				model.base.sprite.hitArea.points[ i ],
