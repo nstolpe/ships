@@ -11,6 +11,7 @@ var Engine = Matter.Engine,
     Render = Matter.Render,
     World = Matter.World,
     Bodies = Matter.Bodies,
+    Events = Matter.Events,
     Loader = PIXI.loader;
 
 let turtle;
@@ -37,26 +38,31 @@ var world = World.create( {
 // create an engine
 var engine = Engine.create( { world: world, positionIterations: 10, velocityIterations: 10 } );
 
-// create a renderer
-var render = Render.create({
-    canvas: document.getElementById( 'view' ),
-    engine: engine,
-    options: {
-        showDebug: true,
-        showInternalEdges: true,
-        showAngleIndicator: true,
-        // showAxes: true,
-        showVertexNumbers: true,
-    }
-});
+// // create a renderer
+// var render = Render.create( {
+//     // canvas: document.getElementById( 'view' ),
+//     element: document.body,
+//     engine: engine,
+//     options: {
+//         showDebug: true,
+//         showInternalEdges: true,
+//         showAngleIndicator: true,
+//         // showAxes: true,
+//         showVertexNumbers: true,
+//         showCollisions: true,
+//         showSeparations: true,
+//         showBroadphase: true,
+//         showVelocity: true,
+//     }
+// } );
 
 var scale = window.devicePixelRatio;
 
 var app = new PIXI.Application(
-    800,
-    800,
+    document.body.offsetWidth,
+    document.body.offsetHeight,
     {
-        view: document.getElementById( 'pixi' ),
+        view: document.getElementById( 'view' ),
         backgroundColor: 0x051224,
         resolution: scale,
         autoResize: true
@@ -86,7 +92,7 @@ function animate() {
 
 }
 
-var forces = [ { x: 0.0001, y: 0.00004 } ];
+var forces = [ { x: 0.00001, y: 0.00004 } ];
 
 // create two boxes and a ground
 var boxA = Bodies.rectangle(400, 200, 120, 120, {
@@ -98,7 +104,7 @@ var boxA = Bodies.rectangle(400, 200, 120, 120, {
     }
 } );
 
-var boxB = Bodies.rectangle(450, 50, 80, 80, {
+var boxB = Bodies.rectangle(400, 100, 10, 80, {
     // restitution: 1,
     label: 'BoxB',
     // density: .1,
@@ -124,7 +130,8 @@ var shipShape = Bodies.fromVertices( 450, 300,
         { x: -7, y: 71 },
         { x: 0, y: 48 },
     ], {
-        // restitution: 1,
+        restitution: .2,
+        friction: .0,
         // density: .1,
         label: 'ShipShape',
         plugin: {
@@ -132,22 +139,97 @@ var shipShape = Bodies.fromVertices( 450, 300,
         }
     }
 );
+var rudder = Bodies.rectangle( 389, 300, 32, 8, {
+    label: 'rudder',
+    plugin: {
+        forces: forces
+    }
+} );
+window.rudder = rudder;
 Matter.Body.scale( shipShape, .75, .75 );
-var ground = Bodies.rectangle( 400, 610, 810, 60, { isStatic: true } );
+var ground = Bodies.rectangle( 400, 610, 810, 60 );
+window.ground = ground;
 var ceiling = Bodies.rectangle( 400, -10, 810, 60, { isStatic: true } );
 var right = Bodies.rectangle( 800, 300, 200, 610, { isStatic: true } );
 var left = Bodies.rectangle( -10, 300, 200, 610, { isStatic: true } );
-var rigidBodies = [ ground, ceiling, right, left, boxA, boxB, shipShape ];
+var rigidBodies = [ ground, ceiling, right, left, boxA, boxB, shipShape, rudder ];
 window.boxA = boxA;
 window.boxB = boxB;
 window.shipShape = shipShape;
 window.Matter = Matter;
-
+var composite = Matter.Composite.create();
+// Matter.Composite.add( composite, boxA );
+// Matter.Composite.add( composite, boxB );
+window.constraint = Matter.Constraint.create( {
+    bodyA: boxA,
+    bodyB: boxB,
+    pointA: { x: 0, y: -60 },
+    pointB: { x: 0, y: 40 }
+} );
 // add all of the bodies to the world
-World.add( engine.world, [ boxA, boxB, shipShape, ground, ceiling, left, right ] );
+World.add( engine.world, [ boxA, boxB, shipShape, ground, ceiling, left, right, constraint, rudder ] );
 
 // run the engine
 Engine.run( engine );
 
 // run the renderer
-Render.run( render );
+// Render.run( render );
+
+var accelerate = 0;
+var turn = 0;
+var boost = false;
+// W
+window.addEventListener( 'keydown', e => {
+    if ( e.which === 87 ) accelerate = 1;
+}, false );
+window.addEventListener( 'keyup', e => {
+    if ( e.which === 87 ) accelerate = 0;
+}, false );
+// S
+window.addEventListener( 'keydown', e => {
+    if ( e.which === 83 ) accelerate = -1;
+}, false );
+window.addEventListener( 'keyup', e => {
+    if ( e.which === 83 ) accelerate = 0;
+}, false );
+// A
+window.addEventListener( 'keydown', e => {
+    if ( e.which === 65 ) turn = -1;
+}, false );
+window.addEventListener( 'keyup', e => {
+    if ( e.which === 65 ) turn = 0;
+}, false );
+// D
+window.addEventListener( 'keydown', e => {
+    if ( e.which === 68 ) turn = 1;
+}, false );
+window.addEventListener( 'keyup', e => {
+    if ( e.which === 68 ) turn = 0;
+}, false );
+// P
+window.addEventListener( 'keydown', e => {
+    if ( e.which === 80 ) boost = true;
+}, false );
+// window.addEventListener( 'keyup', e => {
+//     if ( e.which === 80 ) turn = 0;
+// }, false );
+
+Events.on( engine, "beforeUpdate", ( e ) => {
+    if ( accelerate ) {
+        // console.log(e);
+        let v = Matter.Vector.create(
+            Math.cos( shipShape.angle ),
+            Math.sin( shipShape.angle ) );
+        v = Matter.Vector.normalise( v );
+        v = Matter.Vector.mult( v, .0004 * accelerate );
+        Matter.Body.applyForce( shipShape, shipShape.position, v )
+    }
+    if ( boost ) {
+        let v = Matter.Vector.create( Math.cos( shipShape.angle ), Math.sin( shipShape.angle ) );
+        Matter.Body.applyForce( shipShape, shipShape.position, Matter.Vector.mult( v, .2 ) );
+        boost = false;
+    }
+    if ( turn ) {
+        shipShape.torque = turn * .004;
+    }
+} );
