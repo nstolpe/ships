@@ -1,9 +1,11 @@
 const PIXI = require( 'pixi.js' );
+const Turms = require( 'turms' );
 const decomp = require('poly-decomp');
 window.decomp = decomp;
 const Matter = require( 'matter-js' );
 const MatterAttractors = require( 'matter-attractors' );
 const MatterForces = require( './inc/matter-forces' );
+const Config = require( './inc/config.js' );
 // Matter.use( 'matter-attractors' );
 Matter.use( 'matter-forces' );
 
@@ -19,16 +21,29 @@ let graphics = new PIXI.Graphics()
 
 window.turtle = turtle;
 
-Loader.add( 'turtle', 'assets/images/turtle.png' )
+function loadStage2( config ) {
+    config[ 'spritesheets' ].forEach( ( e, i, a ) => {
+        Loader.add( `spritesheets::${ e }`, `assets/spritesheets/${ e }.json` );
+    } );
+
+    Loader.load( ( loader, resources ) => {
+        console.log( 'stage2loaded');
+        console.log( resources[ `spritesheets::assets` ].textures );
+    } );
+}
+
+Loader
+    .add( 'turtle', 'assets/images/turtle.png' )
+    .add( 'config', 'assets/data/default.json')
     .load( ( loader, resources ) => {
         turtle = new PIXI.Sprite( resources.turtle.texture );
         turtle.pivot.set( turtle.width * .5, turtle.height * .5 );
-        turtle.scale.x *= .75;
-        turtle.scale.y *= .75;
-
-        app.stage.addChild( graphics );
         app.stage.addChild( turtle );
+        app.stage.addChild( graphics );
         app.ticker.add( animate );
+
+        // 2nd stage loader
+        loadStage2( resources.config.data );
     } );
 
 var world = World.create( {
@@ -38,23 +53,23 @@ var world = World.create( {
 // create an engine
 var engine = Engine.create( { world: world, positionIterations: 10, velocityIterations: 10 } );
 
-// // create a renderer
-// var render = Render.create( {
-//     // canvas: document.getElementById( 'view' ),
-//     element: document.body,
-//     engine: engine,
-//     options: {
-//         showDebug: true,
-//         showInternalEdges: true,
-//         showAngleIndicator: true,
-//         // showAxes: true,
-//         showVertexNumbers: true,
-//         showCollisions: true,
-//         showSeparations: true,
-//         showBroadphase: true,
-//         showVelocity: true,
-//     }
-// } );
+// create a renderer
+var render = Render.create( {
+    // canvas: document.getElementById( 'view' ),
+    element: document.body,
+    engine: engine,
+    options: {
+        showDebug: true,
+        showInternalEdges: true,
+        showAngleIndicator: true,
+        // showAxes: true,
+        showVertexNumbers: true,
+        showCollisions: true,
+        showSeparations: true,
+        showBroadphase: true,
+        showVelocity: true,
+    }
+} );
 
 var scale = window.devicePixelRatio;
 
@@ -91,8 +106,10 @@ function animate() {
     }
 
 }
-
-var forces = [ { x: 0.00001, y: 0.00004 } ];
+// angle 163
+// magnitude .0001
+// var forces = [ { x: -0.9563047559630355, y: 0.2923717047227366 } ];
+var forces = [ { x: -0.9563047559630355 * .0001, y: 0.2923717047227366 * .0001 } ];
 
 // create two boxes and a ground
 var boxA = Bodies.rectangle(400, 200, 120, 120, {
@@ -115,38 +132,39 @@ var boxB = Bodies.rectangle(400, 100, 10, 80, {
 
 var shipShape = Bodies.fromVertices( 450, 300,
     [
-        { x: 0, y: 38 },
-        { x: -7, y: 15 },
-        { x: -33, y: 3 },
-        { x: -58, y: 0 },
-        { x: -87, y: 3 },
-        { x: -113, y: 15 },
-        { x: -120, y: 38 },
-        { x: -120, y: 48 },
-        { x: -113, y: 71 },
-        { x: -87, y: 83 },
-        { x: -58, y: 86 },
-        { x: -33, y: 83 },
-        { x: -7, y: 71 },
-        { x: 0, y: 48 },
+        { x: 60, y: 19  },
+        { x: 56, y: 8  },
+        { x: 43, y: 2  },
+        { x: 31, y: 0  },
+        { x: 17, y: 2  },
+        { x: 4, y: 8  },
+        { x: 0, y: 19  },
+        { x: 0, y: 24  },
+        { x: 4, y: 35  },
+        { x: 17, y: 41  },
+        { x: 31, y: 43  },
+        { x: 43, y: 41  },
+        { x: 56, y: 35  },
+        { x: 60, y: 24  }
     ], {
         restitution: .2,
         friction: .0,
-        // density: .1,
+        density: .002,
         label: 'ShipShape',
         plugin: {
             forces: forces
         }
     }
 );
-var rudder = Bodies.rectangle( 389, 300, 32, 8, {
+
+var rudder = Bodies.rectangle( 389, 300, 100, 100, {
     label: 'rudder',
     plugin: {
         forces: forces
     }
 } );
 window.rudder = rudder;
-Matter.Body.scale( shipShape, .75, .75 );
+// Matter.Body.scale( shipShape, .5, .5 );
 var ground = Bodies.rectangle( 400, 610, 810, 60 );
 window.ground = ground;
 var ceiling = Bodies.rectangle( 400, -10, 810, 60, { isStatic: true } );
@@ -166,14 +184,71 @@ window.constraint = Matter.Constraint.create( {
     pointA: { x: 0, y: -60 },
     pointB: { x: 0, y: 40 }
 } );
+window.rudderConstraint0 = Matter.Constraint.create( {
+    pointB: {
+        x: rudder.vertices[0].x - rudder.position.x,
+        y: rudder.vertices[0].y - rudder.position.y
+    },
+    pointA: {
+        x: rudder.vertices[0].x - 2,
+        y: rudder.vertices[0].y - 2
+    },
+    bodyB: rudder,
+    stiffness: 0.1,
+    damping: 0.05
+} );
+window.rudderConstraint1 = Matter.Constraint.create( {
+    pointB: {
+        x: rudder.vertices[1].x - rudder.position.x,
+        y: rudder.vertices[1].y - rudder.position.y
+    },
+    pointA: {
+        x: rudder.vertices[1].x - 2,
+        y: rudder.vertices[1].y - 2
+    },
+    bodyB: rudder,
+    stiffness: 0.1,
+    damping: 0.05
+} );
+window.rudderConstraint2 = Matter.Constraint.create( {
+    pointB: {
+        x: rudder.vertices[2].x - rudder.position.x,
+        y: rudder.vertices[2].y - rudder.position.y
+    },
+    pointA: {
+        x: rudder.vertices[2].x - 2,
+        y: rudder.vertices[2].y - 2
+    },
+    bodyB: rudder,
+    stiffness: 0.1,
+    damping: 0.05
+} );
+window.rudderConstraint3 = Matter.Constraint.create( {
+    pointB: {
+        x: rudder.vertices[3].x - rudder.position.x,
+        y: rudder.vertices[3].y - rudder.position.y
+    },
+    pointA: {
+        x: rudder.vertices[3].x - 2,
+        y: rudder.vertices[3].y - 2
+    },
+    bodyB: rudder,
+    stiffness: 0.1,
+    damping: 0.05
+} );
 // add all of the bodies to the world
-World.add( engine.world, [ boxA, boxB, shipShape, ground, ceiling, left, right, constraint, rudder ] );
+World.add( engine.world, [
+    boxA, boxB, shipShape, ground, ceiling,
+    left, right, constraint, rudder,
+    rudderConstraint0, rudderConstraint1,
+    rudderConstraint2, rudderConstraint3
+] );
 
 // run the engine
 Engine.run( engine );
 
 // run the renderer
-// Render.run( render );
+Render.run( render );
 
 var accelerate = 0;
 var turn = 0;
@@ -230,6 +305,6 @@ Events.on( engine, "beforeUpdate", ( e ) => {
         boost = false;
     }
     if ( turn ) {
-        shipShape.torque = turn * .004;
+        shipShape.torque = turn * .003;
     }
 } );

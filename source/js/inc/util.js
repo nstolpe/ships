@@ -4,7 +4,7 @@ module.exports = {
 	/**
 	 * Enum-like immutable object with 3 states.
 	 */
-	TrinaryState: Object.freeze( { 
+	TrinaryState: Object.freeze( {
 		POSITIVE: 1,
 		NEUTRAL: 0,
 		NEGATIVE: -1
@@ -30,5 +30,50 @@ module.exports = {
 		min = Math.ceil(min);
 		max = Math.floor(max);
 		return Math.floor( Math.random() * (max - min + 1) ) + min;
+	},
+	/**
+	 * Returns an object of arguments retrieved from `location.search` of a `window` object.
+	 */
+	locationArgs( win ) {
+		let search;
+
+		try {
+			search = win.location.search;
+		} catch( e ) {
+			console.warn( 'Invalid window object, could not access `location.search`.' );
+			return {};
+		}
+
+		const args = {};
+		const params = search.replace( /^\?/, '' ).split( '&' );
+
+		params.forEach( ( p, i ) => {
+			let param = p.split( '=' );
+
+			// single length param is either empty or true.
+			if ( param.length < 2 )
+				if ( param[ 0 ] ) args[ param[ 0 ] ] = true;
+
+			// 2 arg param sets a key and value
+			if ( param.length === 2 )
+				args[ param[ 0 ] ] = param[ 1 ];
+		} );
+
+		return args;
+	},
+	/**
+	 * Normalizes a radian angle to keep it between -2PI and 2PI
+	 *
+	 * @param number angle  The angle that may need normalization.
+	 */
+	normalizeAngle( angle ) {
+		const limit = 2 * Math.PI;
+		let normalized = angle;
+		if ( angle >= limit )
+			normalized -= limit * Math.floor( normalized / limit );
+		else if ( angle <= -limit )
+			normalized += limit * Math.floor( normalized / -limit );
+
+		return normalized;
 	}
 };

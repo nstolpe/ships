@@ -24,7 +24,8 @@
     "matter-js": "^0.13.0",
     "pixi-particles": "^2.1.5",
     "pixi.js": "^4.3.5",
-    "poly-decomp": "^0.2.1"
+    "poly-decomp": "^0.2.1",
+    "turms": "^0.1.1"
   },
   "devDependencies": {
     "chokidar": "^1.6.1"
