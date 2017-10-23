@@ -28,7 +28,7 @@ function loadStage2( config ) {
 
     Loader.load( ( loader, resources ) => {
         console.log( 'stage2loaded');
-        console.log( resources[ `spritesheets::assets` ].textures );
+        // console.log( resources[ `spritesheets::assets` ].textures );
     } );
 }
 
@@ -78,7 +78,7 @@ var app = new PIXI.Application(
     document.body.offsetHeight,
     {
         view: document.getElementById( 'view' ),
-        backgroundColor: 0x051224,
+        backgroundColor: 0x0088b4,
         resolution: scale,
         autoResize: true
     }
@@ -186,12 +186,12 @@ window.constraint = Matter.Constraint.create( {
 } );
 window.rudderConstraint0 = Matter.Constraint.create( {
     pointB: {
-        x: rudder.vertices[0].x - rudder.position.x,
-        y: rudder.vertices[0].y - rudder.position.y
+        x: (rudder.vertices[0].x - rudder.position.x) * .8,
+        y: (rudder.vertices[0].y - rudder.position.y) * .8
     },
     pointA: {
-        x: rudder.vertices[0].x - 2,
-        y: rudder.vertices[0].y - 2
+        x: rudder.vertices[0].x,
+        y: rudder.vertices[0].y
     },
     bodyB: rudder,
     stiffness: 0.1,
@@ -199,12 +199,12 @@ window.rudderConstraint0 = Matter.Constraint.create( {
 } );
 window.rudderConstraint1 = Matter.Constraint.create( {
     pointB: {
-        x: rudder.vertices[1].x - rudder.position.x,
-        y: rudder.vertices[1].y - rudder.position.y
+        x: (rudder.vertices[1].x - rudder.position.x) * .8,
+        y: (rudder.vertices[1].y - rudder.position.y) * .8
     },
     pointA: {
-        x: rudder.vertices[1].x - 2,
-        y: rudder.vertices[1].y - 2
+        x: rudder.vertices[1].x,
+        y: rudder.vertices[1].y
     },
     bodyB: rudder,
     stiffness: 0.1,
@@ -212,12 +212,12 @@ window.rudderConstraint1 = Matter.Constraint.create( {
 } );
 window.rudderConstraint2 = Matter.Constraint.create( {
     pointB: {
-        x: rudder.vertices[2].x - rudder.position.x,
-        y: rudder.vertices[2].y - rudder.position.y
+        x: (rudder.vertices[2].x - rudder.position.x) * .8,
+        y: (rudder.vertices[2].y - rudder.position.y) * .8
     },
     pointA: {
-        x: rudder.vertices[2].x - 2,
-        y: rudder.vertices[2].y - 2
+        x: rudder.vertices[2].x,
+        y: rudder.vertices[2].y
     },
     bodyB: rudder,
     stiffness: 0.1,
@@ -225,12 +225,12 @@ window.rudderConstraint2 = Matter.Constraint.create( {
 } );
 window.rudderConstraint3 = Matter.Constraint.create( {
     pointB: {
-        x: rudder.vertices[3].x - rudder.position.x,
-        y: rudder.vertices[3].y - rudder.position.y
+        x: (rudder.vertices[3].x - rudder.position.x) * .8,
+        y: (rudder.vertices[3].y - rudder.position.y) * .8
     },
     pointA: {
-        x: rudder.vertices[3].x - 2,
-        y: rudder.vertices[3].y - 2
+        x: rudder.vertices[3].x,
+        y: rudder.vertices[3].y
     },
     bodyB: rudder,
     stiffness: 0.1,
@@ -240,8 +240,8 @@ window.rudderConstraint3 = Matter.Constraint.create( {
 World.add( engine.world, [
     boxA, boxB, shipShape, ground, ceiling,
     left, right, constraint, rudder,
-    rudderConstraint0, rudderConstraint1,
-    rudderConstraint2, rudderConstraint3
+    rudderConstraint0,
+    rudderConstraint1, rudderConstraint2, rudderConstraint3
 ] );
 
 // run the engine

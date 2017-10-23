@@ -11,6 +11,13 @@ const Components = {
 		};
 	},
 	rotation( angle ) {
-
+		type: 'angle',
+		angle: angle
+	},
+	scale( x, y ) {
+		return {
+			type: 'scale',
+			position: Vector.create( ~~x, ~~y )
+		};
 	}
 }
