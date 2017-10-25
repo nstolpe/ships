@@ -1,8 +1,9 @@
 "use strict";
 
-const Util = require( './util.js' );
-const Loader = require( 'pixi.js' ).loader;
+const PIXI = require( 'pixi.js' );
 const ECS = require( './ecs.js' );
+
+const Loader = PIXI.loader;
 const Entity = ECS.Entity;
 const Components = ECS.Components;
 const Engine = ECS.Engine;
@@ -20,56 +21,78 @@ module.exports = function( id ) {
     return {
         id: id,
         dataPath: 'assets/data',
-        environment: {
-            forces: [],
-            background: 0x000000
-        },
         config: defaultConfig,
         engine: Engine(),
         load() {
             Loader
                 .add( 'config', `${ this.dataPath }/${ this.id }.json` )
-                .load( this.postLoad.bind( this ) );
+                .load( this.loadResources.bind( this ) );
 
             return this;
         },
-        postLoad( loader, resources ) {
+        loadResources( loader, resources ) {
             const config = resources.config;
             Object.assign( this.config, config.data );
 
             // queue all sprite sheets for loading.
+            // @TODO add other resources (sounds, etc) here once ready.
             this.config[ 'spritesheets' ].forEach( ( e, i, a ) => {
                 Loader.add( `spritesheets::${ e }`, `assets/spritesheets/${ e }.json` );
             } );
 
             // load everything
             Loader.load( ( loader, resources ) => {
-                // create an environment entity and add it to the engine
-                let environment = Entity(
-                    Components.color( this.environment.background ),
-                    Components.name( 'Environment' )
-                );
-
-                this.config.environment.forces.forEach( force => {
-                    environment.addComponents( Components.force(
-                                force.direction,
-                                force.magnitude
-                    ) );
-                } );
-
-                this.engine.addEntities( environment );
-
-                resources.config.data.entities.forEach( ( entity ) => {
-                    this.engine.addEntities( Entity(
-                        Components.name( entity.name ),
-                        Components.position( entity.position ),
-                        Components.rotation( entity.rotation ),
-                        Components.scale( entity.scale )
-                    ) );
-                } );
+                this.setEnvironment();
+                this.setActors();
 
                 console.log( this.engine.entities );
             } );
+        },
+        setActors() {
+            const actors = this.config.actors;
+
+            actors.forEach( ( actor ) => {
+                const entity = Entity(
+                    Components.name( actor.name ),
+                    Components.position( actor.position ),
+                    Components.rotation( actor.rotation ),
+                    Components.scale( actor.scale )
+                );
+                this.setGeometry( actor, entity );
+                this.engine.addEntities( entity );
+            } );
+        },
+        setGeometry( actor, entity ) {
+            const geoType = actor.geometry.type;
+            let component;
+
+            switch ( geoType ) {
+                case 'polygon':
+                    component = Components.polygon( actor.geometry.vertices );
+                    break;
+                case 'circle':
+                    component = Components.circle( actor.geometry.radius );
+                    break;
+                case 'rectangle':
+                    component = Components.rectangle( actor.geometry.width, actor.geometry.height );
+                    break;
+                case 'multi':
+                    break;
+            }
+        },
+        setEnvironment() {
+            const environment = this.config.environment;
+            const entity = Entity(
+                Components.color( environment.background ),
+                Components.name( 'Environment' )
+            );
+
+            environment.forces.forEach( force => {
+                let component = Components.force( force.direction, force.magnitude );
+                entity.addComponents( component );
+            } );
+
+            this.engine.addEntities( entity );
         }
     }
 }

@@ -66,8 +66,9 @@ function Entity( ...components ) {
 	return entity;
 }
 
-// weakmap for private data (components array) accessible w/ prototype methods
+// weakmaps for private data (entities array and systems array) accessible w/ prototype methods
 const EntitiesMap = new WeakMap();
+const SystemsMap = new WeakMap();
 
 const EngineProto = Object.create( Object.prototype, {
 	'class': { value: 'Engine' },
@@ -101,6 +102,37 @@ const EngineProto = Object.create( Object.prototype, {
 		value: function() {
 			const entities = EntitiesMap.get( this );
 			return entities.splice( 0, entities.length );
+		}
+	},
+	'addSystems': {
+		value: function( ...additions ) {
+			Array.prototype.push.apply( SystemsMap.get( this ), additions );
+		}
+	},
+	'removeSystems': {
+		value: function( ...subtractions ) {
+			const systems = SystemsMap.get( this );
+			const spliced = [];
+
+			subtractions.forEach( system => {
+				let index = systems.indexOf( system );
+				if ( index >= 0 ) spliced.push( systems.splice( index, 1 )[ 0 ] );
+			} );
+
+			return spliced;
+		}
+	},
+	'clearSystems': {
+		value: function() {
+			const systems = SystemsMap.get( this );
+			return systems.splice( 0, systems.length );
+		}
+	},
+	'update': {
+		value: function() {
+			const systems = SystemsMap.get( this );
+			for ( let i = 0, l = systems.length; i < l; i++)
+				systems[ i ].update();
 		}
 	}
 } );
@@ -144,10 +176,10 @@ const Components = {
 			data: ~~angle
 		} );
 	},
-	scale( x, y ) {
+	scale( scale ) {
 		return Object.assign( Object.create( ComponentProto ), {
 			type: 'scale',
-			data: Vector.create( ~~x, ~~y )
+			data: scale
 		} );
 	},
 	polygon( vertices, options ) {
