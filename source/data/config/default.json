@@ -12,7 +12,7 @@
     },
     "entities": [
         {
-            "id": "player",
+            "name": "player",
             "position": { "x": 0, "y": 0 },
             "rotation": 0,
             "scale": 1,
@@ -44,12 +44,12 @@
             "manager": "player"
         },
         {
-            "id": "dock-001",
+            "name": "dock-001",
             "position": { "x": 384, "y": 384 },
             "rotation": 0,
             "scale": 1,
             "geometry": {
-                "type": "parent"
+                "type": "multi"
             },
             "display": {
                 "type": "sprite",

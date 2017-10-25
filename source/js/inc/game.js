@@ -7,10 +7,6 @@ const Entity = ECS.Entity;
 const Components = ECS.Components;
 const Engine = ECS.Engine;
 
-function GameObject( config ) {
-    console.log( config );
-}
-
 const defaultConfig = {
     spritesheets: [],
     environment: {
@@ -28,7 +24,6 @@ module.exports = function( id ) {
             forces: [],
             background: 0x000000
         },
-        gameObjects: [],
         config: defaultConfig,
         engine: Engine(),
         load() {
@@ -50,25 +45,30 @@ module.exports = function( id ) {
             // load everything
             Loader.load( ( loader, resources ) => {
                 // create an environment entity and add it to the engine
-                let Environment = Entity(
+                let environment = Entity(
                     Components.color( this.environment.background ),
                     Components.name( 'Environment' )
                 );
 
                 this.config.environment.forces.forEach( force => {
-                    Environment.addComponents( Components.force(
+                    environment.addComponents( Components.force(
                                 force.direction,
                                 force.magnitude
                     ) );
                 } );
 
-                this.engine.addEntities( Environment );
+                this.engine.addEntities( environment );
+
+                resources.config.data.entities.forEach( ( entity ) => {
+                    this.engine.addEntities( Entity(
+                        Components.name( entity.name ),
+                        Components.position( entity.position ),
+                        Components.rotation( entity.rotation ),
+                        Components.scale( entity.scale )
+                    ) );
+                } );
 
                 console.log( this.engine.entities );
-
-                resources.config.data.entities.forEach( ( e, i, a ) => {
-                    this.gameObjects.push( GameObject( e ) );
-                } );
             } );
         }
     }

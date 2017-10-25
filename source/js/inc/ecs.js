@@ -135,7 +135,7 @@ const Components = {
 	position( x, y ) {
 		return Object.assign( Object.create( ComponentProto ), {
 			type: 'position',
-			data: Vector( ~~x, ~~y )
+			data: Vector.create( ~~x, ~~y )
 		} );
 	},
 	rotation( angle ) {
@@ -147,7 +147,7 @@ const Components = {
 	scale( x, y ) {
 		return Object.assign( Object.create( ComponentProto ), {
 			type: 'scale',
-			data: Vector( ~~x, ~~y )
+			data: Vector.create( ~~x, ~~y )
 		} );
 	},
 	polygon( vertices, options ) {
