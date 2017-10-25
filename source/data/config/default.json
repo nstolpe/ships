@@ -10,7 +10,7 @@
         ],
         "background": "0x051224"
     },
-    "game-objects": [
+    "entities": [
         {
             "id": "player",
             "position": { "x": 0, "y": 0 },
