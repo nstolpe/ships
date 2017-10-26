@@ -14,7 +14,7 @@ const defaultConfig = {
         forces:[],
         background: 0x000000
     },
-    entities: []
+    actors: []
 };
 
 module.exports = function( id ) {
@@ -77,8 +77,14 @@ module.exports = function( id ) {
                     component = Components.rectangle( actor.geometry.width, actor.geometry.height );
                     break;
                 case 'multi':
+                    component = Components.nogeo();
+                    break;
+                default:
+                    component = Components.nogeo();
                     break;
             }
+
+            entity.addComponents( component );
         },
         setEnvironment() {
             const environment = this.config.environment;
