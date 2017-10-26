@@ -162,14 +162,40 @@ const EmitterProto = Object.create( Object.prototype, {
                 events[ event ] = [];
 
             events[ event ].push( listener );
+            return listener;
+        }
+    },
+    'off': {
+        value: function( event, listener ) {
+            const events = EventsMap.get( this );
+            const listeners = events[ event ]
+
+            if ( Array.isArray( listeners ) ) {
+                const idx = listeners.indexOf( listener );
+                if ( idx >= 0 )
+                    return listeners.splice( idx, 1 );
+            }
+        }
+    },
+    'once': {
+        value: function( event, listener ) {
+            const oneShot = function() {
+                listener.apply( this, arguments );
+                this.off( event, oneShot );
+            };
+
+            this.on( event, oneShot );
+            return oneShot;
         }
     },
     'emit': {
-        value: function( event, ...data ) {
+        value: function( event ) {
             const events = EventsMap.get( this );
 
             if ( Array.isArray( events[ event] ) ) {
-                events[ event ].forEach( listener => listener.apply( this, data ) );
+                events[ event ].forEach( listener => {
+                    listener.apply( this, [].slice.call( arguments, 1 ) );
+                } );
             }
         }
     }
