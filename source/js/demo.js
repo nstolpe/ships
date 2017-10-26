@@ -2,11 +2,14 @@
 
 const Turms = require( 'turms' );
 const Util = require( './inc/util.js' );
-const Config = require( './inc/game.js' );
+const Game = require( './inc/game.js' );
 
 const env = Object.assign( {
     id: 'default'
 }, Util.locationArgs( window ) );
 
-const config = Config( env.id ).load();
-
+const game = Game(
+	env.id,
+	document.getElementById( 'view' ),
+	window.devicePixelRatio
+).load();

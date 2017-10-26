@@ -17,12 +17,20 @@ const defaultConfig = {
     actors: []
 };
 
-module.exports = function( id ) {
+module.exports = function( id, view, scale ) {
     return {
         id: id,
+        view: view,
+        scale: scale,
         dataPath: 'assets/data',
         config: defaultConfig,
         engine: Engine(),
+        spritesheetTemplate: filename => {
+            return `assets/spritesheets/${ filename }.json`;
+        },
+        spritesheetKey: filename => {
+            return `spritesheets::${ filename }`;
+        },
         load() {
             Loader
                 .add( 'config', `${ this.dataPath }/${ this.id }.json` )
@@ -30,25 +38,35 @@ module.exports = function( id ) {
 
             return this;
         },
+        /**
+         * Loads all of the resources from a config.
+         */
         loadResources( loader, resources ) {
             const config = resources.config;
+            // store incoming config
             Object.assign( this.config, config.data );
 
             // queue all sprite sheets for loading.
             // @TODO add other resources (sounds, etc) here once ready.
             this.config[ 'spritesheets' ].forEach( ( e, i, a ) => {
-                Loader.add( `spritesheets::${ e }`, `assets/spritesheets/${ e }.json` );
+                Loader.add( this.spritesheetKey( e ), this.spritesheetTemplate( e ) );
             } );
 
             // load everything
-            Loader.load( ( loader, resources ) => {
-                this.setEnvironment();
-                this.setActors();
-
-                console.log( this.engine.entities );
-            } );
+            Loader.load( this.postLoad.bind( this ) );
         },
-        setActors() {
+        postLoad( loader, resources ) {
+            this.loadEnvironment();
+            this.loadActors();
+            this.loadUI();
+            console.log( this.engine.entities );
+        },
+        loadUI() {
+            this.engine.addEntities( Entity(
+                Components.canvas( this.view )
+            ) );
+        },
+        loadActors() {
             const actors = this.config.actors;
 
             actors.forEach( ( actor ) => {
@@ -58,11 +76,16 @@ module.exports = function( id ) {
                     Components.rotation( actor.rotation ),
                     Components.scale( actor.scale )
                 );
-                this.setGeometry( actor, entity );
+                this.loadGeometry( actor, entity );
                 this.engine.addEntities( entity );
             } );
         },
-        setGeometry( actor, entity ) {
+        /**
+         * Loads gemometry from an `actor` from a config and turns it into
+         * a geometry `component` for an `entity`
+         * @TODO finish multi
+         */
+        loadGeometry( actor, entity ) {
             const geoType = actor.geometry.type;
             let component;
 
@@ -77,16 +100,15 @@ module.exports = function( id ) {
                     component = Components.rectangle( actor.geometry.width, actor.geometry.height );
                     break;
                 case 'multi':
-                    component = Components.nogeo();
                     break;
                 default:
-                    component = Components.nogeo();
                     break;
             }
 
-            entity.addComponents( component );
+            if ( component )
+                entity.addComponents( component );
         },
-        setEnvironment() {
+        loadEnvironment() {
             const environment = this.config.environment;
             const entity = Entity(
                 Components.color( environment.background ),
