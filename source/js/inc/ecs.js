@@ -200,6 +200,12 @@ const Components = {
 			data: Bodies.circle( 0, 0, ~~radius, Object.assign( {}, options ) )
 		} );
 	},
+	nogeo() {
+		return Object.assign( Object.create( ComponentProto ), {
+			type: 'nogeo',
+			data: null
+		} );
+	},
 	sprite( texture ) {
 		return Object.assign( Object.create( ComponentProto ), {
 			type: 'sprite',
