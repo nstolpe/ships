@@ -1,13 +1,29 @@
 {
 	"meta": {
 		"image": "assets.png",
-		"size": {"w":512,"h":256},
+		"size": {"w":548,"h":524},
 		"scale": "1"
 	},
 	"frames": {
+		"circle-target.png":
+		{
+			"frame": {"x":402,"y":2,"w":144,"h":144},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {"x":0,"y":0,"w":144,"h":144},
+			"sourceSize": {"w":144,"h":144}
+		},
+		"sand.png":
+		{
+			"frame": {"x":2,"y":2,"w":396,"h":396},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {"x":0,"y":0,"w":396,"h":396},
+			"sourceSize": {"w":396,"h":396}
+		},
 		"boards.png":
 		{
-			"frame": {"x":0,"y":0,"w":128,"h":128},
+			"frame": {"x":402,"y":150,"w":128,"h":128},
 			"rotated": false,
 			"trimmed": false,
 			"spriteSourceSize": {"x":0,"y":0,"w":128,"h":128},
@@ -15,7 +31,7 @@
 		},
 		"turtle-body.png":
 		{
-			"frame": {"x":128,"y":0,"w":86,"h":120},
+			"frame": {"x":2,"y":402,"w":86,"h":120},
 			"rotated": false,
 			"trimmed": false,
 			"spriteSourceSize": {"x":0,"y":0,"w":86,"h":120},
@@ -23,67 +39,75 @@
 		},
 		"coffin-body.png":
 		{
-			"frame": {"x":214,"y":0,"w":70,"h":116},
+			"frame": {"x":402,"y":282,"w":70,"h":116},
 			"rotated": false,
 			"trimmed": false,
 			"spriteSourceSize": {"x":0,"y":0,"w":70,"h":116},
 			"sourceSize": {"w":70,"h":116}
 		},
+		"turtle.png":
+		{
+			"frame": {"x":476,"y":282,"w":62,"h":44},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {"x":0,"y":0,"w":62,"h":44},
+			"sourceSize": {"w":62,"h":44}
+		},
+		"pixel.png":
+		{
+			"frame": {"x":544,"y":184,"w":2,"h":2},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {"x":0,"y":0,"w":2,"h":2},
+			"sourceSize": {"w":2,"h":2}
+		},
+		"turtle-cannon-large.png":
+		{
+			"frame": {"x":92,"y":402,"w":38,"h":16},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {"x":0,"y":0,"w":38,"h":16},
+			"sourceSize": {"w":38,"h":16}
+		},
+		"turtle-cannon-small.png":
+		{
+			"frame": {"x":134,"y":402,"w":30,"h":14},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {"x":0,"y":0,"w":30,"h":14},
+			"sourceSize": {"w":30,"h":14}
+		},
+		"turtle-rudder.png":
+		{
+			"frame": {"x":534,"y":150,"w":12,"h":30},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {"x":0,"y":0,"w":12,"h":30},
+			"sourceSize": {"w":12,"h":30}
+		},
+		"coffin-cannon-rear.png":
+		{
+			"frame": {"x":534,"y":184,"w":6,"h":14},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {"x":0,"y":0,"w":6,"h":14},
+			"sourceSize": {"w":6,"h":14}
+		},
+		"coffin-cannon-front.png":
+		{
+			"frame": {"x":534,"y":202,"w":12,"h":12},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {"x":0,"y":0,"w":12,"h":12},
+			"sourceSize": {"w":12,"h":12}
+		},
 		"coffin-cannon-top.png":
 		{
-			"frame": {"x":0,"y":128,"w":40,"h":60},
+			"frame": {"x":476,"y":330,"w":40,"h":60},
 			"rotated": false,
 			"trimmed": false,
 			"spriteSourceSize": {"x":0,"y":0,"w":40,"h":60},
 			"sourceSize": {"w":40,"h":60}
-		},
-		"turtle-cannon-large.png":
-		{
-			"frame": {"x":40,"y":128,"w":37,"h":16},
-			"rotated": false,
-			"trimmed": false,
-			"spriteSourceSize": {"x":0,"y":0,"w":37,"h":16},
-			"sourceSize": {"w":37,"h":16}
-		},
-		"turtle-rudder.png":
-		{
-			"frame": {"x":40,"y":144,"w":11,"h":30},
-			"rotated": false,
-			"trimmed": false,
-			"spriteSourceSize": {"x":0,"y":0,"w":11,"h":30},
-			"sourceSize": {"w":11,"h":30}
-		},
-		"turtle-cannon-small.png":
-		{
-			"frame": {"x":77,"y":128,"w":29,"h":13},
-			"rotated": false,
-			"trimmed": false,
-			"spriteSourceSize": {"x":0,"y":0,"w":29,"h":13},
-			"sourceSize": {"w":29,"h":13}
-		},
-		"coffin-cannon-rear.png":
-		{
-			"frame": {"x":106,"y":128,"w":6,"h":13},
-			"rotated": false,
-			"trimmed": false,
-			"spriteSourceSize": {"x":0,"y":0,"w":6,"h":13},
-			"sourceSize": {"w":6,"h":13}
-		},
-		"coffin-cannon-front.png":
-		{
-			"frame": {"x":214,"y":116,"w":11,"h":11},
-			"rotated": false,
-			"trimmed": false,
-			"spriteSourceSize": {"x":0,"y":0,"w":11,"h":11},
-			"sourceSize": {"w":11,"h":11}
-		},
-		"pixel.png":
-		{
-			"frame": {"x":225,"y":116,"w":1,"h":1},
-			"rotated": false,
-			"trimmed": false,
-			"spriteSourceSize": {"x":0,"y":0,"w":1,"h":1},
-			"sourceSize": {"w":1,"h":1}
 		}
 	}
 }
