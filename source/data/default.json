@@ -13,7 +13,7 @@
     "actors": [
         {
             "name": "player",
-            "position": { "x": 0, "y": 0 },
+            "position": { "x": 200, "y": 200 },
             "rotation": 0,
             "scale": 1,
             "geometry": {
@@ -38,7 +38,7 @@
             "display": {
                 "type": "sprite",
                 "spritesheet": "assets",
-                "id": "turtle-body",
+                "id": "turtle.png",
                 "tile": false
             },
             "manager": "player"
@@ -52,10 +52,9 @@
                 "type": "multi"
             },
             "display": {
-                "type": "sprite",
+                "type": "tiling-sprite",
                 "spritesheet": "assets",
-                "id": "boards.png",
-                "tile": true
+                "id": "boards.png"
             },
             "manager": "scene",
             "children": [
@@ -70,10 +69,9 @@
                         "height": 256
                     },
                     "display": {
-                        "type": "sprite",
+                        "type": "tiling-sprite",
                         "spritesheet": "assets",
-                        "id": "boards.png",
-                        "tile": true
+                        "id": "boards.png"
                     }
                 },
                 {
@@ -85,6 +83,11 @@
                         "type": "rectangle",
                         "width": 64,
                         "height": 256
+                    },
+                    "display": {
+                        "type": "tiling-sprite",
+                        "spritesheet": "assets",
+                        "id": "boards.png"
                     }
                 },
                 {
@@ -98,10 +101,9 @@
                         "height": 64
                     },
                     "display": {
-                        "type": "sprite",
+                        "type": "tiling-sprite",
                         "spritesheet": "assets",
-                        "id": "boards.png",
-                        "tile": true
+                        "id": "boards.png"
                     }
                 },
                 {
@@ -115,10 +117,9 @@
                         "height": 64
                     },
                     "display": {
-                        "type": "sprite",
+                        "type": "tiling-sprite",
                         "spritesheet": "assets",
-                        "id": "boards.png",
-                        "tile": true
+                        "id": "boards.png"
                     }
                 },
                 {
@@ -132,10 +133,9 @@
                         "height": 64
                     },
                     "display": {
-                        "type": "sprite",
+                        "type": "tiling-sprite",
                         "spritesheet": "assets",
-                        "id": "boards.png",
-                        "tile": true
+                        "id": "boards.png"
                     }
                 }
             ]
