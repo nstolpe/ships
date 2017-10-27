@@ -9,7 +9,7 @@ const env = Object.assign( {
 }, Util.locationArgs( window ) );
 
 const game = Game(
-	env.id,
-	document.getElementById( 'view' ),
-	window.devicePixelRatio
+    env.id,
+    document.getElementById( 'view' ),
+    window.devicePixelRatio
 ).load();
