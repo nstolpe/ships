@@ -2,7 +2,7 @@
 
 const PIXI = require( 'pixi.js' );
 const Matter = require( 'matter-js' );
-const EE = require( 'eventemitter3' );
+const Emitter = require( './emitter.js' );
 const Vector = Matter.Vector;
 const Bodies = Matter.Bodies;
 const Sprite = PIXI.Sprite;
@@ -12,7 +12,7 @@ const TilingSprite = PIXI.extras.TilingSprite;
 // weakmap for private data (components array) accessible w/ prototype methods
 const ComponentsMap = new WeakMap();
 
-const EntityProto = Object.create( Object.prototype, {
+const EntityProto = Emitter( {
     'class': { value: 'Entity' },
     'id': { value: 0 },
     /**
@@ -21,7 +21,7 @@ const EntityProto = Object.create( Object.prototype, {
      * The returned array is not modifiable, but the components inside are.
      */
     'components': {
-        get() {
+        get: function() {
             const components = ComponentsMap.get( this );
             return components.slice( 0, components.length )
         },
@@ -72,11 +72,11 @@ function Entity( ...components ) {
 const EntitiesMap = new WeakMap();
 const SystemsMap = new WeakMap();
 
-const EngineProto = Object.create( Object.prototype, {
+const EngineProto = Emitter( {
     'class': { value: 'Engine' },
     'id': { value: 0 },
     'entities': {
-        get() {
+        get: function() {
             const entities = EntitiesMap.get( this );
             return entities.slice( 0, entities.length )
         },
@@ -151,66 +151,8 @@ function Engine( ...entities ) {
     return engine;
 }
 
-const EventsMap = new WeakMap();
-
-const EmitterProto = Object.create( Object.prototype, {
-    'on': {
-        value: function( event, listener ) {
-            const events = EventsMap.get( this );
-
-            if ( !Array.isArray( events[ event] ) )
-                events[ event ] = [];
-
-            events[ event ].push( listener );
-            return listener;
-        }
-    },
-    'off': {
-        value: function( event, listener ) {
-            const events = EventsMap.get( this );
-            const listeners = events[ event ]
-
-            if ( Array.isArray( listeners ) ) {
-                const idx = listeners.indexOf( listener );
-                if ( idx >= 0 )
-                    return listeners.splice( idx, 1 );
-            }
-        }
-    },
-    'once': {
-        value: function( event, listener ) {
-            const oneShot = function() {
-                listener.apply( this, arguments );
-                this.off( event, oneShot );
-            };
-
-            this.on( event, oneShot );
-            return oneShot;
-        }
-    },
-    'emit': {
-        value: function( event ) {
-            const events = EventsMap.get( this );
-
-            if ( Array.isArray( events[ event] ) ) {
-                events[ event ].forEach( listener => {
-                    listener.apply( this, [].slice.call( arguments, 1 ) );
-                } );
-            }
-        }
-    }
-} );
-
-const Emitter = function() {
-    const emitter = Object.create( EmitterProto );
-
-    EventsMap.set( emitter, {} );
-    return emitter;
-};
-
-const SystemProto = Object.create( EE.prototype );
+const SystemProto = Emitter( {} );
 const RenderSystem = function( view, scale ) {
-
     const system = {
         application: null,
         engine: null,
@@ -229,7 +171,7 @@ const RenderSystem = function( view, scale ) {
     }
 }
 
-const ComponentProto = Object.create( Object.prototype, {
+const ComponentProto = Emitter( {
     'class': { value: 'Component' },
     'type': {
         value: 'component',
