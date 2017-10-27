@@ -189,7 +189,7 @@ const Components = {
     /**
      * A component that stores a 2d position in a `Matter.Vector`
      */
-    position( x, y ) {
+    Position( x, y ) {
         return Object.assign( Object.create( ComponentProto ), {
             type: 'position',
             data: Vector.create( ~~x, ~~y )
@@ -198,7 +198,7 @@ const Components = {
     /**
      * A component that stores an angle in radians
      */
-    rotation( angle ) {
+    Rotation( angle ) {
         return Object.assign( Object.create( ComponentProto ), {
             type: 'rotation',
             data: ~~angle
@@ -207,7 +207,7 @@ const Components = {
     /**
      * A component that stores a scalar float scale
      */
-    scale( scale ) {
+    Scale( scale ) {
         return Object.assign( Object.create( ComponentProto ), {
             type: 'scale',
             data: scale
@@ -216,7 +216,7 @@ const Components = {
     /**
      * A component that stores a polygon object created from `Matter.Bodies`
      */
-    polygon( vertices, options ) {
+    Polygon( vertices, options ) {
         return Object.assign( Object.create( ComponentProto ), {
             type: 'polygon',
             data: Bodies.fromVertices( 0, 0, vertices, Object.assign( {}, options ) )
@@ -225,7 +225,7 @@ const Components = {
     /**
      * A component that stores a rectangle object created from `Matter.Bodies`
      */
-    rectangle( width, height, options ) {
+    Rectangle( width, height, options ) {
         return Object.assign( Object.create( ComponentProto ), {
             type: 'rectangle',
             data: Bodies.rectangle( 0, 0, ~~width, ~~height, Object.assign( {}, options ) )
@@ -234,7 +234,7 @@ const Components = {
     /**
      * A component that stores a sprite object created from `PIXI.Sprite`
      */
-    sprite( texture ) {
+    Sprite( texture ) {
         return Object.assign( Object.create( ComponentProto ), {
             type: 'sprite',
             data: new Sprite( texture )
@@ -243,7 +243,7 @@ const Components = {
     /**
      * A component that stores a `PIXI.extras.TilingSprite`
      */
-    tilingSprite( texture, width, height ) {
+    TilingSprite( texture, width, height ) {
         return Object.assign( Object.create( ComponentProto ), {
             type: 'tiling-sprite',
             data: new TilingSprite( texture, width, height )
@@ -252,7 +252,7 @@ const Components = {
     /**
      * A component that stores an array of child `Entities`
      */
-    children( children ) {
+    Children( children ) {
         return Object.assign( Object.create( ComponentProto ), {
             type: 'children',
             data: Array.isArray( children ) ? children : []
@@ -261,7 +261,7 @@ const Components = {
     /**
      * A component that stores a force as a direction and magnitude
      */
-    force( direction, magnitude ) {
+    Force( direction, magnitude ) {
         return Object.assign( Object.create( ComponentProto ), {
             type: 'force',
             data: {
@@ -273,7 +273,7 @@ const Components = {
     /**
      * A component that stores a hex color
      */
-    color( color ) {
+    Color( color ) {
         return Object.assign( Object.create( ComponentProto ), {
             type: 'color',
             data: color
@@ -282,7 +282,7 @@ const Components = {
     /**
      * A component that stores a name string
      */
-    name( name ) {
+    Name( name ) {
         return Object.assign( Object.create( ComponentProto ), {
             type: 'name',
             data: String( name )
@@ -291,7 +291,7 @@ const Components = {
     /**
      * A component that stores a `HTMLCanvasElement`
      */
-    canvas( canvas ) {
+    Canvas( canvas ) {
         return Object.assign( Object.create( ComponentProto ), {
             type: 'canvas',
             data: canvas instanceof HTMLCanvasElement ?

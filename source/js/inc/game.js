@@ -63,7 +63,7 @@ module.exports = function( id, view, scale ) {
         },
         loadUI() {
             this.engine.addEntities( Entity(
-                Components.canvas( this.view )
+                Components.Canvas( this.view )
             ) );
         },
         loadActors() {
@@ -71,10 +71,10 @@ module.exports = function( id, view, scale ) {
 
             actors.forEach( ( actor ) => {
                 const entity = Entity(
-                    Components.name( actor.name ),
-                    Components.position( actor.position ),
-                    Components.rotation( actor.rotation ),
-                    Components.scale( actor.scale )
+                    Components.Name( actor.name ),
+                    Components.Position( actor.position ),
+                    Components.Rotation( actor.rotation ),
+                    Components.Scale( actor.scale )
                 );
                 this.loadGeometry( actor, entity );
                 this.engine.addEntities( entity );
@@ -91,13 +91,13 @@ module.exports = function( id, view, scale ) {
 
             switch ( geoType ) {
                 case 'polygon':
-                    component = Components.polygon( actor.geometry.vertices );
+                    component = Components.Polygon( actor.geometry.vertices );
                     break;
                 case 'circle':
-                    component = Components.circle( actor.geometry.radius );
+                    component = Components.Circle( actor.geometry.radius );
                     break;
                 case 'rectangle':
-                    component = Components.rectangle( actor.geometry.width, actor.geometry.height );
+                    component = Components.Rectangle( actor.geometry.width, actor.geometry.height );
                     break;
                 case 'multi':
                     break;
@@ -111,12 +111,12 @@ module.exports = function( id, view, scale ) {
         loadEnvironment() {
             const environment = this.config.environment;
             const entity = Entity(
-                Components.color( environment.background ),
-                Components.name( 'Environment' )
+                Components.Color( environment.background ),
+                Components.Name( 'Environment' )
             );
 
             environment.forces.forEach( force => {
-                let component = Components.force( force.direction, force.magnitude );
+                let component = Components.Force( force.direction, force.magnitude );
                 entity.addComponents( component );
             } );
 
