@@ -21,8 +21,8 @@ const Particles = require( 'pixi-particles' );
 const Config = require( './inc/config-old.js' )( PIXI, app );
 
 window.app = app;
-view.style.width = viewWidth + 'px';
-view.style.height = viewHeight + 'px';
+// view.style.width = viewWidth + 'px';
+// view.style.height = viewHeight + 'px';
 
 loader
 	.add( 'assets/spritesheets/ships.json' )
