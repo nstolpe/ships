@@ -17,7 +17,7 @@ const defaultConfig = {
     actors: []
 };
 
-module.exports = function( id, view, scale ) {
+module.exports = function( id, view, scale, dimensions ) {
     return {
         id: id,
         view: view,
@@ -62,8 +62,31 @@ module.exports = function( id, view, scale ) {
             console.log( this.engine.entities );
         },
         loadUI() {
+            // finds the first envionment entity
+            const envFinder = e => {
+                return !!( e.components.find(
+                    c => Object.getPrototypeOf( c ) === Components.Name &&
+                    c.data === 'Environment' )
+                );
+            };
+            const environment = this.engine.entities.find( envFinder );
+            const background = environment.components.find( c => Object.getPrototypeOf( c ) === Components.Color );
+
             this.engine.addEntities( Entity(
-                Components.Canvas( this.view )
+                Components.Canvas.create( this.view )
+            ) );
+
+            this.engine.addEntities( Entity(
+                Components.PIXIApp.create( new PIXI.Application(
+                    this.view.clientWidth,
+                    this.view.clientHeight,
+                    {
+                        view: this.view,
+                        backgroundColor: background.data,
+                        resolution: this.scale,
+                        autoresize: true
+                    }
+                ) )
             ) );
         },
         loadActors() {
@@ -71,10 +94,10 @@ module.exports = function( id, view, scale ) {
 
             actors.forEach( ( actor ) => {
                 const entity = Entity(
-                    Components.Name( actor.name ),
-                    Components.Position( actor.position ),
-                    Components.Rotation( actor.rotation ),
-                    Components.Scale( actor.scale )
+                    Components.Name.create( actor.name ),
+                    Components.Position.create( actor.position ),
+                    Components.Rotation.create( actor.rotation ),
+                    Components.Scale.create( actor.scale )
                 );
                 this.loadGeometry( actor, entity );
                 this.engine.addEntities( entity );
@@ -91,13 +114,13 @@ module.exports = function( id, view, scale ) {
 
             switch ( geoType ) {
                 case 'polygon':
-                    component = Components.Polygon( actor.geometry.vertices );
+                    component = Components.Polygon.create( actor.geometry.vertices );
                     break;
                 case 'circle':
-                    component = Components.Circle( actor.geometry.radius );
+                    component = Components.Circle.create( actor.geometry.radius );
                     break;
                 case 'rectangle':
-                    component = Components.Rectangle( actor.geometry.width, actor.geometry.height );
+                    component = Components.Rectangle.create( actor.geometry.width, actor.geometry.height );
                     break;
                 case 'multi':
                     break;
@@ -111,12 +134,12 @@ module.exports = function( id, view, scale ) {
         loadEnvironment() {
             const environment = this.config.environment;
             const entity = Entity(
-                Components.Color( environment.background ),
-                Components.Name( 'Environment' )
+                Components.Color.create( environment.background ),
+                Components.Name.create( 'Environment' )
             );
 
             environment.forces.forEach( force => {
-                let component = Components.Force( force.direction, force.magnitude );
+                let component = Components.Force.create( force.direction, force.magnitude );
                 entity.addComponents( component );
             } );
 
