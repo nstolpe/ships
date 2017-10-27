@@ -56,13 +56,18 @@ module.exports = function( id, view, scale, dimensions ) {
             Loader.load( this.postLoad.bind( this ) );
         },
         postLoad( loader, resources ) {
+            this.engine.on( 'entity-added', () => console.log( 'yeah that did it') );
             this.loadEnvironment();
-            this.loadActors();
-            this.loadUI();
+            this.loadActors( resources );
+            this.loadGraphics();
             console.log( this.engine.entities );
+            this.renderSystem = ECS.RenderSystem();
+            this.engine.addSystems( this.renderSystem );
+            this.renderSystem.start();
+            this.engine.update();
         },
-        loadUI() {
-            // finds the first envionment entity
+        loadGraphics() {
+            // finds the first environment entity
             const envFinder = e => {
                 return !!( e.components.find(
                     c => Object.getPrototypeOf( c ) === Components.Name &&
@@ -78,8 +83,8 @@ module.exports = function( id, view, scale, dimensions ) {
 
             this.engine.addEntities( Entity(
                 Components.PIXIApp.create( new PIXI.Application(
-                    this.view.clientWidth,
-                    this.view.clientHeight,
+                    this.view.clientWidth * this.scale,
+                    this.view.clientHeight * this.scale,
                     {
                         view: this.view,
                         backgroundColor: background.data,
@@ -89,19 +94,41 @@ module.exports = function( id, view, scale, dimensions ) {
                 ) )
             ) );
         },
-        loadActors() {
+        loadActors( resources ) {
             const actors = this.config.actors;
 
             actors.forEach( ( actor ) => {
                 const entity = Entity(
                     Components.Name.create( actor.name ),
-                    Components.Position.create( actor.position ),
+                    Components.Position.create( actor.position.x, actor.position.y ),
                     Components.Rotation.create( actor.rotation ),
                     Components.Scale.create( actor.scale )
                 );
+
                 this.loadGeometry( actor, entity );
+
+                if ( actor.display )
+                    this.loadSkinning( actor, entity, resources );
+
                 this.engine.addEntities( entity );
             } );
+        },
+        loadSkinning( actor, entity, resources ) {
+            const type = actor.display.type;
+            let component;
+
+            switch ( type ) {
+                case 'sprite':
+                    component = Components.Sprite.create( resources[ 'spritesheets::' + actor.display.spritesheet ].textures[ actor.display.id ] );
+                    break;
+                case 'multi':
+                    break;
+                default:
+                    break;
+            }
+
+            if ( component )
+                entity.addComponents( component );
         },
         /**
          * Loads gemometry from an `actor` from a config and turns it into
@@ -109,10 +136,10 @@ module.exports = function( id, view, scale, dimensions ) {
          * @TODO finish multi
          */
         loadGeometry( actor, entity ) {
-            const geoType = actor.geometry.type;
+            const type = actor.geometry.type;
             let component;
 
-            switch ( geoType ) {
+            switch ( type ) {
                 case 'polygon':
                     component = Components.Polygon.create( actor.geometry.vertices );
                     break;
