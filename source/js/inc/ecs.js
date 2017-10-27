@@ -32,7 +32,12 @@ const EntityProto = Emitter( {
      */
     'addComponents': {
         value: function( ...additions ) {
-            Array.prototype.push.apply( ComponentsMap.get( this ), additions );
+            const components = ComponentsMap.get( this );
+
+            additions.forEach( component => {
+                components.push( component )
+                this.emit( 'component-added', component );
+            } );
         }
     },
     'removeComponents': {
@@ -40,9 +45,12 @@ const EntityProto = Emitter( {
             const components = ComponentsMap.get( this );
             const spliced = [];
 
-            subtractions.forEach( cmpnt => {
-                let index = components.indexOf( cmpnt );
-                if ( index >= 0 ) spliced.push( components.splice( index, 1 )[ 0 ] );
+            subtractions.forEach( component => {
+                let index = components.indexOf( component );
+                if ( index >= 0 ) {
+                    spliced.push( components.splice( index, 1 )[ 0 ] );
+                    this.emit( 'component-removed', component );
+                }
             } );
 
             return spliced;
@@ -51,6 +59,7 @@ const EntityProto = Emitter( {
     'clearComponents': {
         value: function() {
             const components = ComponentsMap.get( this );
+            this.emit( 'components-cleared' );
             return components.splice( 0, components.length );
         }
     }
@@ -84,7 +93,12 @@ const EngineProto = Emitter( {
     },
     'addEntities': {
         value: function( ...additions ) {
-            Array.prototype.push.apply( EntitiesMap.get( this ), additions );
+            const entities = EntitiesMap.get( this );
+
+            additions.forEach( entity => {
+                entities.push( entity );
+                this.emit( 'entity-added', entity );
+            } );
         }
     },
     'removeEntites': {
@@ -103,12 +117,20 @@ const EngineProto = Emitter( {
     'clearEntities': {
         value: function() {
             const entities = EntitiesMap.get( this );
+            this.emit( 'entities-cleared' );
             return entities.splice( 0, entities.length );
         }
     },
     'addSystems': {
         value: function( ...additions ) {
-            Array.prototype.push.apply( SystemsMap.get( this ), additions );
+            const systems = SystemsMap.get( this );
+
+            additions.forEach( system => {
+                systems.push( system );
+                system.engine = this;
+                system.emit( 'added-to-engine', this );
+                this.emit( 'system-added', system );
+            } );
         }
     },
     'removeSystems': {
@@ -118,7 +140,11 @@ const EngineProto = Emitter( {
 
             subtractions.forEach( system => {
                 let index = systems.indexOf( system );
-                if ( index >= 0 ) spliced.push( systems.splice( index, 1 )[ 0 ] );
+                if ( index >= 0 ) {
+                    spliced.push( systems.splice( index, 1 )[ 0 ] );
+                    system.emit( 'removed-from-engine', engine );
+                    this.emit( 'system-removed', system );
+                }
             } );
 
             return spliced;
@@ -127,14 +153,19 @@ const EngineProto = Emitter( {
     'clearSystems': {
         value: function() {
             const systems = SystemsMap.get( this );
+            this.emit( 'systems-cleared' );
             return systems.splice( 0, systems.length );
         }
     },
     'update': {
         value: function() {
             const systems = SystemsMap.get( this );
+            this.emit( 'update-start' );
+
             for ( let i = 0, l = systems.length; i < l; i++)
                 systems[ i ].update();
+
+            this.emit( 'update-end' );
         }
     }
 } );
@@ -148,27 +179,88 @@ function Engine( ...entities ) {
     } );
 
     EntitiesMap.set( engine, entities );
+    SystemsMap.set( engine, [] );
     return engine;
 }
 
-const SystemProto = Emitter( {} );
-const RenderSystem = function( view, scale ) {
-    const system = {
-        application: null,
-        engine: null,
-        init() {
-            this.application = new Application(
-                document.body.offsetWidth,
-                document.body.offsetHeight,
-                {
-                    view: view,
-                    backgroundColor: 0x25caff,
-                    resolution: scale,
-                    autoResize: true
-                }
-            )
+const SystemProto = Emitter( {
+    'engine': {
+        value: null,
+        enumerable: true,
+        writable: true
+    },
+    'on': {
+        value: false,
+        enumerable: true,
+        writable: true
+    },
+    'start': {
+        value: function() {
+            this.on = true;
+            this.emit( 'start' );
+        }
+    },
+    'stop': {
+        value: function() {
+            this.on = false;
+            this.emit( 'stop' );
         }
     }
+} );
+
+const RenderSystem = function() {
+    const system = Object.create( SystemProto, {
+        'start': {
+            value: function() {
+                Object.getPrototypeOf( this ).start();
+                const entities = this.getEntities();
+                let PIXIAppComponent;
+                const PIXIAppEntity = this.engine.entities.find( entity => {
+                    PIXIAppComponent = entity.components.find( component => Object.getPrototypeOf( component ) === Components.PIXIApp );
+                    return PIXIAppComponent;
+                } );
+                window.addEventListener( 'resize', function() {
+                    PIXIAppComponent.data.renderer.resize(
+                        PIXIAppComponent.data.view.clientWidth * PIXIAppComponent.data.renderer.resolution,
+                        PIXIAppComponent.data.view.clientHeight * PIXIAppComponent.data.renderer.resolution
+                    );
+                }, false );
+                entities.forEach( entity => {
+                    const spriteComponent = entity.components.find( component => Object.getPrototypeOf( component ) === Components.Sprite );
+                    const positionComponent = entity.components.find( component => Object.getPrototypeOf( component ) === Components.Position );
+                    const rotationComponent = entity.components.find( component => Object.getPrototypeOf( component ) === Components.Rotation );
+                    const scaleComponent = entity.components.find( component => Object.getPrototypeOf( component ) === Components.Scale );
+                    spriteComponent.data.position.x = positionComponent.data.x;
+                    spriteComponent.data.position.y = positionComponent.data.y;
+                    spriteComponent.data.rotation = rotationComponent.data;
+                    spriteComponent.data.scale.x = scaleComponent.data;
+                    spriteComponent.data.scale.y = scaleComponent.data;
+                    PIXIAppComponent.data.stage.addChild( spriteComponent.data );
+                } );
+            }
+        },
+        'update': {
+            value: function() {
+                const entities = this.getEntities();
+                console.log( entities );
+            }
+        },
+        'getEntities': {
+            value: function() {
+                const entities = this.engine.entities.filter( entity => {
+                    return entity.components.find( component => Object.getPrototypeOf( component ) === Components.Position ) &&
+                           entity.components.find( component => Object.getPrototypeOf( component ) === Components.Rotation ) &&
+                           entity.components.find( component => Object.getPrototypeOf( component ) === Components.Scale ) &&
+                           ( entity.components.find( component => Object.getPrototypeOf( component ) === Components.Sprite ) ||
+                             entity.components.find( component => Object.getPrototypeOf( component ) === Components.TilingSprites ) );
+                } );
+
+                return entities;
+            }
+        }
+    } );
+
+    return system;
 }
 
 const ComponentProto = Object.create( Object.prototype, {
@@ -268,7 +360,7 @@ const Components ={
      */
     Sprite: Object.create( ComponentProto, {
         'create': {
-            value: function( sprite ) {
+            value: function( texture ) {
                 return Object.getPrototypeOf( this ).create( this, new Sprite( texture ) );
             },
             configurable: false
@@ -353,5 +445,6 @@ const Components ={
 module.exports = {
     Components: Components,
     Entity: Entity,
-    Engine: Engine
+    Engine: Engine,
+    RenderSystem: RenderSystem
 };
