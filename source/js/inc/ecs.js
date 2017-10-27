@@ -171,7 +171,7 @@ const RenderSystem = function( view, scale ) {
     }
 }
 
-const ComponentProto = Emitter( {
+const ComponentProto = Object.create( Object.prototype, {
     'class': { value: 'Component' },
     'type': {
         value: 'component',
@@ -179,125 +179,175 @@ const ComponentProto = Emitter( {
         writable: true
     },
     'data': {
-        value: true,
+        value: 0,
         enumerable: true,
         writable: true
+    },
+    'create': {
+        value: ( proto, data ) => {
+            return Object.assign(
+                Object.create( proto, {
+                    'create': {
+                        value: function() {
+                            return proto.create.apply( proto, arguments );
+                        },
+                        configurable: false
+                    }
+                } ),
+                { data: data }
+            );
+        },
+        configurable: true
     }
 } );
 
-const Components = {
+const Components ={
     /**
      * A component that stores a 2d position in a `Matter.Vector`
      */
-    Position( x, y ) {
-        return Object.assign( Object.create( ComponentProto ), {
-            type: 'position',
-            data: Vector.create( ~~x, ~~y )
-        } );
-    },
+    Position: Object.create( ComponentProto, {
+        'create': {
+            value: function( x, y ) {
+                return Object.getPrototypeOf( this ).create( this, Vector.create( ~~x, ~~y ) );
+            },
+            configurable: false
+        }
+    } ),
     /**
      * A component that stores an angle in radians
      */
-    Rotation( angle ) {
-        return Object.assign( Object.create( ComponentProto ), {
-            type: 'rotation',
-            data: ~~angle
-        } );
-    },
+    Rotation: Object.create( ComponentProto, {
+        'create': {
+            value: function( angle ) {
+                return Object.getPrototypeOf( this ).create( this, ~~angle );
+            },
+            configurable: false
+        }
+    } ),
     /**
      * A component that stores a scalar float scale
      */
-    Scale( scale ) {
-        return Object.assign( Object.create( ComponentProto ), {
-            type: 'scale',
-            data: scale
-        } );
-    },
+     Scale: Object.create( ComponentProto, {
+        'create': {
+            value: function( scale ) {
+                return Object.getPrototypeOf( this ).create( this, ~~scale );
+            },
+            configurable: false
+        }
+    } ),
     /**
      * A component that stores a polygon object created from `Matter.Bodies`
      */
-    Polygon( vertices, options ) {
-        return Object.assign( Object.create( ComponentProto ), {
-            type: 'polygon',
-            data: Bodies.fromVertices( 0, 0, vertices, Object.assign( {}, options ) )
-        } );
-    },
+    Polygon: Object.create( ComponentProto, {
+        'create': {
+            value: function( vertices, options ) {
+                return Object.getPrototypeOf( this ).create(
+                    this,
+                    Bodies.fromVertices( 0, 0, vertices, Object.assign( {}, options ) )
+                );
+            },
+            configurable: false
+        }
+    } ),
     /**
      * A component that stores a rectangle object created from `Matter.Bodies`
      */
-    Rectangle( width, height, options ) {
-        return Object.assign( Object.create( ComponentProto ), {
-            type: 'rectangle',
-            data: Bodies.rectangle( 0, 0, ~~width, ~~height, Object.assign( {}, options ) )
-        } );
-    },
+    Rectangle: Object.create( ComponentProto, {
+        'create': {
+            value: function( width, height, options ) {
+                return Object.getPrototypeOf( this ).create(
+                    this,
+                    Bodies.rectangle( 0, 0, ~~width, ~~height, Object.assign( {}, options ) )
+                );
+            },
+            configurable: false
+        }
+    } ),
     /**
      * A component that stores a sprite object created from `PIXI.Sprite`
      */
-    Sprite( texture ) {
-        return Object.assign( Object.create( ComponentProto ), {
-            type: 'sprite',
-            data: new Sprite( texture )
-        } );
-    },
+    Sprite: Object.create( ComponentProto, {
+        'create': {
+            value: function( sprite ) {
+                return Object.getPrototypeOf( this ).create( this, new Sprite( texture ) );
+            },
+            configurable: false
+        }
+    } ),
     /**
      * A component that stores a `PIXI.extras.TilingSprite`
      */
-    TilingSprite( texture, width, height ) {
-        return Object.assign( Object.create( ComponentProto ), {
-            type: 'tiling-sprite',
-            data: new TilingSprite( texture, width, height )
-        } );
-    },
+    TilingSprite: Object.create( ComponentProto, {
+        'create': {
+            value: function( texture, width, height ) {
+                return Object.getPrototypeOf( this ).create( this, new TilingSprite( texture, width, height ) );
+            },
+            configurable: false
+        }
+    } ),
     /**
      * A component that stores an array of child `Entities`
      */
-    Children( children ) {
-        return Object.assign( Object.create( ComponentProto ), {
-            type: 'children',
-            data: Array.isArray( children ) ? children : []
-        } );
-    },
+    Children: Object.create( ComponentProto, {
+        'create': {
+            value: function( children ) {
+                return Object.getPrototypeOf( this ).create( this, Array.isArray( children ) ? children : [] );
+            },
+            configurable: false
+        }
+    } ),
     /**
      * A component that stores a force as a direction and magnitude
      */
-    Force( direction, magnitude ) {
-        return Object.assign( Object.create( ComponentProto ), {
-            type: 'force',
-            data: {
-                direction: direction,
-                magnitude: magnitude
-            }
-        } );
-    },
+    Force: Object.create( ComponentProto, {
+        'create': {
+            value: function( direction, magnitude ) {
+                return Object.getPrototypeOf( this ).create( this, { direction: ~~direction, magnitude: ~~magnitude } );
+            },
+            configurable: false
+        }
+    } ),
     /**
      * A component that stores a hex color
      */
-    Color( color ) {
-        return Object.assign( Object.create( ComponentProto ), {
-            type: 'color',
-            data: color
-        } );
-    },
+    Color: Object.create( ComponentProto, {
+        'create': {
+            value: function( color ) {
+                return Object.getPrototypeOf( this ).create( this, parseInt( color, 16 ) );
+            },
+            configurable: false
+        }
+    } ),
     /**
      * A component that stores a name string
      */
-    Name( name ) {
-        return Object.assign( Object.create( ComponentProto ), {
-            type: 'name',
-            data: String( name )
-        } );
-    },
+    Name: Object.create( ComponentProto, {
+        'create': {
+            value: function( name ) {
+                return Object.getPrototypeOf( this ).create( this, String( name ) );
+            },
+            configurable: false
+        }
+    } ),
     /**
      * A component that stores a `HTMLCanvasElement`
      */
-    Canvas( canvas ) {
-        return Object.assign( Object.create( ComponentProto ), {
-            type: 'canvas',
-            data: canvas instanceof HTMLCanvasElement ?
-                            canvas : document.createElement( 'canvas' )
-        } );
-    }
+    Canvas: Object.create( ComponentProto, {
+        'create': {
+            value: function( canvas ) {
+                return Object.getPrototypeOf( this ).create( this, canvas instanceof HTMLCanvasElement ? canvas : document.createElement( 'canvas' ) );
+            },
+            configurable: false
+        }
+    } ),
+    PIXIApp: Object.create( ComponentProto, {
+        'create': {
+            value: function( application ) {
+                return Object.getPrototypeOf( this ).create( this, application );
+            },
+            configurable: false
+        }
+    } )
 };
 
 module.exports = {
