@@ -149,7 +149,7 @@ const EmitterProto = Object.create( Object.prototype, {
             // lets emitter's made Object.assign from a proto work.
             if ( events === undefined ) {
                 events = {};
-                EventsMap.set( this, {} );
+                EventsMap.set( this, events );
             }
 
             return events;
