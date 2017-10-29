@@ -183,7 +183,7 @@ function Engine( ...entities ) {
     return engine;
 }
 
-const SystemProto = Emitter( {
+const System = Emitter( {
     'engine': {
         value: null,
         enumerable: true,
@@ -209,9 +209,10 @@ const SystemProto = Emitter( {
 } );
 
 const RenderSystem = function() {
-    const system = Object.create( SystemProto, {
+    const system = Object.create( System, {
         'start': {
             value: function() {
+                // prototype handles `on` state and event emission
                 Object.getPrototypeOf( this ).start();
                 const entities = this.getEntities();
                 let PIXIAppComponent;
@@ -219,12 +220,16 @@ const RenderSystem = function() {
                     PIXIAppComponent = entity.components.find( component => Object.getPrototypeOf( component ) === Components.PIXIApp );
                     return PIXIAppComponent;
                 } );
+                // @TODO this window listener needs to move.
                 window.addEventListener( 'resize', function() {
                     PIXIAppComponent.data.renderer.resize(
                         PIXIAppComponent.data.view.clientWidth * PIXIAppComponent.data.renderer.resolution,
                         PIXIAppComponent.data.view.clientHeight * PIXIAppComponent.data.renderer.resolution
                     );
                 }, false );
+                // get visual and transform data and create a child for the `PIXI.application` stage
+                // @TODO only handles Sprites. needs at support TilingSprite and other possibilities.
+                // `multi` visuals will work as they'll be individual components
                 entities.forEach( entity => {
                     const spriteComponent = entity.components.find( component => Object.getPrototypeOf( component ) === Components.Sprite );
                     const positionComponent = entity.components.find( component => Object.getPrototypeOf( component ) === Components.Position );
@@ -263,7 +268,7 @@ const RenderSystem = function() {
     return system;
 }
 
-const ComponentProto = Object.create( Object.prototype, {
+const Component = Object.create( Object.prototype, {
     'class': { value: 'Component' },
     'type': {
         value: 'component',
@@ -297,7 +302,7 @@ const Components ={
     /**
      * A component that stores a 2d position in a `Matter.Vector`
      */
-    Position: Object.create( ComponentProto, {
+    Position: Object.create( Component, {
         'create': {
             value: function( x, y ) {
                 return Object.getPrototypeOf( this ).create( this, Vector.create( ~~x, ~~y ) );
@@ -308,7 +313,7 @@ const Components ={
     /**
      * A component that stores an angle in radians
      */
-    Rotation: Object.create( ComponentProto, {
+    Rotation: Object.create( Component, {
         'create': {
             value: function( angle ) {
                 return Object.getPrototypeOf( this ).create( this, ~~angle );
@@ -319,7 +324,7 @@ const Components ={
     /**
      * A component that stores a scalar float scale
      */
-     Scale: Object.create( ComponentProto, {
+     Scale: Object.create( Component, {
         'create': {
             value: function( scale ) {
                 return Object.getPrototypeOf( this ).create( this, ~~scale );
@@ -330,7 +335,7 @@ const Components ={
     /**
      * A component that stores a polygon object created from `Matter.Bodies`
      */
-    Polygon: Object.create( ComponentProto, {
+    Polygon: Object.create( Component, {
         'create': {
             value: function( vertices, options ) {
                 return Object.getPrototypeOf( this ).create(
@@ -344,7 +349,7 @@ const Components ={
     /**
      * A component that stores a rectangle object created from `Matter.Bodies`
      */
-    Rectangle: Object.create( ComponentProto, {
+    Rectangle: Object.create( Component, {
         'create': {
             value: function( width, height, options ) {
                 return Object.getPrototypeOf( this ).create(
@@ -358,7 +363,7 @@ const Components ={
     /**
      * A component that stores a sprite object created from `PIXI.Sprite`
      */
-    Sprite: Object.create( ComponentProto, {
+    Sprite: Object.create( Component, {
         'create': {
             value: function( texture ) {
                 return Object.getPrototypeOf( this ).create( this, new Sprite( texture ) );
@@ -369,7 +374,7 @@ const Components ={
     /**
      * A component that stores a `PIXI.extras.TilingSprite`
      */
-    TilingSprite: Object.create( ComponentProto, {
+    TilingSprite: Object.create( Component, {
         'create': {
             value: function( texture, width, height ) {
                 return Object.getPrototypeOf( this ).create( this, new TilingSprite( texture, width, height ) );
@@ -380,7 +385,7 @@ const Components ={
     /**
      * A component that stores an array of child `Entities`
      */
-    Children: Object.create( ComponentProto, {
+    Children: Object.create( Component, {
         'create': {
             value: function( children ) {
                 return Object.getPrototypeOf( this ).create( this, Array.isArray( children ) ? children : [] );
@@ -391,7 +396,7 @@ const Components ={
     /**
      * A component that stores a force as a direction and magnitude
      */
-    Force: Object.create( ComponentProto, {
+    Force: Object.create( Component, {
         'create': {
             value: function( direction, magnitude ) {
                 return Object.getPrototypeOf( this ).create( this, { direction: ~~direction, magnitude: ~~magnitude } );
@@ -402,7 +407,7 @@ const Components ={
     /**
      * A component that stores a hex color
      */
-    Color: Object.create( ComponentProto, {
+    Color: Object.create( Component, {
         'create': {
             value: function( color ) {
                 return Object.getPrototypeOf( this ).create( this, parseInt( color, 16 ) );
@@ -413,7 +418,7 @@ const Components ={
     /**
      * A component that stores a name string
      */
-    Name: Object.create( ComponentProto, {
+    Name: Object.create( Component, {
         'create': {
             value: function( name ) {
                 return Object.getPrototypeOf( this ).create( this, String( name ) );
@@ -424,7 +429,7 @@ const Components ={
     /**
      * A component that stores a `HTMLCanvasElement`
      */
-    Canvas: Object.create( ComponentProto, {
+    Canvas: Object.create( Component, {
         'create': {
             value: function( canvas ) {
                 return Object.getPrototypeOf( this ).create( this, canvas instanceof HTMLCanvasElement ? canvas : document.createElement( 'canvas' ) );
@@ -432,7 +437,7 @@ const Components ={
             configurable: false
         }
     } ),
-    PIXIApp: Object.create( ComponentProto, {
+    PIXIApp: Object.create( Component, {
         'create': {
             value: function( application ) {
                 return Object.getPrototypeOf( this ).create( this, application );
