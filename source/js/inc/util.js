@@ -90,10 +90,12 @@ module.exports = {
 	 *     }
 	 *     property( foo, 'baz.gaz.bar' );
 	 *     > 'bar'
+	 *
+	 * @return varies
 	 */
 	property( source, propString ) {
 		const propTree = String( propString ).split( '.' );
-		let current = source;
+		let current = source || undefined;
 		let i = 0;
 
 		while( Object.prototype.isPrototypeOf( current ) && i < propTree.length ) {

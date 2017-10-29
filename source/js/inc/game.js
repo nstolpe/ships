@@ -3,6 +3,7 @@
 const PIXI = require( 'pixi.js' );
 const Turms = require( 'turms' );
 const ECS = require( './ecs.js' );
+const Util = require( './util.js' );
 
 const Loader = PIXI.loader;
 const Entity = ECS.Entity;
@@ -63,7 +64,7 @@ module.exports = function( id, view, scale, dimensions ) {
             this.loadEnvironment();
             this.loadActors( resources );
             this.loadGraphics();
-            console.log( this.engine.entities );
+            // console.log( this.engine.entities );
             this.renderSystem = ECS.RenderSystem();
             this.engine.addSystems( this.renderSystem );
             this.renderSystem.start();
@@ -103,7 +104,7 @@ module.exports = function( id, view, scale, dimensions ) {
             actors.forEach( ( actor ) => {
                 const entity = Entity(
                     Components.Name.create( actor.name ),
-                    Components.Position.create( actor.position.x, actor.position.y ),
+                    Components.Position.create( Util.property( actor.position, 'x' ), Util.property( actor.position, 'y' ) ),
                     Components.Rotation.create( actor.rotation ),
                     Components.Scale.create( actor.scale )
                 );
@@ -117,12 +118,12 @@ module.exports = function( id, view, scale, dimensions ) {
             } );
         },
         loadSkinning( actor, entity, resources ) {
-            const type = actor.geometry.display.type;
+            const type = Util.property( actor.geometry, 'display.type' );
             let component;
 
             switch ( type ) {
                 case 'sprite':
-                    component = Components.Sprite.create( resources[ 'spritesheets::' + actor.geometry.display.spritesheet ].textures[ actor.geometry.display.id ] );
+                    component = Components.Sprite.create( resources[ 'spritesheets::' + Util.property( actor.geometry, 'display.spritesheet' ) ].textures[ Util.property( actor.geometry, 'display.id' ) ] );
                     break;
                 case 'multi':
                     break;
@@ -139,18 +140,18 @@ module.exports = function( id, view, scale, dimensions ) {
          * @TODO finish multi
          */
         loadGeometry( actor, entity ) {
-            const type = actor.geometry.display.type;
-            let component;
+            const type = Util.property( actor.geometry, 'display.type' );
+            const components =[];
 
             switch ( type ) {
                 case 'polygon':
-                    component = Components.Polygon.create( actor.geometry.vertices );
+                    components.push( Components.Polygon.create( actor.geometry, 'vertices' ) );
                     break;
                 case 'circle':
-                    component = Components.Circle.create( actor.geometry.radius );
+                    components.push( Components.Circle.create( actor.geometry, 'radius' ) );
                     break;
                 case 'rectangle':
-                    component = Components.Rectangle.create( actor.geometry.width, actor.geometry.height );
+                    components.push( Components.Rectangle.create( actor.geometry, 'width', actor.geometry, 'height' ) );
                     break;
                 case 'multi':
                     break;
@@ -158,11 +159,11 @@ module.exports = function( id, view, scale, dimensions ) {
                     break;
             }
 
-            if ( component )
-                entity.addComponents( component );
+            if ( components ) entity.addComponents.apply( this, components );
         },
         loadEnvironment() {
-            const environment = this.config.environment;
+            const config = this.config;
+            const environment = config.environment;
             const entity = Entity(
                 Components.Color.create( environment.background ),
                 Components.Name.create( 'Environment' )
