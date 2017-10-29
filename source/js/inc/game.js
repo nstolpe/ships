@@ -1,6 +1,7 @@
 "use strict";
 
 const PIXI = require( 'pixi.js' );
+const Turms = require( 'turms' );
 const ECS = require( './ecs.js' );
 
 const Loader = PIXI.loader;
@@ -16,6 +17,8 @@ const defaultConfig = {
     },
     actors: []
 };
+
+const Hub = Turms.Hub();
 
 module.exports = function( id, view, scale, dimensions ) {
     return {
@@ -107,19 +110,19 @@ module.exports = function( id, view, scale, dimensions ) {
 
                 this.loadGeometry( actor, entity );
 
-                if ( actor.display )
+                if ( actor.geometry.display )
                     this.loadSkinning( actor, entity, resources );
 
                 this.engine.addEntities( entity );
             } );
         },
         loadSkinning( actor, entity, resources ) {
-            const type = actor.display.type;
+            const type = actor.geometry.display.type;
             let component;
 
             switch ( type ) {
                 case 'sprite':
-                    component = Components.Sprite.create( resources[ 'spritesheets::' + actor.display.spritesheet ].textures[ actor.display.id ] );
+                    component = Components.Sprite.create( resources[ 'spritesheets::' + actor.geometry.display.spritesheet ].textures[ actor.geometry.display.id ] );
                     break;
                 case 'multi':
                     break;
@@ -136,7 +139,7 @@ module.exports = function( id, view, scale, dimensions ) {
          * @TODO finish multi
          */
         loadGeometry( actor, entity ) {
-            const type = actor.geometry.type;
+            const type = actor.geometry.display.type;
             let component;
 
             switch ( type ) {
