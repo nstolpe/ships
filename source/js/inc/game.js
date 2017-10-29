@@ -5,7 +5,6 @@ const Turms = require( 'turms' );
 const ECS = require( './ecs.js' );
 const Util = require( './util.js' );
 
-const Loader = PIXI.loader;
 const Entity = ECS.Entity;
 const Components = ECS.Components;
 const Engine = ECS.Engine;
@@ -29,6 +28,7 @@ module.exports = function( id, view, scale, dimensions ) {
         dataPath: 'assets/data',
         config: defaultConfig,
         engine: Engine(),
+        loader: PIXI.loader,
         spritesheetTemplate: filename => {
             return `assets/spritesheets/${ filename }.json`;
         },
@@ -36,7 +36,7 @@ module.exports = function( id, view, scale, dimensions ) {
             return `spritesheets::${ filename }`;
         },
         load() {
-            Loader
+            this.loader
                 .add( 'config', `${ this.dataPath }/${ this.id }.json` )
                 .load( this.loadResources.bind( this ) );
 
@@ -45,24 +45,25 @@ module.exports = function( id, view, scale, dimensions ) {
         /**
          * Loads all of the resources from a config.
          */
-        loadResources( loader, resources ) {
-            const config = resources.config;
+        loadResources() {
+            const loader = this.loader;
+            const config = loader.resources.config;
             // store incoming config
             Object.assign( this.config, config.data );
 
             // queue all sprite sheets for loading.
             // @TODO add other resources (sounds, etc) here once ready.
             this.config[ 'spritesheets' ].forEach( ( e, i, a ) => {
-                Loader.add( this.spritesheetKey( e ), this.spritesheetTemplate( e ) );
+                this.loader.add( this.spritesheetKey( e ), this.spritesheetTemplate( e ) );
             } );
 
             // load everything
-            Loader.load( this.postLoad.bind( this ) );
+            this.loader.load( this.postLoad.bind( this ) );
         },
-        postLoad( loader, resources ) {
+        postLoad() {
             this.engine.on( 'entity-added', () => console.log( 'yeah that did it') );
             this.loadEnvironment();
-            this.loadActors( resources );
+            this.loadActors();
             this.loadGraphics();
             // console.log( this.engine.entities );
             this.renderSystem = ECS.RenderSystem();
@@ -98,7 +99,7 @@ module.exports = function( id, view, scale, dimensions ) {
                 ) )
             ) );
         },
-        loadActors( resources ) {
+        loadActors() {
             const actors = this.config.actors;
 
             actors.forEach( ( actor ) => {
@@ -112,13 +113,14 @@ module.exports = function( id, view, scale, dimensions ) {
                 this.loadGeometry( actor, entity );
 
                 if ( actor.geometry.display )
-                    this.loadSkinning( actor, entity, resources );
+                    this.loadSkinning( actor, entity );
 
                 this.engine.addEntities( entity );
             } );
         },
-        loadSkinning( actor, entity, resources ) {
+        loadSkinning( actor, entity ) {
             const type = Util.property( actor.geometry, 'display.type' );
+            const resources = this.loader.resources;
             let component;
 
             switch ( type ) {
@@ -145,15 +147,18 @@ module.exports = function( id, view, scale, dimensions ) {
 
             switch ( type ) {
                 case 'polygon':
-                    components.push( Components.Polygon.create( actor.geometry, 'vertices' ) );
+                    components.push( Components.Polygon.create( Util.property( actor.geometry, 'vertices' ) ) );
                     break;
                 case 'circle':
-                    components.push( Components.Circle.create( actor.geometry, 'radius' ) );
+                    components.push( Components.Circle.create( Util.property( actor.geometry, 'radius' ) ) );
                     break;
                 case 'rectangle':
-                    components.push( Components.Rectangle.create( actor.geometry, 'width', actor.geometry, 'height' ) );
+                    components.push( Components.Rectangle.create( Util.property( actor.geometry, 'width') , Util.property( actor.geometry, 'height' ) ) );
                     break;
                 case 'multi':
+                    const children = Util.property( actor.geometry, 'children' );
+
+                    // children.forEach( ( val, idx, arr ) => );
                     break;
                 default:
                     break;
