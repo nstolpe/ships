@@ -63,9 +63,9 @@ module.exports = function( id, view, scale, dimensions ) {
         postLoad() {
             this.engine.on( 'entity-added', () => console.log( 'yeah that did it') );
             this.loadEnvironment();
-            this.loadActors();
+            this.loadActors( this.config.actors );
             this.loadGraphics();
-            // console.log( this.engine.entities );
+            console.log( this.engine.entities );
             this.renderSystem = ECS.RenderSystem();
             this.engine.addSystems( this.renderSystem );
             this.renderSystem.start();
@@ -99,9 +99,7 @@ module.exports = function( id, view, scale, dimensions ) {
                 ) )
             ) );
         },
-        loadActors() {
-            const actors = this.config.actors;
-
+        loadActors( actors ) {
             actors.forEach( ( actor ) => {
                 const entity = Entity(
                     Components.Name.create( actor.name ),
@@ -122,10 +120,18 @@ module.exports = function( id, view, scale, dimensions ) {
             const type = Util.property( actor.geometry, 'display.type' );
             const resources = this.loader.resources;
             let component;
+            let texture;
 
             switch ( type ) {
                 case 'sprite':
-                    component = Components.Sprite.create( resources[ 'spritesheets::' + Util.property( actor.geometry, 'display.spritesheet' ) ].textures[ Util.property( actor.geometry, 'display.id' ) ] );
+                    texture = this.getTexture( actor, resources );
+                    component = Components.Sprite.create( texture );
+                    break;
+                case 'tiling-sprite':
+                    texture = this.getTexture( actor, resources );
+                    const w = Util.property(actor.geometry, 'width' );
+                    const h = Util.property(actor.geometry, 'height' );
+                    component = Components.TilingSprite.create( texture, w, h );
                     break;
                 case 'multi':
                     break;
@@ -135,6 +141,11 @@ module.exports = function( id, view, scale, dimensions ) {
 
             if ( component )
                 entity.addComponents( component );
+        },
+        getTexture( actor, resources ) {
+            const resourceKey = 'spritesheets::' + Util.property( actor.geometry, 'display.spritesheet' );
+            const textureKey = Util.property( actor.geometry, 'display.id' );
+            return resources[ resourceKey ].textures[ textureKey ];
         },
         /**
          * Loads gemometry from an `actor` from a config and turns it into
@@ -157,8 +168,7 @@ module.exports = function( id, view, scale, dimensions ) {
                     break;
                 case 'multi':
                     const children = Util.property( actor.geometry, 'children' );
-
-                    // children.forEach( ( val, idx, arr ) => );
+                    this.loadActors( children );
                     break;
                 default:
                     break;
