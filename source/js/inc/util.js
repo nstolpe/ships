@@ -75,5 +75,33 @@ module.exports = {
 			normalized += limit * Math.floor( normalized / -limit );
 
 		return normalized;
+	},
+	/**
+	 * Attempts to safely retrieve a nested property from a `source` object.
+	 * The `propString` determines the levels and names of properties, with the
+	 * names/levels delineatd by a period.
+	 * ex: The desired target object is `bar`, the parent/source object is foo
+	 *     var foo = {
+	 *         baz: {
+	 *            gaz: {}
+	 *                bar: 'bar'
+	 *            }
+	 *         }
+	 *     }
+	 *     property( foo, 'baz.gaz.bar' );
+	 *     > 'bar'
+	 */
+	property( source, propString ) {
+		const propTree = String( propString ).split( '.' );
+		let current = source;
+		let i = 0;
+
+		while( Object.prototype.isPrototypeOf( current ) && i < propTree.length ) {
+			current = current[ propTree[ i ] ];
+			i++;
+		}
+
+		if ( current === source ) return;
+		return current;
 	}
 };
