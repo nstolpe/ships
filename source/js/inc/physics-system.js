@@ -64,12 +64,16 @@ const PhysicsSystem = function( options ) {
 
                 geometry.data.plugin.forces = [];
                 forces.forEach( force => {
-                    const forceVector = Util.angleToVector( force.data.direction );
+                    const forceVector = Util.angleToVector( Util.toRadians( force.data.direction ) );
                     geometry.data.plugin.forces.push( {
                         x: forceVector.x * force.data.magnitude,
                         y: forceVector.y * force.data.magnitude
                     } );
                 } );
+
+                positionComponent.data.x = geometry.data.position.x;
+                positionComponent.data.y = geometry.data.position.y;
+                rotationComponent.data = geometry.data.angle;
             }
         },
         'update': {
