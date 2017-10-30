@@ -2,8 +2,9 @@
 
 const PIXI = require( 'pixi.js' );
 const Turms = require( 'turms' );
-const ECS = require( './ecs.js' );
 const Util = require( './util.js' );
+const ECS = require( './ecs.js' );
+const RenderSystem = require( './render-system.js' );
 
 const Entity = ECS.Entity;
 const Components = ECS.Components;
@@ -66,7 +67,7 @@ module.exports = function( id, view, scale, dimensions ) {
             this.loadActors( this.config.actors );
             this.loadGraphics();
             console.log( this.engine.entities );
-            this.renderSystem = ECS.RenderSystem();
+            this.renderSystem = RenderSystem();
             this.engine.addSystems( this.renderSystem );
             this.renderSystem.start();
             this.engine.update();
