@@ -5,6 +5,7 @@ const Turms = require( 'turms' );
 const Util = require( './util.js' );
 const ECS = require( './ecs.js' );
 const RenderSystem = require( './render-system.js' );
+const PhysicsSystem = require( './physics-system.js' );
 
 const Entity = ECS.Entity;
 const Components = ECS.Components;
@@ -21,7 +22,16 @@ const defaultConfig = {
 
 const Hub = Turms.Hub();
 
-module.exports = function( id, view, scale, dimensions ) {
+module.exports = function( id, view, scale ) {
+    const App = new PIXI.Application(
+        view.clientWidth * scale,
+        view.clientHeight * scale,
+        {
+            view: view,
+            resolution: scale,
+            autoresize: true
+        }
+    );
     return {
         id: id,
         view: view,
@@ -62,17 +72,20 @@ module.exports = function( id, view, scale, dimensions ) {
             this.loader.load( this.postLoad.bind( this ) );
         },
         postLoad() {
-            this.engine.on( 'entity-added', () => console.log( 'yeah that did it') );
             this.loadEnvironment();
             this.loadActors( this.config.actors );
             console.log( this.engine.entities );
+            const physicsSystem = PhysicsSystem();
             const renderSystem = RenderSystem( {
                 view: this.view,
                 resolution: this.scale,
                 // @TODO make this less terrible
-                backgroundColor: this.getEnvironment().components.find( c => Object.getPrototypeOf( c ) === Components.Color ).data
+                backgroundColor: this.getEnvironment().components.find( c => Object.getPrototypeOf( c ) === Components.Color ).data,
+                App: App
             } );
+            this.engine.addSystems( physicsSystem );
             this.engine.addSystems( renderSystem );
+            physicsSystem.start();
             renderSystem.start();
             this.engine.update();
         },
