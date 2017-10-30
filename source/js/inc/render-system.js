@@ -4,7 +4,18 @@ const ECS = require( './ecs.js' );
 const Components = ECS.Components;
 const System = ECS.System;
 
-const RenderSystem = function() {
+const RenderSystem = function( options ) {
+    const app = new PIXI.Application(
+        options.view.clientWidth * options.resolution,
+        options.view.clientHeight * options.resolution,
+        {
+            view: options.view,
+            backgroundColor: options.backgroundColor,
+            resolution: options.resolution,
+            autoresize: true
+        }
+    );
+
     const system = Object.create( System, {
         'start': {
             value: function() {
@@ -12,16 +23,11 @@ const RenderSystem = function() {
                 Object.getPrototypeOf( this ).start();
 
                 const entities = this.getEntities();
-                let PIXIAppComponent;
-                const PIXIAppEntity = this.engine.entities.find( entity => {
-                    PIXIAppComponent = entity.components.find( component => Object.getPrototypeOf( component ) === Components.PIXIApp );
-                    return PIXIAppComponent;
-                } );
                 // @TODO this window listener needs to move.
                 window.addEventListener( 'resize', function() {
-                    PIXIAppComponent.data.renderer.resize(
-                        PIXIAppComponent.data.view.clientWidth * PIXIAppComponent.data.renderer.resolution,
-                        PIXIAppComponent.data.view.clientHeight * PIXIAppComponent.data.renderer.resolution
+                    app.renderer.resize(
+                        app.view.clientWidth * app.renderer.resolution,
+                        app.view.clientHeight * app.renderer.resolution
                     );
                 }, false );
                 // get visual and transform data and create a child for the `PIXI.application` stage
@@ -41,7 +47,7 @@ const RenderSystem = function() {
                         spriteComponent.data.scale.x = scaleComponent.data;
                         spriteComponent.data.scale.y = scaleComponent.data;
                         spriteComponent.data.pivot.set( spriteComponent.data.width * 0.5, spriteComponent.data.height * 0.5 );
-                        PIXIAppComponent.data.stage.addChild( spriteComponent.data );
+                        app.stage.addChild( spriteComponent.data );
                     } else if ( tilingSpriteComponent ) {
                         tilingSpriteComponent.data.position.x = positionComponent.data.x;
                         tilingSpriteComponent.data.position.y = positionComponent.data.y;
@@ -49,7 +55,7 @@ const RenderSystem = function() {
                         tilingSpriteComponent.data.scale.x = scaleComponent.data;
                         tilingSpriteComponent.data.scale.y = scaleComponent.data;
                         tilingSpriteComponent.data.pivot.set( tilingSpriteComponent.data.width * 0.5, tilingSpriteComponent.data.height * 0.5 );
-                        PIXIAppComponent.data.stage.addChild( tilingSpriteComponent.data );
+                        app.stage.addChild( tilingSpriteComponent.data );
                     }
                 } );
             }

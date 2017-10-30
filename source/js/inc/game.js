@@ -65,14 +65,18 @@ module.exports = function( id, view, scale, dimensions ) {
             this.engine.on( 'entity-added', () => console.log( 'yeah that did it') );
             this.loadEnvironment();
             this.loadActors( this.config.actors );
-            this.loadGraphics();
             console.log( this.engine.entities );
-            this.renderSystem = RenderSystem();
-            this.engine.addSystems( this.renderSystem );
-            this.renderSystem.start();
+            const renderSystem = RenderSystem( {
+                view: this.view,
+                resolution: this.scale,
+                // @TODO make this less terrible
+                backgroundColor: this.getEnvironment().components.find( c => Object.getPrototypeOf( c ) === Components.Color ).data
+            } );
+            this.engine.addSystems( renderSystem );
+            renderSystem.start();
             this.engine.update();
         },
-        loadGraphics() {
+        getEnvironment() {
             // finds the first environment entity
             const envFinder = e => {
                 return !!( e.components.find(
@@ -81,24 +85,7 @@ module.exports = function( id, view, scale, dimensions ) {
                 );
             };
             const environment = this.engine.entities.find( envFinder );
-            const background = environment.components.find( c => Object.getPrototypeOf( c ) === Components.Color );
-
-            this.engine.addEntities( Entity(
-                Components.Canvas.create( this.view )
-            ) );
-
-            this.engine.addEntities( Entity(
-                Components.PIXIApp.create( new PIXI.Application(
-                    this.view.clientWidth * this.scale,
-                    this.view.clientHeight * this.scale,
-                    {
-                        view: this.view,
-                        backgroundColor: background.data,
-                        resolution: this.scale,
-                        autoresize: true
-                    }
-                ) )
-            ) );
+            return environment;
         },
         loadActors( actors ) {
             actors.forEach( ( actor ) => {

@@ -368,25 +368,6 @@ const Components ={
             },
             configurable: false
         }
-    } ),
-    /**
-     * A component that stores a `HTMLCanvasElement`
-     */
-    Canvas: Object.create( Component, {
-        'create': {
-            value: function( canvas ) {
-                return Object.getPrototypeOf( this ).create( this, canvas instanceof HTMLCanvasElement ? canvas : document.createElement( 'canvas' ) );
-            },
-            configurable: false
-        }
-    } ),
-    PIXIApp: Object.create( Component, {
-        'create': {
-            value: function( application ) {
-                return Object.getPrototypeOf( this ).create( this, application );
-            },
-            configurable: false
-        }
     } )
 };
 
