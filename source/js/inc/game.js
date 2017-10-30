@@ -87,7 +87,8 @@ module.exports = function( id, view, scale ) {
             this.engine.addSystems( renderSystem );
             physicsSystem.start();
             renderSystem.start();
-            this.engine.update();
+            // this.engine.update();
+            App.ticker.add( this.engine.update.bind( this.engine ) );
         },
         getEnvironment() {
             // finds the first environment entity
@@ -154,7 +155,7 @@ module.exports = function( id, view, scale ) {
          * @TODO finish multi
          */
         loadGeometry( actor, entity ) {
-            const type = Util.property( actor.geometry, 'display.type' );
+            const type = Util.property( actor.geometry, 'type' );
             const components =[];
 
             switch ( type ) {
@@ -175,7 +176,7 @@ module.exports = function( id, view, scale ) {
                     break;
             }
 
-            if ( components ) entity.addComponents.apply( this, components );
+            if ( components ) entity.addComponents.apply( entity, components );
         },
         loadEnvironment() {
             const config = this.config;

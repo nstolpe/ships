@@ -31,8 +31,8 @@ const RenderSystem = function( options ) {
             }
         },
         'update': {
-            value: function() {
-                // console.log('update');
+            value: function( delta ) {
+                // console.log('update render');
                 const entities = this.getEntities();
                 entities.forEach( entity => this.updateEntity( entity ) );
             }

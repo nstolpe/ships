@@ -9,6 +9,12 @@ module.exports = {
 		NEUTRAL: 0,
 		NEGATIVE: -1
 	} ),
+	angleToVector( angle ) {
+		return {
+			x: Math.cos( angle ),
+			y: Math.sin( angle )
+		}
+	},
 	toDegrees( angle ) {
 		return angle * ( 180 / Math.PI );
 	},

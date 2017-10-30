@@ -158,12 +158,12 @@ const EngineProto = Emitter( {
         }
     },
     'update': {
-        value: function() {
+        value: function( delta ) {
             const systems = SystemsMap.get( this );
             this.emit( 'update-start' );
 
             for ( let i = 0, l = systems.length; i < l; i++)
-                systems[ i ].update();
+                systems[ i ].update( delta );
 
             this.emit( 'update-end' );
         }
