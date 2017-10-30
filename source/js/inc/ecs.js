@@ -192,20 +192,25 @@ const System = Emitter( {
         enumerable: true,
         writable: true
     },
-    'on': {
+    'started': {
         value: false,
         enumerable: true,
         writable: true
     },
+    'update': {
+        value: function() {
+            this.emit( 'system-update', this );
+        }
+    },
     'start': {
         value: function() {
-            this.on = true;
+            this.started = true;
             this.emit( 'start' );
         }
     },
     'stop': {
         value: function() {
-            this.on = false;
+            this.started = false;
             this.emit( 'stop' );
         }
     }
