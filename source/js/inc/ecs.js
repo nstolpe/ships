@@ -253,7 +253,7 @@ const Components ={
     Position: Object.create( Component, {
         'create': {
             value: function( x, y ) {
-                return Object.getPrototypeOf( this ).create( this, Vector.create( ~~x, ~~y ) );
+                return Object.getPrototypeOf( this ).create( this, Vector.create( Number( x ), Number( y ) ) );
             },
             configurable: false
         }
@@ -264,7 +264,7 @@ const Components ={
     Rotation: Object.create( Component, {
         'create': {
             value: function( angle ) {
-                return Object.getPrototypeOf( this ).create( this, ~~angle );
+                return Object.getPrototypeOf( this ).create( this, Number( angle ) );
             },
             configurable: false
         }
@@ -275,7 +275,7 @@ const Components ={
      Scale: Object.create( Component, {
         'create': {
             value: function( scale ) {
-                return Object.getPrototypeOf( this ).create( this, ~~scale );
+                return Object.getPrototypeOf( this ).create( this, Number( scale ) );
             },
             configurable: false
         }
@@ -302,7 +302,7 @@ const Components ={
             value: function( width, height, options ) {
                 return Object.getPrototypeOf( this ).create(
                     this,
-                    Bodies.rectangle( 0, 0, ~~width, ~~height, Object.assign( {}, options ) )
+                    Bodies.rectangle( 0, 0, Number( width ), Number( height ), Object.assign( {}, options ) )
                 );
             },
             configurable: false
@@ -347,7 +347,7 @@ const Components ={
     Force: Object.create( Component, {
         'create': {
             value: function( direction, magnitude ) {
-                return Object.getPrototypeOf( this ).create( this, { direction: ~~direction, magnitude: ~~magnitude } );
+                return Object.getPrototypeOf( this ).create( this, { direction: Number( direction ), magnitude: Number( magnitude ) } );
             },
             configurable: false
         }

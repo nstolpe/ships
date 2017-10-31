@@ -1,7 +1,7 @@
 'use strict';
 
 const Matter = require( 'matter-js' );
-const MatterAttractors = require( 'matter-attractors' );
+// const MatterAttractors = require( 'matter-attractors' );
 const ECS = require( './ecs.js' );
 const MatterForces = require( './matter-forces' );
 const Util = require( './util' );
@@ -33,12 +33,15 @@ const PhysicsSystem = function( options ) {
                     const positionComponent = entity.components.find( component => Object.getPrototypeOf( component ) === Components.Position );
                     const rotationComponent = entity.components.find( component => Object.getPrototypeOf( component ) === Components.Rotation );
                     const scaleComponent = entity.components.find( component => Object.getPrototypeOf( component ) === Components.Scale );
-                    geometry.data.position.x = positionComponent.data.x;
-                    geometry.data.position.y = positionComponent.data.y;
-                    geometry.data.angle = rotationComponent.data;
+                    Matter.Body.setPosition( geometry.data, positionComponent.data );
+                    Matter.Body.setAngle( geometry.data, rotationComponent.data );
+                    Matter.Body.scale( geometry.data, scaleComponent.data, scaleComponent.data );
                     Matter.World.add( engine.world, [ geometry.data ] );
                     this.updateEntity( entity, environment );
                 } );
+
+                // Matter.Engine.run( engine );
+                // Matter.Events.on( engine, 'afterUpdate', this.update.bind( this ) );
             }
         },
         'getEntities': {
@@ -54,31 +57,31 @@ const PhysicsSystem = function( options ) {
         },
         'updateEntity': {
             value: function( entity, environment ) {
-                const geometry = entity.components.find( component => Object.getPrototypeOf( component ) === Components.Polygon ) ||
+                const geometryComponent = entity.components.find( component => Object.getPrototypeOf( component ) === Components.Polygon ) ||
                                entity.components.find( component => Object.getPrototypeOf( component ) === Components.Rectangle ) ||
                                entity.components.find( component => Object.getPrototypeOf( component ) === Components.Circle );
                 const positionComponent = entity.components.find( component => Object.getPrototypeOf( component ) === Components.Position );
                 const rotationComponent = entity.components.find( component => Object.getPrototypeOf( component ) === Components.Rotation );
                 const scaleComponent = entity.components.find( component => Object.getPrototypeOf( component ) === Components.Scale );
                 const forces = environment.components.filter( component => Object.getPrototypeOf( component ) === Components.Force );
+                const nameComponent = entity.components.find( component => Object.getPrototypeOf( component ) === Components.Name );
 
-                geometry.data.plugin.forces = [];
+                geometryComponent.data.plugin.forces = [];
                 forces.forEach( force => {
                     const forceVector = Util.angleToVector( Util.toRadians( force.data.direction ) );
-                    geometry.data.plugin.forces.push( {
+                    geometryComponent.data.plugin.forces.push( {
                         x: forceVector.x * force.data.magnitude,
                         y: forceVector.y * force.data.magnitude
                     } );
                 } );
 
-                positionComponent.data.x = geometry.data.position.x;
-                positionComponent.data.y = geometry.data.position.y;
-                rotationComponent.data = geometry.data.angle;
+                positionComponent.data.x = geometryComponent.data.position.x;
+                positionComponent.data.y = geometryComponent.data.position.y;
+                rotationComponent.data = geometryComponent.data.angle;
             }
         },
         'update': {
             value: function( delta ) {
-                // console.log( 'update physics' );
                 const entities = this.getEntities();
                 const environment = this.getEnvironment();
 
