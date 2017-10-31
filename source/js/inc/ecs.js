@@ -5,6 +5,7 @@ const Matter = require( 'matter-js' );
 const Emitter = require( './emitter.js' );
 const Vector = Matter.Vector;
 const Bodies = Matter.Bodies;
+const Body = Matter.Body;
 const Sprite = PIXI.Sprite;
 const Application = PIXI.Application;
 const TilingSprite = PIXI.extras.TilingSprite;
@@ -289,6 +290,17 @@ const Components ={
                 return Object.getPrototypeOf( this ).create(
                     this,
                     Bodies.fromVertices( 0, 0, vertices, Object.assign( {}, options ) )
+                );
+            },
+            configurable: false
+        }
+    } ),
+    CompoundBody: Object.create( Component, {
+        'create': {
+            value: function( parts, options ) {
+                return Object.getPrototypeOf( this ).create(
+                    this,
+                    Body.create( Object.assign( { parts: parts }, options ) )
                 );
             },
             configurable: false
