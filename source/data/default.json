@@ -49,9 +49,9 @@
             "rotation": 0,
             "scale": 1,
             "geometry": {
-                "type": "multi",
+                "type": "compound",
                 "display": {
-                    "type": "multi"
+                    "type": "compound"
                 },
                 "children": [
                     {

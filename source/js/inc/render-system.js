@@ -17,7 +17,7 @@ const RenderSystem = function( options ) {
 
                 // get visual and transform data and create a child for the `PIXI.application` stage
                 // @TODO only handles Sprites. needs at support TilingSprite and other possibilities.
-                // `multi` visuals will work as they'll be individual components
+                // `compound` visuals will work as they'll be individual components
                 entities.forEach( entity => {
                     // @TODO better entity api
                     const spriteComponent = entity.components.find( component => Object.getPrototypeOf( component ) === Components.Sprite ) ||
