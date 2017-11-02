@@ -25,15 +25,28 @@ const RenderSystem = function( options ) {
                     this.updateEntity( entity );
                     App.stage.addChild( spriteComponent.data );
                 } );
+
                 App.renderer.backgroundColor = options.backgroundColor;
-                this.setListeners();
                 App.ticker.add( this.update.bind( this ) );
+            }
+        },
+        'resize': {
+            value: function() {
+                if ( App.view.width != App.view.clientWidth || App.view.height !== App.view.clientHeight ) {
+                    App.renderer.resize(
+                        App.view.clientWidth * App.renderer.resolution,
+                        App.view.clientHeight * App.renderer.resolution
+                    );
+                }
             }
         },
         'update': {
             value: function( delta ) {
                 // console.log('update render');
                 const entities = this.getEntities();
+
+                this.resize();
+
                 entities.forEach( entity => this.updateEntity( entity ) );
             }
         },
@@ -65,16 +78,6 @@ const RenderSystem = function( options ) {
                 } );
 
                 return entities;
-            }
-        },
-        'setListeners': {
-            value: function() {
-                window.addEventListener( 'resize', function() {
-                    App.renderer.resize(
-                        App.view.clientWidth * App.renderer.resolution,
-                        App.view.clientHeight * App.renderer.resolution
-                    );
-                }, false );
             }
         }
     } );
