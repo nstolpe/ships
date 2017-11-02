@@ -28,14 +28,21 @@ const PhysicsSystem = function( options ) {
 
                 entities.forEach( entity => {
                     const geometry = entity.components.find( component => Object.getPrototypeOf( component ) === Components.Polygon ) ||
+                           entity.components.find( component => Object.getPrototypeOf( component ) === Components.CompoundBody ) ||
                            entity.components.find( component => Object.getPrototypeOf( component ) === Components.Rectangle ) ||
                            entity.components.find( component => Object.getPrototypeOf( component ) === Components.Circle );
                     const positionComponent = entity.components.find( component => Object.getPrototypeOf( component ) === Components.Position );
                     const rotationComponent = entity.components.find( component => Object.getPrototypeOf( component ) === Components.Rotation );
                     const scaleComponent = entity.components.find( component => Object.getPrototypeOf( component ) === Components.Scale );
-                    Matter.Body.setPosition( geometry.data, positionComponent.data );
-                    Matter.Body.setAngle( geometry.data, rotationComponent.data );
-                    Matter.Body.scale( geometry.data, scaleComponent.data, scaleComponent.data );
+
+                    // everythins has them, maybe enforce this in retrieval
+                    if ( positionComponent )
+                        Matter.Body.setPosition( geometry.data, positionComponent.data );
+                    if ( rotationComponent )
+                        Matter.Body.setAngle( geometry.data, rotationComponent.data );
+                    if ( scaleComponent )
+                        Matter.Body.scale( geometry.data, scaleComponent.data, scaleComponent.data );
+
                     Matter.World.add( engine.world, [ geometry.data ] );
                     this.updateEntity( entity, environment );
                 } );
@@ -48,6 +55,7 @@ const PhysicsSystem = function( options ) {
             value: function() {
                 const entities = this.engine.entities.filter( entity => {
                     return entity.components.find( component => Object.getPrototypeOf( component ) === Components.Polygon ) ||
+                           entity.components.find( component => Object.getPrototypeOf( component ) === Components.CompoundBody ) ||
                            entity.components.find( component => Object.getPrototypeOf( component ) === Components.Rectangle ) ||
                            entity.components.find( component => Object.getPrototypeOf( component ) === Components.Circle );
                 } );
@@ -58,8 +66,9 @@ const PhysicsSystem = function( options ) {
         'updateEntity': {
             value: function( entity, environment ) {
                 const geometryComponent = entity.components.find( component => Object.getPrototypeOf( component ) === Components.Polygon ) ||
-                               entity.components.find( component => Object.getPrototypeOf( component ) === Components.Rectangle ) ||
-                               entity.components.find( component => Object.getPrototypeOf( component ) === Components.Circle );
+                            entity.components.find( component => Object.getPrototypeOf( component ) === Components.CompoundBody ) ||
+                            entity.components.find( component => Object.getPrototypeOf( component ) === Components.Rectangle ) ||
+                            entity.components.find( component => Object.getPrototypeOf( component ) === Components.Circle );
                 const positionComponent = entity.components.find( component => Object.getPrototypeOf( component ) === Components.Position );
                 const rotationComponent = entity.components.find( component => Object.getPrototypeOf( component ) === Components.Rotation );
                 const scaleComponent = entity.components.find( component => Object.getPrototypeOf( component ) === Components.Scale );

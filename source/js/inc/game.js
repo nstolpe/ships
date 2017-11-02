@@ -135,14 +135,15 @@ module.exports = function( id, view, scale ) {
                     const h = Util.property(actor.geometry, 'height' );
                     component = Components.TilingSprite.create( texture, w, h );
                     break;
-                case 'multi':
+                case 'compound':
                     break;
                 default:
                     break;
             }
 
-            if ( component )
-                entity.addComponents( component );
+            if ( component ) entity.addComponents( component );
+
+            return component;
         },
         getTexture( actor, resources ) {
             const resourceKey = 'spritesheets::' + Util.property( actor.geometry, 'display.spritesheet' );
@@ -152,31 +153,59 @@ module.exports = function( id, view, scale ) {
         /**
          * Loads gemometry from an `actor` from a config and turns it into
          * a geometry `component` for an `entity`
-         * @TODO finish multi
+         *
+         * @param {object} actor   Actor data from a config.
+         * @param {object} entity  An instance of `ECS.Entity`
+         * @return {object}        An instance of `ECS.Components.Polyogon`,
+         *                                        `ECS.Components.Rectangle`,
+         *                                        `ECS.Components.Circle`,
+         *                                     or `ECS.Components.CompoundBody`
          */
         loadGeometry( actor, entity ) {
             const type = Util.property( actor.geometry, 'type' );
-            const components =[];
+            let component;
 
             switch ( type ) {
                 case 'polygon':
-                    components.push( Components.Polygon.create( Util.property( actor.geometry, 'vertices' ) ) );
+                    component = Components.Polygon.create( Util.property( actor.geometry, 'vertices' ) );
                     break;
                 case 'circle':
-                    components.push( Components.Circle.create( Util.property( actor.geometry, 'radius' ) ) );
+                    component = Components.Circle.create( Util.property( actor.geometry, 'radius' ) );
                     break;
                 case 'rectangle':
-                    components.push( Components.Rectangle.create( Util.property( actor.geometry, 'width') , Util.property( actor.geometry, 'height' ) ) );
+                    component = Components.Rectangle.create( Util.property( actor.geometry, 'width') , Util.property( actor.geometry, 'height' ) );
                     break;
-                case 'multi':
+                case 'compound':
                     const children = Util.property( actor.geometry, 'children' );
-                    this.loadActors( children );
+                    const childrenComponent = Components.Children.create();
+                    const parts = [];
+
+                    children.forEach( actor => {
+                        const entity = Entity(
+                            Components.Name.create( actor.name ),
+                            Components.Position.create( Util.property( actor.position, 'x' ), Util.property( actor.position, 'y' ) ),
+                            Components.Rotation.create( actor.rotation ),
+                            Components.Scale.create( actor.scale )
+                        );
+
+                        const geometryComponent = this.loadGeometry( actor, entity );
+                        parts.push( geometryComponent.data );
+
+                        this.loadSkinning( actor, entity );
+                        this.engine.addEntities( entity );
+
+                        childrenComponent.data.push( entity );
+                    } );
+
+                    component = Components.CompoundBody.create( parts );
                     break;
                 default:
                     break;
             }
 
-            if ( components ) entity.addComponents.apply( entity, components );
+            if ( component ) entity.addComponents( component );
+
+            return component;
         },
         loadEnvironment() {
             const config = this.config;
