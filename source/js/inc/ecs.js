@@ -385,6 +385,17 @@ const Components ={
             },
             configurable: false
         }
+    } ),
+    /**
+     * A component that stores a manager
+     */
+    Manager: Object.create( Component, {
+        'create': {
+            value: function( name ) {
+                return Object.getPrototypeOf( this ).create( this, String( name ) );
+            },
+            configurable: false
+        }
     } )
 };
 
