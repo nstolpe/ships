@@ -30,6 +30,10 @@ const RenderSystem = function( options ) {
                 App.ticker.add( this.update.bind( this ) );
             }
         },
+        /**
+         * Resizes the canvas if its `clientWidth` doesn't equal it's `width` or if its
+         * `clientHeight` doesn't equal its `height`
+         */
         'resize': {
             value: function() {
                 if ( App.view.width != App.view.clientWidth || App.view.height !== App.view.clientHeight ) {
