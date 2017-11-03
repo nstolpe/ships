@@ -35,7 +35,7 @@ const PhysicsSystem = function( options ) {
                     const rotationComponent = entity.components.find( component => Object.getPrototypeOf( component ) === Components.Rotation );
                     const scaleComponent = entity.components.find( component => Object.getPrototypeOf( component ) === Components.Scale );
 
-                    // everythins has them, maybe enforce this in retrieval
+                    // everything has them, maybe enforce this in retrieval
                     if ( positionComponent )
                         Matter.Body.setPosition( geometry.data, positionComponent.data );
                     if ( rotationComponent )
@@ -43,7 +43,10 @@ const PhysicsSystem = function( options ) {
                     if ( scaleComponent )
                         Matter.Body.scale( geometry.data, scaleComponent.data, scaleComponent.data );
 
-                    Matter.World.add( engine.world, [ geometry.data ] );
+                    // prevents compound children from being added.
+                    if ( geometry.data === geometry.data.parent )
+                        Matter.World.add( engine.world, [ geometry.data ] );
+
                     this.updateEntity( entity, environment );
                 } );
 
