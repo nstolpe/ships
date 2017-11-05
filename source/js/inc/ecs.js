@@ -345,6 +345,17 @@ const Components ={
     /**
      * A component that stores an array of child `Entities`
      */
+    Parent: Object.create( Component, {
+        'create': {
+            value: function( parent ) {
+                return Object.getPrototypeOf( this ).create( this, parent );
+            },
+            configurable: false
+        }
+    } ),
+    /**
+     * A component that stores an array of child `Entities`
+     */
     Children: Object.create( Component, {
         'create': {
             value: function( children ) {
@@ -389,10 +400,10 @@ const Components ={
     /**
      * A component that stores a manager
      */
-    Manager: Object.create( Component, {
+    PlayerManager: Object.create( Component, {
         'create': {
-            value: function( name ) {
-                return Object.getPrototypeOf( this ).create( this, String( name ) );
+            value: function() {
+                return Object.getPrototypeOf( this ).create( this, true );
             },
             configurable: false
         }
