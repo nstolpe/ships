@@ -130,9 +130,34 @@ var boxB = Bodies.rectangle(400, 100, 10, 80, {
     }
 } );
 
+var partA = Bodies.rectangle(200, 560, 10, 80, {
+    // restitution: 1,
+    label: 'partA',
+    // density: .1,
+    // plugin: {
+    //     forces: forces
+    // }
+} );
+
+var partB = Bodies.rectangle(240, 560, 80, 10, {
+    // restitution: 1,
+    label: 'partB',
+    // density: .1,
+    // plugin: {
+    //     forces: forces
+    // }
+} );
+
+var compound = Matter.Body.create( {
+    parts: [ partA, partB ],
+    plugin: {
+        forces: forces
+    }
+} );
+window.compound = compound;
 var shipShape = Bodies.fromVertices( 450, 300,
     [
-        { x: 60, y: 19  },
+        { x: 60, y: 19 },
         { x: 56, y: 8  },
         { x: 43, y: 2  },
         { x: 31, y: 0  },
@@ -170,7 +195,7 @@ window.ground = ground;
 var ceiling = Bodies.rectangle( 400, -10, 810, 60, { isStatic: true } );
 var right = Bodies.rectangle( 800, 300, 200, 610, { isStatic: true } );
 var left = Bodies.rectangle( -10, 300, 200, 610, { isStatic: true } );
-var rigidBodies = [ ground, ceiling, right, left, boxA, boxB, shipShape, rudder ];
+var rigidBodies = [ ground, ceiling, right, left, boxA, boxB, shipShape, rudder, compound ];
 window.boxA = boxA;
 window.boxB = boxB;
 window.shipShape = shipShape;
@@ -241,11 +266,15 @@ World.add( engine.world, [
     boxA, boxB, shipShape, ground, ceiling,
     left, right, constraint, rudder,
     rudderConstraint0,
-    rudderConstraint1, rudderConstraint2, rudderConstraint3
+    rudderConstraint1, rudderConstraint2, rudderConstraint3, compound
 ] );
 
 // run the engine
 Engine.run( engine );
+// app.ticker.add( delta => {
+//     Matter.Engine.update( engine, delta * 16 )
+// } );
+
 
 // run the renderer
 Render.run( render );
