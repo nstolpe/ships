@@ -18,6 +18,7 @@ const PhysicsSystem = function( options ) {
 
     const engine = Matter.Engine.create( { world: world } );
 
+    Matter.Events.on( engine, "collisionActive", e => console.log('colide'))
     const system = Object.create( System, {
         'start': {
             value: function() {
@@ -27,29 +28,37 @@ const PhysicsSystem = function( options ) {
                 const environment = this.getEnvironment();
 
                 entities.forEach( entity => {
-                    const geometry = entity.components.find( component => Object.getPrototypeOf( component ) === Components.Polygon ) ||
+                    const geometryComponent = entity.components.find( component => Object.getPrototypeOf( component ) === Components.Polygon ) ||
                            entity.components.find( component => Object.getPrototypeOf( component ) === Components.CompoundBody ) ||
                            entity.components.find( component => Object.getPrototypeOf( component ) === Components.Rectangle ) ||
                            entity.components.find( component => Object.getPrototypeOf( component ) === Components.Circle );
-                    const positionComponent = entity.components.find( component => Object.getPrototypeOf( component ) === Components.Position );
-                    const rotationComponent = entity.components.find( component => Object.getPrototypeOf( component ) === Components.Rotation );
-                    const scaleComponent = entity.components.find( component => Object.getPrototypeOf( component ) === Components.Scale );
-
-                    // everything has them, maybe enforce this in retrieval
-                    if ( positionComponent )
-                        Matter.Body.setPosition( geometry.data, positionComponent.data );
-                    if ( rotationComponent )
-                        Matter.Body.setAngle( geometry.data, rotationComponent.data );
-                    if ( scaleComponent )
-                        Matter.Body.scale( geometry.data, scaleComponent.data, scaleComponent.data );
 
                     // prevents compound children from being added.
-                    if ( geometry.data === geometry.data.parent )
-                        Matter.World.add( engine.world, [ geometry.data ] );
+                    if ( !entity.components.find( c => Object.getPrototypeOf( c ) === Components.Parent ) )
+                        Matter.World.add( engine.world, [ geometryComponent.data ] );
 
                     this.updateEntity( entity, environment );
                 } );
 
+                // @TODO move this into function when debug setting on
+                var render = Matter.Render.create( {
+                    canvas: document.getElementById( 'render' ),
+                    engine: engine,
+                    options: {
+                        showDebug: true,
+                        showInternalEdges: true,
+                        showAngleIndicator: true,
+                        // showAxes: true,
+                        showVertexNumbers: true,
+                        showCollisions: true,
+                        showSeparations: true,
+                        showBroadphase: true,
+                        showVelocity: true,
+                        width: document.getElementById( 'render' ).clientWidth * 1.5,
+                        height: document.getElementById( 'render' ).clientHeight * 1.5,
+                    }
+                } );
+                Matter.Render.run( render );
                 // Matter.Engine.run( engine );
                 // Matter.Events.on( engine, 'afterUpdate', this.update.bind( this ) );
             }
