@@ -4,8 +4,17 @@ const ECS = require( './ecs.js' );
 const Components = ECS.Components;
 const System = ECS.System;
 
+/**
+ * @param {object} options                  Key/value set of options
+ * @param {object} options.app              PIXI.application instance
+ * @param {object} options.backgroundColor  ECS.Components.Color instance
+ * @param {object} options.hub              Turms.Hub instance
+ */
 const RenderSystem = function( options ) {
-    const App = options.App;
+    const App = options.app;
+    const graphics = options.graphics;
+    const hub = options.hub;
+    App.renderer.backgroundColor = options.backgroundColor == null ? 0x000000 : options.backgroundColor;
 
     const system = Object.create( System, {
         'start': {
@@ -26,7 +35,10 @@ const RenderSystem = function( options ) {
                     App.stage.addChild( spriteComponent.data );
                 } );
 
-                App.renderer.backgroundColor = options.backgroundColor;
+                App.stage.addChild( graphics );
+                if ( typeof hub === 'object' )
+                    this.registerSubscriptions();
+
                 App.ticker.add( this.update.bind( this ) );
             }
         },
@@ -52,6 +64,40 @@ const RenderSystem = function( options ) {
                 this.resize();
 
                 entities.forEach( entity => this.updateEntity( entity ) );
+
+                graphics.clear();
+
+                entities.forEach( entity => {
+                    const geometryComponent = entity.components.find( component => Object.getPrototypeOf( component ) === Components.Polygon ) ||
+                        entity.components.find( component => Object.getPrototypeOf( component ) === Components.CompoundBody ) ||
+                        entity.components.find( component => Object.getPrototypeOf( component ) === Components.Rectangle ) ||
+                        entity.components.find( component => Object.getPrototypeOf( component ) === Components.Circle );
+
+                        switch ( true ) {
+                            case Object.getPrototypeOf( geometryComponent ) === Components.Rectangle:
+                            case Object.getPrototypeOf( geometryComponent ) === Components.Polygon:
+                                graphics.lineStyle( 1, 0xff00ff, 1 );
+                                geometryComponent.data.vertices.forEach( ( vertex, idx, vertices ) => {
+                                    switch ( idx ) {
+                                        case 0:
+                                            graphics.moveTo( vertex.x, vertex.y );
+                                            break;
+                                        case vertices.length - 1:
+                                            graphics.lineTo( vertex.x,vertex.y );
+                                            graphics.lineTo( vertices[ 0 ].x, vertices[ 0 ].y );
+                                            break;
+                                        default:
+                                            graphics.lineTo( vertex.x,vertex.y );
+                                            break;
+                                    }
+                                } );
+                                break;
+                            case Object.getPrototypeOf( geometryComponent ) === Components.Circle:
+                            case Object.getPrototypeOf( geometryComponent ) === Components.CompoundBody:
+                            defaut:
+                                break;
+                        }
+                } );
             }
         },
         'updateEntity': {
@@ -82,6 +128,25 @@ const RenderSystem = function( options ) {
                 } );
 
                 return entities;
+            }
+        },
+        'registerSubscriptions': {
+            value: function() {
+                hub.addSubscription( this, 'get-renderable-entities' );
+            }
+        },
+        'receiveMessage': {
+            value: function( action, message ) {
+                switch ( message.type ) {
+                    case 'get-renderable-entities':
+                        hub.sendMessage( {
+                            type: 'renderable-entities',
+                            data: this.getEntities
+                        } );
+                        break;
+                    default:
+                        break;
+                }
             }
         }
     } );
