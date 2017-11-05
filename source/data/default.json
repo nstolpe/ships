@@ -5,7 +5,7 @@
             {
                 "name": "current",
                 "direction": 163.0,
-                "magnitude": 0.1
+                "magnitude": 0
             }
         ],
         "background": "0x19fffc"
@@ -44,8 +44,70 @@
             "manager": "player"
         },
         {
+            "name": "boards-square",
+            "position": { "x": 600, "y": 800 },
+            "rotation": 37,
+            "scale": 1,
+            "geometry": {
+                "type": "rectangle",
+                "width": 128,
+                "height": 128,
+                "display": {
+                    "type": "tiling-sprite",
+                    "spritesheet": "assets",
+                    "id": "boards.png"
+                }
+            }
+        },
+        {
+            "name": "boards-x",
+            "position": { "x": 800, "y": 800 },
+            "rotation": 0,
+            "scale": 1,
+            "geometry": {
+                "type": "compound",
+                "display": {
+                    "type": "compound"
+                },
+                "children": [
+                    {
+                        "name": "cross-1",
+                        "position": { "x": 580, "y": 400 },
+                        "rotation": 0,
+                        "scale": 1,
+                        "geometry": {
+                            "type": "rectangle",
+                            "width": 16,
+                            "height": 64,
+                            "display": {
+                                "type": "tiling-sprite",
+                                "spritesheet": "assets",
+                                "id": "boards.png"
+                            }
+                        }
+                    },
+                    {
+                        "name": "cross-2",
+                        "position": { "x": 580, "y": 400 },
+                        "rotation": 0,
+                        "scale": 1,
+                        "geometry": {
+                            "type": "rectangle",
+                            "width": 64,
+                            "height": 16,
+                            "display": {
+                                "type": "tiling-sprite",
+                                "spritesheet": "assets",
+                                "id": "boards.png"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        {
             "name": "dock-001",
-            "position": { "x": 384, "y": 384 },
+            "position": { "x": 580, "y": 400 },
             "rotation": 0,
             "scale": 1,
             "geometry": {
