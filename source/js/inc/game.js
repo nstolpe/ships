@@ -1,15 +1,21 @@
 "use strict";
 
 const PIXI = require( 'pixi.js' );
+const Matter = require( 'matter-js' );
+const decomp = require('poly-decomp');
+window.decomp = decomp;
+
 const Turms = require( 'turms' );
 const Util = require( './util.js' );
 const ECS = require( './ecs.js' );
 const RenderSystem = require( './render-system.js' );
 const PhysicsSystem = require( './physics-system.js' );
+const PlayerManagerSystem = require( './player-manager-system.js' );
 
 const Entity = ECS.Entity;
 const Components = ECS.Components;
 const Engine = ECS.Engine;
+const hub = Turms.Hub();
 
 const defaultConfig = {
     spritesheets: [],
@@ -19,8 +25,6 @@ const defaultConfig = {
     },
     actors: []
 };
-
-const Hub = Turms.Hub();
 
 module.exports = function( id, view, scale ) {
     const App = new PIXI.Application(
@@ -77,17 +81,19 @@ module.exports = function( id, view, scale ) {
             console.log( this.engine.entities );
             const physicsSystem = PhysicsSystem();
             const renderSystem = RenderSystem( {
-                view: this.view,
-                resolution: this.scale,
                 // @TODO make this less terrible
+                app: App,
                 backgroundColor: this.getEnvironment().components.find( c => Object.getPrototypeOf( c ) === Components.Color ).data,
-                App: App
+                graphics: new PIXI.Graphics(),
+                hub: hub
             } );
-            this.engine.addSystems( physicsSystem );
-            this.engine.addSystems( renderSystem );
+            const playerManagerSystem = PlayerManagerSystem( { hub: hub } );
+            this.engine.addSystems( playerManagerSystem, physicsSystem, renderSystem )
             physicsSystem.start();
             renderSystem.start();
+            playerManagerSystem.start();
             // this.engine.update();
+            // engine updates are trigerred by pixi ticker.
             App.ticker.add( this.engine.update.bind( this.engine ) );
         },
         getEnvironment() {
@@ -111,6 +117,9 @@ module.exports = function( id, view, scale ) {
                 );
 
                 this.loadGeometry( actor, entity );
+
+                if ( actor.manager === 'player' )
+                    entity.addComponents( Components.PlayerManager.create() );
 
                 if ( actor.geometry.display )
                     this.loadSkinning( actor, entity );
@@ -167,43 +176,56 @@ module.exports = function( id, view, scale ) {
 
             switch ( type ) {
                 case 'polygon':
-                    component = Components.Polygon.create( Util.property( actor.geometry, 'vertices' ) );
+                    component = Components.Polygon.create( Util.property( actor.geometry, 'vertices' ), { label: actor.name } );
                     break;
                 case 'circle':
-                    component = Components.Circle.create( Util.property( actor.geometry, 'radius' ) );
+                    component = Components.Circle.create( Util.property( actor.geometry, 'radius' ), { label: actor.name } );
                     break;
                 case 'rectangle':
-                    component = Components.Rectangle.create( Util.property( actor.geometry, 'width') , Util.property( actor.geometry, 'height' ) );
+                    component = Components.Rectangle.create( Util.property( actor.geometry, 'width') , Util.property( actor.geometry, 'height' ), { label: actor.name } );
                     break;
                 case 'compound':
                     const children = Util.property( actor.geometry, 'children' );
                     const childrenComponent = Components.Children.create();
-                    const parts = [];
+                    const parts = Array( children.length );
 
-                    children.forEach( actor => {
-                        const entity = Entity(
-                            Components.Name.create( actor.name ),
-                            Components.Position.create( Util.property( actor.position, 'x' ), Util.property( actor.position, 'y' ) ),
-                            Components.Rotation.create( actor.rotation ),
-                            Components.Scale.create( actor.scale )
+                    childrenComponent.data.length = children.length;
+
+                    children.forEach( ( child, idx ) => {
+                        const childEntity = Entity(
+                            Components.Name.create( child.name ),
+                            Components.Position.create( Util.property( child.position, 'x' ), Util.property( child.position, 'y' ) ),
+                            Components.Rotation.create( child.rotation ),
+                            Components.Scale.create( child.scale ),
+                            Components.Parent.create( entity ),
+                            childrenComponent
                         );
 
-                        const geometryComponent = this.loadGeometry( actor, entity );
-                        parts.push( geometryComponent.data );
+                        const geometryComponent = this.loadGeometry( child, childEntity );
+                        parts[ idx ] = geometryComponent.data;
 
-                        this.loadSkinning( actor, entity );
-                        this.engine.addEntities( entity );
+                        this.loadSkinning( child, childEntity );
+                        this.engine.addEntities( childEntity );
 
-                        childrenComponent.data.push( entity );
+                        childrenComponent.data[ idx ] = childEntity;
                     } );
 
-                    component = Components.CompoundBody.create( parts );
+                    component = Components.CompoundBody.create( parts, { label: actor.name } );
                     break;
                 default:
                     break;
             }
 
-            if ( component ) entity.addComponents( component );
+            if ( component ) {
+                const positionComponent = entity.components.find( component => Object.getPrototypeOf( component ) === Components.Position );
+                const rotationComponent = entity.components.find( component => Object.getPrototypeOf( component ) === Components.Rotation );
+                const scaleComponent = entity.components.find( component => Object.getPrototypeOf( component ) === Components.Scale );
+
+                Matter.Body.setPosition( component.data, positionComponent.data );
+                Matter.Body.setAngle( component.data, rotationComponent.data );
+                Matter.Body.scale( component.data, scaleComponent.data, scaleComponent.data );
+                entity.addComponents( component );
+            }
 
             return component;
         },
@@ -224,3 +246,78 @@ module.exports = function( id, view, scale ) {
         }
     }
 }
+
+// @TODO move this out
+// W
+window.addEventListener( 'keydown', e => {
+    if ( e.which === 87 ) {
+        console.log(e.repeat);
+        hub.sendMessage( {
+            type: 'player-input-thrust',
+            data: 1
+        } );
+    }
+}, false );
+window.addEventListener( 'keyup', e => {
+    if ( e.which === 87 ) {
+        hub.sendMessage( {
+            type: 'player-input-thrust',
+            data: 0
+        } );
+    }
+}, false );
+// S
+window.addEventListener( 'keydown', e => {
+    if ( e.which === 83 ) {
+        hub.sendMessage( {
+            type: 'player-input-thrust',
+            data: -1
+        } );
+    }
+}, false );
+window.addEventListener( 'keyup', e => {
+    if ( e.which === 83 ) {
+        hub.sendMessage( {
+            type: 'player-input-thrust',
+            data: 0
+        } );
+    }
+}, false );
+// A
+window.addEventListener( 'keydown', e => {
+    if ( e.which === 65 ) {
+        hub.sendMessage( {
+            type: 'player-input-turn',
+            data: -1
+        } );
+    }
+}, false );
+window.addEventListener( 'keyup', e => {
+    if ( e.which === 65 ) {
+        hub.sendMessage( {
+            type: 'player-input-turn',
+            data: 0
+        } );
+    }
+}, false );
+// D
+window.addEventListener( 'keydown', e => {
+    if ( e.which === 68 ) {
+        hub.sendMessage( {
+            type: 'player-input-turn',
+            data: 1
+        } );
+    }
+}, false );
+window.addEventListener( 'keyup', e => {
+    if ( e.which === 68 ) {
+        hub.sendMessage( {
+            type: 'player-input-turn',
+            data: 0
+        } );
+    }
+}, false );
+// P
+window.addEventListener( 'keydown', e => {
+    // if ( e.which === 80 ) boost = true;
+}, false );
