@@ -86,6 +86,7 @@ const PhysicsSystem = function( options ) {
                 const scaleComponent = entity.components.find( component => Object.getPrototypeOf( component ) === Components.Scale );
                 const forces = environment.components.filter( component => Object.getPrototypeOf( component ) === Components.Force );
                 const nameComponent = entity.components.find( component => Object.getPrototypeOf( component ) === Components.Name );
+                const parentComponent = entity.components.find( component => Object.getPrototypeOf( component ) === Components.Parent );
 
                 geometryComponent.data.plugin.forces = [];
                 forces.forEach( force => {
@@ -96,9 +97,15 @@ const PhysicsSystem = function( options ) {
                     } );
                 } );
 
-                positionComponent.data.x = geometryComponent.data.position.x;
                 positionComponent.data.y = geometryComponent.data.position.y;
-                rotationComponent.data = geometryComponent.data.angle;
+                positionComponent.data.x = geometryComponent.data.position.x;
+                // if there's a parent component, rotation comes from it
+                if ( parentComponent ) {
+                    const parentGeoComp = parentComponent.data.components.find( component => Object.getPrototypeOf( component ) === Components.CompoundBody );
+                    rotationComponent.data = parentGeoComp.data.angle;
+                } else {
+                    rotationComponent.data = geometryComponent.data.angle;
+                }
             }
         },
         'update': {
