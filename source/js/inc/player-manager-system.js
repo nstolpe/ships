@@ -6,6 +6,11 @@ const ECS = require( './ecs.js' );
 const Components = ECS.Components;
 const System = ECS.System;
 
+const Forces = {
+    thrust: 0,
+    rotation: 0
+};
+
 const PlayerManagerSystem = function( options ) {
     const hub = options.hub;
 
@@ -19,7 +24,28 @@ const PlayerManagerSystem = function( options ) {
         },
         'update': {
             value: function( delta ) {
+                // if ( Forces.rotation || Forces.thrust ) {
+                    const player = this.getEntities()[0];
+                    const geometryComponent = player.components.find( component => Object.getPrototypeOf( component ) === Components.Polygon ) ||
+                           player.components.find( component => Object.getPrototypeOf( component ) === Components.CompoundBody ) ||
+                           player.components.find( component => Object.getPrototypeOf( component ) === Components.Rectangle ) ||
+                           player.components.find( component => Object.getPrototypeOf( component ) === Components.Circle );
+                    const positionComponent = player.components.find( component => Object.getPrototypeOf( component ) === Components.Position );
+                    const rotationComponent = player.components.find( component => Object.getPrototypeOf( component ) === Components.Rotation );
+                // }
 
+                if ( Forces.thrust ) {
+                        let vec = Matter.Vector.create(
+                            Math.cos( rotationComponent.data ),
+                            Math.sin( rotationComponent.data )
+                        );
+                        vec = Matter.Vector.normalise( vec );
+                        vec = Matter.Vector.mult( vec, Forces.thrust );
+                        Matter.Body.applyForce( geometryComponent.data, positionComponent.data, vec );
+                }
+
+                if ( Forces.rotation )
+                    geometryComponent.data.torque = Forces.rotation;
             }
         },
         'getEntities': {
@@ -38,27 +64,12 @@ const PlayerManagerSystem = function( options ) {
         },
         'receiveMessage': {
             value: function( action, message ) {
-                const player = this.getEntities()[0];
-                const geometryComponent = player.components.find( component => Object.getPrototypeOf( component ) === Components.Polygon ) ||
-                       player.components.find( component => Object.getPrototypeOf( component ) === Components.CompoundBody ) ||
-                       player.components.find( component => Object.getPrototypeOf( component ) === Components.Rectangle ) ||
-                       player.components.find( component => Object.getPrototypeOf( component ) === Components.Circle );
-                const positionComponent = player.components.find( component => Object.getPrototypeOf( component ) === Components.Position );
-                const rotationComponent = player.components.find( component => Object.getPrototypeOf( component ) === Components.Rotation );
-
                 switch ( message.type ) {
                     case 'player-input-thrust':
-                        console.log(geometryComponent.data.velocity)
-                        let vec = Matter.Vector.create(
-                            Math.cos( rotationComponent.data ),
-                            Math.sin( rotationComponent.data )
-                        );
-                        vec = Matter.Vector.normalise( vec );
-                        vec = Matter.Vector.mult( vec, message.data );
-                        Matter.Body.applyForce( geometryComponent.data, positionComponent.data, vec );
+                        Forces.thrust = message.data;
                         break;
                     case 'player-input-turn':
-                        geometryComponent.data.torque = message.data * 10;
+                        Forces.rotation = message.data;
                         break;
                 }
             }
