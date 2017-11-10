@@ -29,9 +29,13 @@ const RenderSystem = function( options ) {
                 // `compound` visuals will work as they'll be individual components
                 entities.forEach( entity => {
                     // @TODO better entity api
-                    const spriteComponent = entity.components.find( component => Object.getPrototypeOf( component ) === Components.Sprite ) ||
+                    const spriteComponent = entity.components.find( component => Object.getPrototypeOf( component ) === Components.Container ) ||
+                        entity.components.find( component => Object.getPrototypeOf( component ) === Components.Sprite ) ||
                         entity.components.find( component => Object.getPrototypeOf( component ) === Components.TilingSprite );
-                    this.updateEntity( entity );
+
+                    if ( !entity.components.find( component => Object.getPrototypeOf( component ) === Components.Parent ) )
+                        this.updateEntity( entity );
+
                     App.stage.addChild( spriteComponent.data );
                 } );
 
@@ -93,7 +97,7 @@ const RenderSystem = function( options ) {
                                 } );
                                 break;
                             case Object.getPrototypeOf( geometryComponent ) === Components.Circle:
-                            case Object.getPrototypeOf( geometryComponent ) === Components.CompoundBody:
+                            case Object.getPrototypeOf( geometryComponent ) === Components.Container:
                             defaut:
                                 break;
                         }
@@ -103,7 +107,8 @@ const RenderSystem = function( options ) {
         'updateEntity': {
             value: function( entity ) {
                 // @TODO add querying functions to components so these don't need to be so long and messy.
-                const spriteComponent = entity.components.find( component => Object.getPrototypeOf( component ) === Components.Sprite ) ||
+                const spriteComponent = entity.components.find( component => Object.getPrototypeOf( component ) === Components.Container ) ||
+                    entity.components.find( component => Object.getPrototypeOf( component ) === Components.Sprite ) ||
                     entity.components.find( component => Object.getPrototypeOf( component ) === Components.TilingSprite );
                 const positionComponent = entity.components.find( component => Object.getPrototypeOf( component ) === Components.Position );
                 const rotationComponent = entity.components.find( component => Object.getPrototypeOf( component ) === Components.Rotation );
@@ -123,7 +128,8 @@ const RenderSystem = function( options ) {
                     return entity.components.find( component => Object.getPrototypeOf( component ) === Components.Position ) &&
                            entity.components.find( component => Object.getPrototypeOf( component ) === Components.Rotation ) &&
                            entity.components.find( component => Object.getPrototypeOf( component ) === Components.Scale ) &&
-                           ( entity.components.find( component => Object.getPrototypeOf( component ) === Components.Sprite ) ||
+                           ( entity.components.find( component => Object.getPrototypeOf( component ) === Components.Container ) ||
+                             entity.components.find( component => Object.getPrototypeOf( component ) === Components.Sprite ) ||
                              entity.components.find( component => Object.getPrototypeOf( component ) === Components.TilingSprite ) );
                 } );
 
