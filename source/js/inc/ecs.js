@@ -7,6 +7,7 @@ const Vector = Matter.Vector;
 const Bodies = Matter.Bodies;
 const Body = Matter.Body;
 const Sprite = PIXI.Sprite;
+const Container = PIXI.Container;
 const Application = PIXI.Application;
 const TilingSprite = PIXI.extras.TilingSprite;
 
@@ -343,7 +344,18 @@ const Components ={
         }
     } ),
     /**
-     * A component that stores an array of child `Entities`
+     * A component that stores a `PIXI.Container`
+     */
+    Container: Object.create( Component, {
+        'create': {
+            value: function() {
+                return Object.getPrototypeOf( this ).create( this, new Container() );
+            },
+            configurable: false
+        }
+    } ),
+    /**
+     * A component that stores a parent `Entity`
      */
     Parent: Object.create( Component, {
         'create': {
