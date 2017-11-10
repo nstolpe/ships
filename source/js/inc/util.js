@@ -109,7 +109,6 @@ module.exports = {
 			i++;
 		}
 
-		if ( current === source ) return;
-		return current;
+		return current === source ? undefined : current;
 	}
 };
