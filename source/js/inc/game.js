@@ -145,6 +145,16 @@ module.exports = function( id, view, scale ) {
                     component = Components.TilingSprite.create( texture, w, h );
                     break;
                 case 'compound':
+                    const children = Util.property( actor.geometry, 'children' );
+                    component = Components.Container.create();
+                    const childrenComponent = entity.components.find( component => Object.getPrototypeOf( component ) === Components.Children );
+
+                    children.forEach( ( child, idx ) => {
+                        const childEntity = childrenComponent.data[ idx ];
+                        const renderComponent = this.loadSkinning( child, childEntity );
+                        childEntity.addComponents( renderComponent );
+                        component.data.addChild( renderComponent.data );
+                    } );
                     break;
                 default:
                     break;
@@ -189,6 +199,7 @@ module.exports = function( id, view, scale ) {
                     const childrenComponent = Components.Children.create();
                     const parts = Array( children.length );
 
+                    entity.addComponents( childrenComponent );
                     childrenComponent.data.length = children.length;
 
                     children.forEach( ( child, idx ) => {
@@ -197,14 +208,12 @@ module.exports = function( id, view, scale ) {
                             Components.Position.create( Util.property( child.position, 'x' ), Util.property( child.position, 'y' ) ),
                             Components.Rotation.create( child.rotation ),
                             Components.Scale.create( child.scale ),
-                            Components.Parent.create( entity ),
-                            childrenComponent
+                            Components.Parent.create( entity )
                         );
 
                         const geometryComponent = this.loadGeometry( child, childEntity );
                         parts[ idx ] = geometryComponent.data;
 
-                        this.loadSkinning( child, childEntity );
                         this.engine.addEntities( childEntity );
 
                         childrenComponent.data[ idx ] = childEntity;
@@ -248,76 +257,69 @@ module.exports = function( id, view, scale ) {
 }
 
 // @TODO move this out
-// W
 window.addEventListener( 'keydown', e => {
-    if ( e.which === 87 ) {
-        console.log(e.repeat);
-        hub.sendMessage( {
-            type: 'player-input-thrust',
-            data: 1
-        } );
+    let type;
+    let data;
+
+    switch ( e.which ) {
+        // W
+        case 87:
+            type = 'player-input-thrust';
+            data = 1 * .1;
+            break;
+        // S
+        case 83:
+            type = 'player-input-thrust';
+            data = -1 * .1;
+            break;
+        // A
+        case 65:
+            type = 'player-input-turn'
+            data = -1 * .2;
+            break;
+        // D
+        case 68:
+            type = 'player-input-turn'
+            data = 1 * .2;
+            break;
     }
+
+    if ( type !== undefined && data !== undefined )
+        hub.sendMessage( { type: type, data: data } );
 }, false );
+
 window.addEventListener( 'keyup', e => {
-    if ( e.which === 87 ) {
-        hub.sendMessage( {
-            type: 'player-input-thrust',
-            data: 0
-        } );
+    let type;
+    let data;
+
+    switch ( e.which ) {
+        // W
+        case 87:
+            type = 'player-input-thrust';
+            data = 0;
+            break;
+        // S
+        case 83:
+            type = 'player-input-thrust';
+            data = 0;
+            break;
+        // A
+        case 65:
+            type = 'player-input-turn'
+            data = 0;
+            break;
+        // D
+        case 68:
+            type = 'player-input-turn'
+            data = 0;
+            break;
     }
+
+    if ( type !== undefined && data !== undefined )
+        hub.sendMessage( { type: type, data: data } );
 }, false );
-// S
-window.addEventListener( 'keydown', e => {
-    if ( e.which === 83 ) {
-        hub.sendMessage( {
-            type: 'player-input-thrust',
-            data: -1
-        } );
-    }
-}, false );
-window.addEventListener( 'keyup', e => {
-    if ( e.which === 83 ) {
-        hub.sendMessage( {
-            type: 'player-input-thrust',
-            data: 0
-        } );
-    }
-}, false );
-// A
-window.addEventListener( 'keydown', e => {
-    if ( e.which === 65 ) {
-        hub.sendMessage( {
-            type: 'player-input-turn',
-            data: -1
-        } );
-    }
-}, false );
-window.addEventListener( 'keyup', e => {
-    if ( e.which === 65 ) {
-        hub.sendMessage( {
-            type: 'player-input-turn',
-            data: 0
-        } );
-    }
-}, false );
-// D
-window.addEventListener( 'keydown', e => {
-    if ( e.which === 68 ) {
-        hub.sendMessage( {
-            type: 'player-input-turn',
-            data: 1
-        } );
-    }
-}, false );
-window.addEventListener( 'keyup', e => {
-    if ( e.which === 68 ) {
-        hub.sendMessage( {
-            type: 'player-input-turn',
-            data: 0
-        } );
-    }
-}, false );
-// P
+
+
 window.addEventListener( 'keydown', e => {
     // if ( e.which === 80 ) boost = true;
 }, false );
