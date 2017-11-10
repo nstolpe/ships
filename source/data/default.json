@@ -62,7 +62,7 @@
         {
             "name": "boards-x",
             "position": { "x": 800, "y": 800 },
-            "rotation": 0,
+            "rotation": 37,
             "scale": 1,
             "geometry": {
                 "type": "compound",
