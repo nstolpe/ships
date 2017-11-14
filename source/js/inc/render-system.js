@@ -11,18 +11,29 @@ const System = ECS.System;
  * @param {object} options.hub              Turms.Hub instance
  */
 const RenderSystem = function( options ) {
-    const App = options.app;
-    const graphics = options.graphics;
-    const hub = options.hub;
+    let App = options.app;
+    let graphics = options.graphics;
+    let hub = options.hub;
+    let debug = !!options.debug;
+
     App.renderer.backgroundColor = options.backgroundColor == null ? 0x000000 : options.backgroundColor;
 
     const system = Object.create( System, {
+        'debug': {
+            set( value ) {
+                debug = !!value;
+            },
+            get() {
+                return debug;
+            }
+        },
         'start': {
             value: function() {
                 // prototype handles `on` state and event emission
                 Object.getPrototypeOf( this ).start();
 
                 const entities = this.getEntities();
+                const player = entities.find( e => e.components.find( c => Object.getPrototypeOf( c ) === Components.PlayerManager ) );
 
                 // get visual and transform data and create a child for the `PIXI.application` stage
                 // @TODO only handles Sprites. needs at support TilingSprite and other possibilities.
@@ -40,6 +51,18 @@ const RenderSystem = function( options ) {
                 } );
 
                 App.stage.addChild( graphics );
+
+                // Set stage to player position
+                if ( player ) {
+                    const positionComponent = player.components.find( component => Object.getPrototypeOf( component ) === Components.Position );
+                    if ( positionComponent ) {
+                        App.stage.position.x = ( App.renderer.width / 1.5) / 2;
+                        App.stage.position.y = ( App.renderer.height / 1.5) / 2;
+                        App.stage.pivot.x = positionComponent.data.x;
+                        App.stage.pivot.y = positionComponent.data.y;
+                    }
+                }
+                // better checking?
                 if ( typeof hub === 'object' )
                     this.registerSubscriptions();
 
@@ -69,39 +92,20 @@ const RenderSystem = function( options ) {
 
                 entities.forEach( entity => this.updateEntity( entity ) );
 
-                graphics.clear();
+                // keeps the camera centerd on the player
+                const player = entities.find( e => e.components.find( c => Object.getPrototypeOf( c ) === Components.PlayerManager ) );
+                const positionComponent = player.components.find( c => Object.getPrototypeOf( c ) === Components.Position );
+                App.stage.pivot.x = positionComponent.data.x;
+                App.stage.pivot.y = positionComponent.data.y;
 
-                entities.forEach( entity => {
-                    const geometryComponent = entity.components.find( component => Object.getPrototypeOf( component ) === Components.Polygon ) ||
-                        entity.components.find( component => Object.getPrototypeOf( component ) === Components.CompoundBody ) ||
-                        entity.components.find( component => Object.getPrototypeOf( component ) === Components.Rectangle ) ||
-                        entity.components.find( component => Object.getPrototypeOf( component ) === Components.Circle );
 
-                        switch ( true ) {
-                            case Object.getPrototypeOf( geometryComponent ) === Components.Rectangle:
-                            case Object.getPrototypeOf( geometryComponent ) === Components.Polygon:
-                                graphics.lineStyle( 1, 0xff00ff, 1 );
-                                geometryComponent.data.vertices.forEach( ( vertex, idx, vertices ) => {
-                                    switch ( idx ) {
-                                        case 0:
-                                            graphics.moveTo( vertex.x, vertex.y );
-                                            break;
-                                        case vertices.length - 1:
-                                            graphics.lineTo( vertex.x,vertex.y );
-                                            graphics.lineTo( vertices[ 0 ].x, vertices[ 0 ].y );
-                                            break;
-                                        default:
-                                            graphics.lineTo( vertex.x,vertex.y );
-                                            break;
-                                    }
-                                } );
-                                break;
-                            case Object.getPrototypeOf( geometryComponent ) === Components.Circle:
-                            case Object.getPrototypeOf( geometryComponent ) === Components.Container:
-                            defaut:
-                                break;
-                        }
-                } );
+                // @TODO draw anything, besides debug, that needs to be drawn by graphics
+                // @TODO generate graphics if it's not there
+                if ( typeof graphics.clear === 'function' ) {
+                    graphics.clear();
+                    if ( this.debug )
+                        this.drawDebug( entities );
+                }
             }
         },
         'updateEntity': {
@@ -134,6 +138,42 @@ const RenderSystem = function( options ) {
                 } );
 
                 return entities;
+            }
+        },
+        'drawDebug': {
+            value: function( entities ) {
+                // Draws bounding shapes.
+                entities.forEach( entity => {
+                    const geometryComponent = entity.components.find( component => Object.getPrototypeOf( component ) === Components.Polygon ) ||
+                        entity.components.find( component => Object.getPrototypeOf( component ) === Components.CompoundBody ) ||
+                        entity.components.find( component => Object.getPrototypeOf( component ) === Components.Rectangle ) ||
+                        entity.components.find( component => Object.getPrototypeOf( component ) === Components.Circle );
+
+                        switch ( true ) {
+                            case Object.getPrototypeOf( geometryComponent ) === Components.Rectangle:
+                            case Object.getPrototypeOf( geometryComponent ) === Components.Polygon:
+                                graphics.lineStyle( 1, 0xff00ff, 1 );
+                                geometryComponent.data.vertices.forEach( ( vertex, idx, vertices ) => {
+                                    switch ( idx ) {
+                                        case 0:
+                                            graphics.moveTo( vertex.x, vertex.y );
+                                            break;
+                                        case vertices.length - 1:
+                                            graphics.lineTo( vertex.x,vertex.y );
+                                            graphics.lineTo( vertices[ 0 ].x, vertices[ 0 ].y );
+                                            break;
+                                        default:
+                                            graphics.lineTo( vertex.x,vertex.y );
+                                            break;
+                                    }
+                                } );
+                                break;
+                            case Object.getPrototypeOf( geometryComponent ) === Components.Circle:
+                            case Object.getPrototypeOf( geometryComponent ) === Components.Container:
+                            defaut:
+                                break;
+                        }
+                } );
             }
         },
         'registerSubscriptions': {

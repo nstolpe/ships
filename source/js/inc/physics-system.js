@@ -40,25 +40,25 @@ const PhysicsSystem = function( options ) {
                     this.updateEntity( entity, environment );
                 } );
 
-                // @TODO move this into function when debug setting on
-                var render = Matter.Render.create( {
-                    canvas: document.getElementById( 'render' ),
-                    engine: engine,
-                    options: {
-                        showDebug: true,
-                        showInternalEdges: true,
-                        showAngleIndicator: true,
-                        // showAxes: true,
-                        showVertexNumbers: true,
-                        showCollisions: true,
-                        showSeparations: true,
-                        showBroadphase: true,
-                        showVelocity: true,
-                        width: document.getElementById( 'render' ).clientWidth * 1.5,
-                        height: document.getElementById( 'render' ).clientHeight * 1.5,
-                    }
-                } );
-                Matter.Render.run( render );
+                // // @TODO move this into function when debug setting on
+                // var render = Matter.Render.create( {
+                //     canvas: document.getElementById( 'render' ),
+                //     engine: engine,
+                //     options: {
+                //         showDebug: true,
+                //         showInternalEdges: true,
+                //         showAngleIndicator: true,
+                //         // showAxes: true,
+                //         showVertexNumbers: true,
+                //         showCollisions: true,
+                //         showSeparations: true,
+                //         showBroadphase: true,
+                //         showVelocity: true,
+                //         width: document.getElementById( 'render' ).clientWidth * 1.5,
+                //         height: document.getElementById( 'render' ).clientHeight * 1.5,
+                //     }
+                // } );
+                // Matter.Render.run( render );
                 // Matter.Engine.run( engine );
                 // Matter.Events.on( engine, 'afterUpdate', this.update.bind( this ) );
             }

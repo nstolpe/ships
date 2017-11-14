@@ -78,7 +78,7 @@ module.exports = function( id, view, scale ) {
         postLoad() {
             this.loadEnvironment();
             this.loadActors( this.config.actors );
-            console.log( this.engine.entities );
+
             const physicsSystem = PhysicsSystem();
             const renderSystem = RenderSystem( {
                 // @TODO make this less terrible
@@ -88,11 +88,13 @@ module.exports = function( id, view, scale ) {
                 hub: hub
             } );
             const playerManagerSystem = PlayerManagerSystem( { hub: hub } );
+
             this.engine.addSystems( playerManagerSystem, physicsSystem, renderSystem )
+
             physicsSystem.start();
             renderSystem.start();
             playerManagerSystem.start();
-            // this.engine.update();
+
             // engine updates are trigerred by pixi ticker.
             App.ticker.add( this.engine.update.bind( this.engine ) );
         },
