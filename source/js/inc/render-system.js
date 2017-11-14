@@ -15,6 +15,8 @@ const RenderSystem = function( options ) {
     let graphics = options.graphics;
     let hub = options.hub;
     let debug = !!options.debug;
+    let entities;
+    let player;
 
     App.renderer.backgroundColor = options.backgroundColor == null ? 0x000000 : options.backgroundColor;
 
@@ -33,7 +35,7 @@ const RenderSystem = function( options ) {
                 Object.getPrototypeOf( this ).start();
 
                 const entities = this.getEntities();
-                const player = entities.find( e => e.components.find( c => Object.getPrototypeOf( c ) === Components.PlayerManager ) );
+                const player = this.getPlayer();
 
                 // get visual and transform data and create a child for the `PIXI.application` stage
                 // @TODO only handles Sprites. needs at support TilingSprite and other possibilities.
@@ -93,7 +95,7 @@ const RenderSystem = function( options ) {
                 entities.forEach( entity => this.updateEntity( entity ) );
 
                 // keeps the camera centerd on the player
-                const player = entities.find( e => e.components.find( c => Object.getPrototypeOf( c ) === Components.PlayerManager ) );
+                const player = this.getPlayer();
                 const positionComponent = player.components.find( c => Object.getPrototypeOf( c ) === Components.Position );
                 App.stage.pivot.x = positionComponent.data.x;
                 App.stage.pivot.y = positionComponent.data.y;
@@ -128,16 +130,31 @@ const RenderSystem = function( options ) {
         },
         'getEntities': {
             value: function() {
-                const entities = this.engine.entities.filter( entity => {
-                    return entity.components.find( component => Object.getPrototypeOf( component ) === Components.Position ) &&
-                           entity.components.find( component => Object.getPrototypeOf( component ) === Components.Rotation ) &&
-                           entity.components.find( component => Object.getPrototypeOf( component ) === Components.Scale ) &&
-                           ( entity.components.find( component => Object.getPrototypeOf( component ) === Components.Container ) ||
-                             entity.components.find( component => Object.getPrototypeOf( component ) === Components.Sprite ) ||
-                             entity.components.find( component => Object.getPrototypeOf( component ) === Components.TilingSprite ) );
-                } );
+                if ( !entities ) {
+                    entities = this.engine.entities.filter( entity => {
+                        return entity.components.find( component => Object.getPrototypeOf( component ) === Components.Position ) &&
+                               entity.components.find( component => Object.getPrototypeOf( component ) === Components.Rotation ) &&
+                               entity.components.find( component => Object.getPrototypeOf( component ) === Components.Scale ) &&
+                               ( entity.components.find( component => Object.getPrototypeOf( component ) === Components.Container ) ||
+                                 entity.components.find( component => Object.getPrototypeOf( component ) === Components.Sprite ) ||
+                                 entity.components.find( component => Object.getPrototypeOf( component ) === Components.TilingSprite ) );
+                    } );
+                }
 
                 return entities;
+            }
+        },
+        'getPlayer': {
+            value: function() {
+                if ( !player ) {
+                    player = this.getEntities().find( entity => {
+                        return entity.components.find( component => {
+                            return Object.getPrototypeOf( component ) === Components.PlayerManager
+                        } );
+                    } );
+                }
+
+                return player;
             }
         },
         'drawDebug': {
