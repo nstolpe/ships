@@ -15,7 +15,7 @@ const RenderSystem = function( options ) {
     let graphics = options.graphics;
     let hub = options.hub;
     let debug = !!options.debug;
-    let entities;
+    let renderables;
     let player;
 
     App.renderer.backgroundColor = options.backgroundColor == null ? 0x000000 : options.backgroundColor;
@@ -34,20 +34,20 @@ const RenderSystem = function( options ) {
                 // prototype handles `on` state and event emission
                 Object.getPrototypeOf( this ).start();
 
-                const entities = this.getEntities();
+                const renderables = this.getRenderables();
                 const player = this.getPlayer();
 
                 // get visual and transform data and create a child for the `PIXI.application` stage
                 // @TODO only handles Sprites. needs at support TilingSprite and other possibilities.
                 // `compound` visuals will work as they'll be individual components
-                entities.forEach( entity => {
+                renderables.forEach( renderable => {
                     // @TODO better entity api
-                    const spriteComponent = entity.components.find( component => Object.getPrototypeOf( component ) === Components.Container ) ||
-                        entity.components.find( component => Object.getPrototypeOf( component ) === Components.Sprite ) ||
-                        entity.components.find( component => Object.getPrototypeOf( component ) === Components.TilingSprite );
+                    const spriteComponent = renderable.components.find( component => Object.getPrototypeOf( component ) === Components.Container ) ||
+                        renderable.components.find( component => Object.getPrototypeOf( component ) === Components.Sprite ) ||
+                        renderable.components.find( component => Object.getPrototypeOf( component ) === Components.TilingSprite );
 
-                    if ( !entity.components.find( component => Object.getPrototypeOf( component ) === Components.Parent ) )
-                        this.updateEntity( entity );
+                    if ( !renderable.components.find( component => Object.getPrototypeOf( component ) === Components.Parent ) )
+                        this.updateRenderable( renderable );
 
                     App.stage.addChild( spriteComponent.data );
                 } );
@@ -88,11 +88,11 @@ const RenderSystem = function( options ) {
         'update': {
             value: function( delta ) {
                 // console.log('update render');
-                const entities = this.getEntities();
+                const renderables = this.getRenderables();
 
                 this.resize();
 
-                entities.forEach( entity => this.updateEntity( entity ) );
+                renderables.forEach( renderable => this.updateRenderable( renderable ) );
 
                 // keeps the camera centerd on the player
                 const player = this.getPlayer();
@@ -106,19 +106,19 @@ const RenderSystem = function( options ) {
                 if ( typeof graphics.clear === 'function' ) {
                     graphics.clear();
                     if ( this.debug )
-                        this.drawDebug( entities );
+                        this.drawDebug( renderables );
                 }
             }
         },
-        'updateEntity': {
-            value: function( entity ) {
+        'updateRenderable': {
+            value: function( renderable ) {
                 // @TODO add querying functions to components so these don't need to be so long and messy.
-                const spriteComponent = entity.components.find( component => Object.getPrototypeOf( component ) === Components.Container ) ||
-                    entity.components.find( component => Object.getPrototypeOf( component ) === Components.Sprite ) ||
-                    entity.components.find( component => Object.getPrototypeOf( component ) === Components.TilingSprite );
-                const positionComponent = entity.components.find( component => Object.getPrototypeOf( component ) === Components.Position );
-                const rotationComponent = entity.components.find( component => Object.getPrototypeOf( component ) === Components.Rotation );
-                const scaleComponent = entity.components.find( component => Object.getPrototypeOf( component ) === Components.Scale );
+                const spriteComponent = renderable.components.find( component => Object.getPrototypeOf( component ) === Components.Container ) ||
+                    renderable.components.find( component => Object.getPrototypeOf( component ) === Components.Sprite ) ||
+                    renderable.components.find( component => Object.getPrototypeOf( component ) === Components.TilingSprite );
+                const positionComponent = renderable.components.find( component => Object.getPrototypeOf( component ) === Components.Position );
+                const rotationComponent = renderable.components.find( component => Object.getPrototypeOf( component ) === Components.Rotation );
+                const scaleComponent = renderable.components.find( component => Object.getPrototypeOf( component ) === Components.Scale );
 
                 spriteComponent.data.position.x = positionComponent.data.x;
                 spriteComponent.data.position.y = positionComponent.data.y;
@@ -128,10 +128,10 @@ const RenderSystem = function( options ) {
                 spriteComponent.data.pivot.set( spriteComponent.data.width * 0.5, spriteComponent.data.height * 0.5 );
             }
         },
-        'getEntities': {
+        'getRenderables': {
             value: function() {
-                if ( !entities ) {
-                    entities = this.engine.entities.filter( entity => {
+                if ( !renderables ) {
+                    renderables = this.engine.entities.filter( entity => {
                         return entity.components.find( component => Object.getPrototypeOf( component ) === Components.Position ) &&
                                entity.components.find( component => Object.getPrototypeOf( component ) === Components.Rotation ) &&
                                entity.components.find( component => Object.getPrototypeOf( component ) === Components.Scale ) &&
@@ -141,13 +141,13 @@ const RenderSystem = function( options ) {
                     } );
                 }
 
-                return entities;
+                return renderables;
             }
         },
         'getPlayer': {
             value: function() {
                 if ( !player ) {
-                    player = this.getEntities().find( entity => {
+                    player = this.getRenderables().find( entity => {
                         return entity.components.find( component => {
                             return Object.getPrototypeOf( component ) === Components.PlayerManager
                         } );
@@ -204,7 +204,7 @@ const RenderSystem = function( options ) {
                     case 'get-renderable-entities':
                         hub.sendMessage( {
                             type: 'renderable-entities',
-                            data: this.getEntities
+                            data: this.getRenderables
                         } );
                         break;
                     default:
