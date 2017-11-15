@@ -185,16 +185,20 @@ module.exports = function( id, view, scale ) {
         loadGeometry( actor, entity ) {
             const type = Util.property( actor.geometry, 'type' );
             let component;
+            let options = {
+                label: actor.name,
+                density: actor.density || .001
+            };
 
             switch ( type ) {
                 case 'polygon':
-                    component = Components.Polygon.create( Util.property( actor.geometry, 'vertices' ), { label: actor.name } );
+                    component = Components.Polygon.create( Util.property( actor.geometry, 'vertices' ), options );
                     break;
                 case 'circle':
-                    component = Components.Circle.create( Util.property( actor.geometry, 'radius' ), { label: actor.name } );
+                    component = Components.Circle.create( Util.property( actor.geometry, 'radius' ), options );
                     break;
                 case 'rectangle':
-                    component = Components.Rectangle.create( Util.property( actor.geometry, 'width') , Util.property( actor.geometry, 'height' ), { label: actor.name } );
+                    component = Components.Rectangle.create( Util.property( actor.geometry, 'width') , Util.property( actor.geometry, 'height' ), options );
                     break;
                 case 'compound':
                     const children = Util.property( actor.geometry, 'children' );
@@ -221,7 +225,7 @@ module.exports = function( id, view, scale ) {
                         childrenComponent.data[ idx ] = childEntity;
                     } );
 
-                    component = Components.CompoundBody.create( parts, { label: actor.name } );
+                    component = Components.CompoundBody.create( parts, options );
                     break;
                 default:
                     break;
