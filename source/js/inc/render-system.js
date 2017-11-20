@@ -68,7 +68,7 @@ const RenderSystem = function( options ) {
                 if ( typeof hub === 'object' )
                     this.registerSubscriptions();
 
-                App.ticker.add( this.update.bind( this ) );
+                // App.ticker.add( this.update.bind( this ) );
             }
         },
         /**
@@ -202,12 +202,14 @@ const RenderSystem = function( options ) {
         'receiveMessage': {
             value: function( action, message ) {
                 switch ( message.type ) {
+                    // returns renderable entities. unused.
                     case 'get-renderable-entities':
                         hub.sendMessage( {
                             type: 'renderable-entities',
                             data: this.getRenderables
                         } );
                         break;
+                    // handles zoom
                     case 'zoom':
                         let scale = App.stage.scale.x + message.data;
                         if ( scale > 2.5 ) scale = 2.5;
