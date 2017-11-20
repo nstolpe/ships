@@ -58,8 +58,8 @@ const RenderSystem = function( options ) {
                 if ( player ) {
                     const positionComponent = player.components.find( component => Object.getPrototypeOf( component ) === Components.Position );
                     if ( positionComponent ) {
-                        App.stage.position.x = ( App.renderer.width / 1.5) / 2;
-                        App.stage.position.y = ( App.renderer.height / 1.5) / 2;
+                        App.stage.position.x = ( App.renderer.width / App.renderer.resolution ) / 2;
+                        App.stage.position.y = ( App.renderer.height / App.renderer.resolution ) / 2;
                         App.stage.pivot.x = positionComponent.data.x;
                         App.stage.pivot.y = positionComponent.data.y;
                     }
