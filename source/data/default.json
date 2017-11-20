@@ -121,12 +121,41 @@
                 "display": {
                     "type": "compound"
                 },
+                "constraints": [
+                    {
+                        "pointA": { "x": -124,"y": -124 },
+                        "pointB": { "x": 452,"y": 272 },
+                        "stiffness": 0.01,
+                        "damping": 0.0
+                    },
+                    {
+                        "pointA": { "x": 124,"y": -124 },
+                        "pointB": { "x": 704,"y": 272 },
+                        "stiffness": 0.01,
+                        "damping": 0.0
+                    },
+                    {
+                        "pointA": { "x": 124,"y": 124 },
+                        "pointB": { "x": 704,"y": 524 },
+                        "stiffness": 0.01,
+                        "damping": 0.0
+                    },
+                    {
+                        "pointA": { "x": -124,"y": 124 },
+                        "pointB": { "x": 452,"y": 524 },
+                        "stiffness": 0.01,
+                        "damping": 0.0
+                    }
+                ],
                 "children": [
                     {
-                        "name": "boards-left",
+                        "name": "dock-001::boards-left",
                         "position": { "x": 384, "y": 384 },
                         "rotation": 0,
                         "scale": 1,
+                        "density": 0.002,
+                        "restitution": 0.5,
+                        "friction": 0.0,
                         "geometry": {
                             "type": "rectangle",
                             "width": 64,
@@ -139,10 +168,13 @@
                         }
                     },
                     {
-                        "name": "boards-right",
+                        "name": "dock-001::boards-right",
                         "position": { "x": 576, "y": 384 },
                         "rotation": 0,
                         "scale": 1,
+                        "density": 0.002,
+                        "restitution": 0.5,
+                        "friction": 0.0,
                         "geometry": {
                             "type": "rectangle",
                             "width": 64,
@@ -155,10 +187,13 @@
                         }
                     },
                     {
-                        "name": "boards-top",
+                        "name": "dock-001::boards-top",
                         "position": { "x": 480, "y": 288 },
                         "rotation": 0,
                         "scale": 1,
+                        "density": 0.002,
+                        "restitution": 0.5,
+                        "friction": 0.0,
                         "geometry": {
                             "type": "rectangle",
                             "width": 128,
@@ -171,10 +206,13 @@
                         }
                     },
                     {
-                        "name": "boards-bottom-left",
+                        "name": "dock-001::boards-bottom-left",
                         "position": { "x": 432, "y": 480 },
                         "rotation": 0,
                         "scale": 1,
+                        "density": 0.002,
+                        "restitution": 0.5,
+                        "friction": 0.0,
                         "geometry": {
                             "type": "rectangle",
                             "width": 32,
@@ -187,7 +225,7 @@
                         }
                     },
                     {
-                        "name": "boards-bottom-right",
+                        "name": "dock-001::boards-bottom-right",
                         "position": { "x": 528, "y": 480 },
                         "rotation": 0,
                         "scale": 1,
@@ -218,10 +256,13 @@
                 },
                 "children": [
                     {
-                        "name": "boards-left",
+                        "name": "dock-002::boards-left",
                         "position": { "x": 384, "y": 384 },
                         "rotation": 0,
                         "scale": 1,
+                        "density": 0.002,
+                        "restitution": 0.5,
+                        "friction": 0.0,
                         "geometry": {
                             "type": "rectangle",
                             "width": 64,
@@ -234,10 +275,13 @@
                         }
                     },
                     {
-                        "name": "boards-right",
+                        "name": "dock-002::dock-002::boards-right",
                         "position": { "x": 576, "y": 384 },
                         "rotation": 0,
                         "scale": 1,
+                        "density": 0.002,
+                        "restitution": 0.5,
+                        "friction": 0.0,
                         "geometry": {
                             "type": "rectangle",
                             "width": 64,
@@ -250,10 +294,13 @@
                         }
                     },
                     {
-                        "name": "boards-top",
+                        "name": "dock-002::boards-top",
                         "position": { "x": 480, "y": 288 },
                         "rotation": 0,
                         "scale": 1,
+                        "density": 0.002,
+                        "restitution": 0.5,
+                        "friction": 0.0,
                         "geometry": {
                             "type": "rectangle",
                             "width": 128,
@@ -266,10 +313,13 @@
                         }
                     },
                     {
-                        "name": "boards-bottom-left",
+                        "name": "dock-002::boards-bottom-left",
                         "position": { "x": 432, "y": 480 },
                         "rotation": 0,
                         "scale": 1,
+                        "density": 0.002,
+                        "restitution": 0.5,
+                        "friction": 0.0,
                         "geometry": {
                             "type": "rectangle",
                             "width": 32,
@@ -282,10 +332,13 @@
                         }
                     },
                     {
-                        "name": "boards-bottom-right",
+                        "name": "dock-002::boards-bottom-right",
                         "position": { "x": 528, "y": 480 },
                         "rotation": 0,
                         "scale": 1,
+                        "density": 0.002,
+                        "restitution": 0.5,
+                        "friction": 0.0,
                         "geometry": {
                             "type": "rectangle",
                             "width": 32,
