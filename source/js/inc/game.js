@@ -191,7 +191,8 @@ module.exports = function( id, view, scale ) {
                 restitution: Util.isNumeric( actor.restitution ) ? parseFloat( actor.restitution ) : 0,
                 friction: Util.isNumeric( actor.friction ) ? parseFloat( actor.friction ) : 0.1,
                 frictionAir: Util.isNumeric( actor.frictionAir ) ? parseFloat( actor.frictionAir ) : 0.01,
-                frictionStatic: Util.isNumeric( actor.frictionStatic ) ? parseFloat( actor.frictionStatic ) : 0.5
+                frictionStatic: Util.isNumeric( actor.frictionStatic ) ? parseFloat( actor.frictionStatic ) : 0.5,
+                isStatic: !!actor.isStatic
             };
 
             switch ( type ) {
@@ -267,7 +268,7 @@ module.exports = function( id, view, scale ) {
 }
 
 // @TODO move this out
-window.addEventListener( 'keydown', e => {
+document.getElementById( 'view' ).addEventListener( 'keydown', e => {
     let type;
     let data;
 
@@ -305,7 +306,7 @@ window.addEventListener( 'keydown', e => {
         hub.sendMessage( { type: type, data: data } );
 }, false );
 
-window.addEventListener( 'keyup', e => {
+document.getElementById( 'view' ).addEventListener( 'keyup', e => {
     let type;
     let data;
 
@@ -346,12 +347,7 @@ window.addEventListener( 'keyup', e => {
         hub.sendMessage( { type: type, data: data } );
 }, false );
 
-
-window.addEventListener( 'keydown', e => {
-    // if ( e.which === 80 ) boost = true;
-}, false );
-
-window.addEventListener( 'wheel', e => {
+document.getElementById( 'view' ).addEventListener( 'wheel', e => {
     // the zoom delta needs to be inverted and scaled.
     if ( e.deltaY !== 0 )
         hub.sendMessage( { type: 'zoom', data: e.deltaY * -0.001 } );
