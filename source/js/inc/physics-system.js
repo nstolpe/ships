@@ -18,7 +18,6 @@ const PhysicsSystem = function( options ) {
 
     const engine = Matter.Engine.create( { world: world } );
 
-    Matter.Events.on( engine, "collisionActive", e => console.log('colide'))
     const system = Object.create( System, {
         'start': {
             value: function() {
