@@ -15,10 +15,11 @@
 		</style>
 	</head>
 	<body>
-		<canvas id="view" class="view"></canvas>
+		<canvas id="view" tabindex="1" class="view"></canvas>
 		{{!-- <canvas id="render" class="view"></canvas> --}}
 		<script src="assets/js/demo.js"></script>
 		<script type="text/javascript">
+			document.getElementById( 'view' ).focus();
 		</script>
 	</body>
 </html>
