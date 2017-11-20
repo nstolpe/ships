@@ -209,6 +209,13 @@ window.constraint = Matter.Constraint.create( {
     pointA: { x: 0, y: -60 },
     pointB: { x: 0, y: 40 }
 } );
+window.constraint2 = Matter.Constraint.create( {
+    pointB: { x: 0, y: 0 },
+    pointA: { x: compound.position.x + 100, y: compound.position.y - 100 },
+    bodyB: compound,
+    stiffness: 0.1,
+    damping: 0.5
+} );
 window.rudderConstraint0 = Matter.Constraint.create( {
     pointB: {
         x: (rudder.vertices[0].x - rudder.position.x) * .8,
@@ -266,14 +273,16 @@ World.add( engine.world, [
     boxA, boxB, shipShape, ground, ceiling,
     left, right, constraint, rudder,
     rudderConstraint0,
-    rudderConstraint1, rudderConstraint2, rudderConstraint3, compound
+    rudderConstraint1, rudderConstraint2, rudderConstraint3, compound,
+    constraint2
 ] );
 
 // run the engine
-Engine.run( engine );
-// app.ticker.add( delta => {
-//     Matter.Engine.update( engine, delta * 16 )
-// } );
+// Engine.run( engine );
+app.ticker.add( delta => {
+    Matter.Engine.update( engine, app.ticker.elapsedMS )
+    // Matter.Engine.update( engine, delta * 16 )
+} );
 
 
 // run the renderer
