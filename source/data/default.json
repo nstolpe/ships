@@ -254,6 +254,32 @@
                 "display": {
                     "type": "compound"
                 },
+                "constraints": [
+                    {
+                        "pointA": { "x": -124,"y": -124 },
+                        "pointB": { "x": -428,"y": -1128 },
+                        "stiffness": 0.01,
+                        "damping": 0.0
+                    },
+                    {
+                        "pointA": { "x": 124,"y": -124 },
+                        "pointB": { "x": -172,"y": -1128 },
+                        "stiffness": 0.01,
+                        "damping": 0.0
+                    },
+                    {
+                        "pointA": { "x": 124,"y": 124 },
+                        "pointB": { "x": -172,"y": -972 },
+                        "stiffness": 0.01,
+                        "damping": 0.0
+                    },
+                    {
+                        "pointA": { "x": -124,"y": 124 },
+                        "pointB": { "x": -428,"y": -972 },
+                        "stiffness": 0.01,
+                        "damping": 0.0
+                    }
+                ],
                 "children": [
                     {
                         "name": "dock-002::boards-left",
