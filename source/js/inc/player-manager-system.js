@@ -8,7 +8,7 @@ const System = ECS.System;
 
 const Forces = {
     thrust: 0,
-    rotation: 0,
+    torque: 0,
     boost: 0
 };
 
@@ -25,15 +25,13 @@ const PlayerManagerSystem = function( options ) {
         },
         'update': {
             value: function( delta ) {
-                // if ( Forces.rotation || Forces.thrust ) {
-                    const player = this.getEntities()[0];
-                    const geometryComponent = player.components.find( component => Object.getPrototypeOf( component ) === Components.Polygon ) ||
-                           player.components.find( component => Object.getPrototypeOf( component ) === Components.CompoundBody ) ||
-                           player.components.find( component => Object.getPrototypeOf( component ) === Components.Rectangle ) ||
-                           player.components.find( component => Object.getPrototypeOf( component ) === Components.Circle );
-                    const positionComponent = player.components.find( component => Object.getPrototypeOf( component ) === Components.Position );
-                    const rotationComponent = player.components.find( component => Object.getPrototypeOf( component ) === Components.Rotation );
-                // }
+                const player = this.getEntities()[0];
+                const geometryComponent = player.components.find( component => Object.getPrototypeOf( component ) === Components.Polygon ) ||
+                       player.components.find( component => Object.getPrototypeOf( component ) === Components.CompoundBody ) ||
+                       player.components.find( component => Object.getPrototypeOf( component ) === Components.Rectangle ) ||
+                       player.components.find( component => Object.getPrototypeOf( component ) === Components.Circle );
+                const positionComponent = player.components.find( component => Object.getPrototypeOf( component ) === Components.Position );
+                const rotationComponent = player.components.find( component => Object.getPrototypeOf( component ) === Components.Rotation );
 
                 if ( Forces.thrust || Forces.boost ) {
                         // get rotation as vector
@@ -41,9 +39,8 @@ const PlayerManagerSystem = function( options ) {
                             Math.cos( rotationComponent.data ),
                             Math.sin( rotationComponent.data )
                         );
-                        // normalize and multiply by thrust
+                        // normalize rotation/direction
                         vec = Matter.Vector.normalise( vec );
-                        // vec = Matter.Vector.mult( vec, Forces.thrust );
 
                         if ( Forces.thrust ) {
                             Matter.Body.applyForce(
@@ -63,8 +60,9 @@ const PlayerManagerSystem = function( options ) {
                         }
                 }
 
-                if ( Forces.rotation )
-                    geometryComponent.data.torque = Forces.rotation;
+                if ( Forces.torque ) {
+                    geometryComponent.data.torque = Forces.torque;
+                }
             }
         },
         'getEntities': {
@@ -89,7 +87,7 @@ const PlayerManagerSystem = function( options ) {
                         Forces.thrust = message.data;
                         break;
                     case 'player-input-turn':
-                        Forces.rotation = message.data;
+                        Forces.torque = message.data;
                         break;
                     case 'player-input-boost':
                         Forces.boost = message.data;
