@@ -27,13 +27,13 @@ const PhysicsSystem = function( options ) {
                 const environment = this.getEnvironment();
 
                 entities.forEach( entity => {
-                    const geometryComponent = entity.components.find( component => Object.getPrototypeOf( component ) === Components.Polygon ) ||
-                           entity.components.find( component => Object.getPrototypeOf( component ) === Components.CompoundBody ) ||
-                           entity.components.find( component => Object.getPrototypeOf( component ) === Components.Rectangle ) ||
-                           entity.components.find( component => Object.getPrototypeOf( component ) === Components.Circle );
+                    const geometryComponent = entity.components.find( component => component.is( Components.Polygon ) ) ||
+                           entity.components.find( component => component.is( Components.CompoundBody ) ) ||
+                           entity.components.find( component => component.is( Components.Rectangle ) ) ||
+                           entity.components.find( component => component.is( Components.Circle ) );
 
                     // prevents compound children from being added.
-                    if ( !entity.components.find( c => Object.getPrototypeOf( c ) === Components.Parent ) )
+                    if ( !entity.components.find( component => component.is( Components.Parent ) ) )
                         Matter.World.add( engine.world, [ geometryComponent.data ] );
 
                     const constraintComponents = entity.components.filter( component => component.is( Components.Constraint ) );
@@ -72,10 +72,10 @@ const PhysicsSystem = function( options ) {
         'getEntities': {
             value: function() {
                 const entities = this.engine.entities.filter( entity => {
-                    return entity.components.find( component => Object.getPrototypeOf( component ) === Components.Polygon ) ||
-                           entity.components.find( component => Object.getPrototypeOf( component ) === Components.CompoundBody ) ||
-                           entity.components.find( component => Object.getPrototypeOf( component ) === Components.Rectangle ) ||
-                           entity.components.find( component => Object.getPrototypeOf( component ) === Components.Circle );
+                    return entity.components.find( component => component.is( Components.Polygon ) ) ||
+                           entity.components.find( component => component.is( Components.CompoundBody ) ) ||
+                           entity.components.find( component => component.is( Components.Rectangle ) ) ||
+                           entity.components.find( component => component.is( Components.Circle ) );
                 } );
 
                 return entities;
@@ -83,16 +83,18 @@ const PhysicsSystem = function( options ) {
         },
         'updateEntity': {
             value: function( entity, environment ) {
-                const geometryComponent = entity.components.find( component => Object.getPrototypeOf( component ) === Components.Polygon ) ||
-                            entity.components.find( component => Object.getPrototypeOf( component ) === Components.CompoundBody ) ||
-                            entity.components.find( component => Object.getPrototypeOf( component ) === Components.Rectangle ) ||
-                            entity.components.find( component => Object.getPrototypeOf( component ) === Components.Circle );
-                const positionComponent = entity.components.find( component => Object.getPrototypeOf( component ) === Components.Position );
-                const rotationComponent = entity.components.find( component => Object.getPrototypeOf( component ) === Components.Rotation );
-                const scaleComponent = entity.components.find( component => Object.getPrototypeOf( component ) === Components.Scale );
-                const forces = environment.components.filter( component => Object.getPrototypeOf( component ) === Components.Force );
-                const nameComponent = entity.components.find( component => Object.getPrototypeOf( component ) === Components.Name );
-                const parentComponent = entity.components.find( component => Object.getPrototypeOf( component ) === Components.Parent );
+                const geometryComponent = entity.components.find( component => {
+                    return component.is( Components.Polygon ) ||
+                        component.is( Components.CompoundBody ) ||
+                        component.is( Components.Rectangle ) ||
+                        component.is( Components.Circle );
+                } );
+                const positionComponent = entity.components.find( component => component.is( Components.Position ) );
+                const rotationComponent = entity.components.find( component => component.is( Components.Rotation ) );
+                const scaleComponent = entity.components.find( component => component.is( Components.Scale ) );
+                const forces = environment.components.filter( component => component.is( Components.Force ) );
+                const nameComponent = entity.components.find( component => component.is( Components.Name ) );
+                const parentComponent = entity.components.find( component => component.is( Components.Parent ) );
 
                 geometryComponent.data.plugin.forces = [];
                 forces.forEach( force => {
@@ -107,7 +109,7 @@ const PhysicsSystem = function( options ) {
                 positionComponent.data.x = geometryComponent.data.position.x;
                 // if there's a parent component, rotation comes from it
                 if ( parentComponent ) {
-                    const parentGeoComp = parentComponent.data.components.find( component => Object.getPrototypeOf( component ) === Components.CompoundBody );
+                    const parentGeoComp = parentComponent.data.components.find( component => component.is( Components.CompoundBody ) );
                     rotationComponent.data = parentGeoComp.data.angle;
                 } else {
                     rotationComponent.data = geometryComponent.data.angle;
@@ -126,10 +128,9 @@ const PhysicsSystem = function( options ) {
         'getEnvironment': {
             value: function() {
                 // finds the first environment entity
-                const envFinder = e => {
-                    return !!( e.components.find(
-                        c => Object.getPrototypeOf( c ) === Components.Name &&
-                        c.data === 'Environment' )
+                const envFinder = entity => {
+                    return !!( entity.components.find(
+                        component => component.is( Components.Name ) && component.data === 'Environment' )
                     );
                 };
                 const environment = this.engine.entities.find( envFinder );

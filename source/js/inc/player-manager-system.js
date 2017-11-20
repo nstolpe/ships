@@ -26,12 +26,14 @@ const PlayerManagerSystem = function( options ) {
         'update': {
             value: function( delta ) {
                 const player = this.getEntities()[0];
-                const geometryComponent = player.components.find( component => Object.getPrototypeOf( component ) === Components.Polygon ) ||
-                       player.components.find( component => Object.getPrototypeOf( component ) === Components.CompoundBody ) ||
-                       player.components.find( component => Object.getPrototypeOf( component ) === Components.Rectangle ) ||
-                       player.components.find( component => Object.getPrototypeOf( component ) === Components.Circle );
-                const positionComponent = player.components.find( component => Object.getPrototypeOf( component ) === Components.Position );
-                const rotationComponent = player.components.find( component => Object.getPrototypeOf( component ) === Components.Rotation );
+                const geometryComponent = player.components.find( component => {
+                    return component.is( Components.Polygon ) ||
+                    component.is( Components.CompoundBody ) ||
+                    component.is( Components.Rectangle ) ||
+                    component.is( Components.Circle );
+                } );
+                const positionComponent = player.components.find( component => component.is( Components.Position ) );
+                const rotationComponent = player.components.find( component => component.is( Components.Rotation ) );
 
                 if ( Forces.thrust || Forces.boost ) {
                         // get rotation as vector
@@ -68,7 +70,7 @@ const PlayerManagerSystem = function( options ) {
         'getEntities': {
             value: function() {
                 const entities = this.engine.entities.filter( entity => {
-                    return entity.components.find( component => Object.getPrototypeOf( component ) === Components.PlayerManager );
+                    return entity.components.find( component => component.is( Components.PlayerManager ) );
                 } );
                 return entities;
             }

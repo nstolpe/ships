@@ -42,11 +42,11 @@ const RenderSystem = function( options ) {
                 // `compound` visuals will work as they'll be individual components
                 renderables.forEach( renderable => {
                     // @TODO better entity api
-                    const spriteComponent = renderable.components.find( component => Object.getPrototypeOf( component ) === Components.Container ) ||
-                        renderable.components.find( component => Object.getPrototypeOf( component ) === Components.Sprite ) ||
-                        renderable.components.find( component => Object.getPrototypeOf( component ) === Components.TilingSprite );
+                    const spriteComponent = renderable.components.find( component => component.is( Components.Container ) ) ||
+                        renderable.components.find( component => component.is( Components.Sprite ) ) ||
+                        renderable.components.find( component => component.is( Components.TilingSprite ) );
 
-                    if ( !renderable.components.find( component => Object.getPrototypeOf( component ) === Components.Parent ) )
+                    if ( !renderable.components.find( component => component.is( Components.Parent ) ) )
                         this.updateRenderable( renderable );
 
                     App.stage.addChild( spriteComponent.data );
@@ -56,7 +56,7 @@ const RenderSystem = function( options ) {
 
                 // Set stage to player position
                 if ( player ) {
-                    const positionComponent = player.components.find( component => Object.getPrototypeOf( component ) === Components.Position );
+                    const positionComponent = player.components.find( component => component.is( Components.Position ) );
                     if ( positionComponent ) {
                         App.stage.position.x = ( App.renderer.width / App.renderer.resolution ) / 2;
                         App.stage.position.y = ( App.renderer.height / App.renderer.resolution ) / 2;
@@ -96,7 +96,7 @@ const RenderSystem = function( options ) {
 
                 // keeps the camera centerd on the player
                 const player = this.getPlayer();
-                const positionComponent = player.components.find( c => Object.getPrototypeOf( c ) === Components.Position );
+                const positionComponent = player.components.find( component => component.is( Components.Position ) );
                 App.stage.pivot.x = positionComponent.data.x;
                 App.stage.pivot.y = positionComponent.data.y;
 
@@ -113,12 +113,12 @@ const RenderSystem = function( options ) {
         'updateRenderable': {
             value: function( renderable ) {
                 // @TODO add querying functions to components so these don't need to be so long and messy.
-                const spriteComponent = renderable.components.find( component => Object.getPrototypeOf( component ) === Components.Container ) ||
-                    renderable.components.find( component => Object.getPrototypeOf( component ) === Components.Sprite ) ||
-                    renderable.components.find( component => Object.getPrototypeOf( component ) === Components.TilingSprite );
-                const positionComponent = renderable.components.find( component => Object.getPrototypeOf( component ) === Components.Position );
-                const rotationComponent = renderable.components.find( component => Object.getPrototypeOf( component ) === Components.Rotation );
-                const scaleComponent = renderable.components.find( component => Object.getPrototypeOf( component ) === Components.Scale );
+                const spriteComponent = renderable.components.find( component => component.is( Components.Container ) ) ||
+                    renderable.components.find( component => component.is( Components.Sprite ) ) ||
+                    renderable.components.find( component => component.is( Components.TilingSprite ) );
+                const positionComponent = renderable.components.find( component => component.is( Components.Position ) );
+                const rotationComponent = renderable.components.find( component => component.is( Components.Rotation ) );
+                const scaleComponent = renderable.components.find( component => component.is( Components.Scale ) );
 
                 spriteComponent.data.position.x = positionComponent.data.x;
                 spriteComponent.data.position.y = positionComponent.data.y;
@@ -132,12 +132,12 @@ const RenderSystem = function( options ) {
             value: function() {
                 if ( !renderables ) {
                     renderables = this.engine.entities.filter( entity => {
-                        return entity.components.find( component => Object.getPrototypeOf( component ) === Components.Position ) &&
-                               entity.components.find( component => Object.getPrototypeOf( component ) === Components.Rotation ) &&
-                               entity.components.find( component => Object.getPrototypeOf( component ) === Components.Scale ) &&
-                               ( entity.components.find( component => Object.getPrototypeOf( component ) === Components.Container ) ||
-                                 entity.components.find( component => Object.getPrototypeOf( component ) === Components.Sprite ) ||
-                                 entity.components.find( component => Object.getPrototypeOf( component ) === Components.TilingSprite ) );
+                        return entity.components.find( component => component.is( Components.Position ) ) &&
+                               entity.components.find( component => component.is( Components.Rotation ) ) &&
+                               entity.components.find( component => component.is( Components.Scale ) ) &&
+                               ( entity.components.find( component => component.is( Components.Container ) ) ||
+                                 entity.components.find( component => component.is( Components.Sprite ) ) ||
+                                 entity.components.find( component => component.is( Components.TilingSprite ) ) );
                     } );
                 }
 
@@ -148,9 +148,7 @@ const RenderSystem = function( options ) {
             value: function() {
                 if ( !player ) {
                     player = this.getRenderables().find( entity => {
-                        return entity.components.find( component => {
-                            return Object.getPrototypeOf( component ) === Components.PlayerManager
-                        } );
+                        return entity.components.find( component => component.is( Components.PlayerManager ) );
                     } );
                 }
 
@@ -161,14 +159,14 @@ const RenderSystem = function( options ) {
             value: function( entities ) {
                 // Draws bounding shapes.
                 entities.forEach( entity => {
-                    const geometryComponent = entity.components.find( component => Object.getPrototypeOf( component ) === Components.Polygon ) ||
-                        entity.components.find( component => Object.getPrototypeOf( component ) === Components.CompoundBody ) ||
-                        entity.components.find( component => Object.getPrototypeOf( component ) === Components.Rectangle ) ||
-                        entity.components.find( component => Object.getPrototypeOf( component ) === Components.Circle );
+                    const geometryComponent = entity.components.find( component => component.is( Components.Polygon ) ) ||
+                        entity.components.find( component => component.is( Components.CompoundBody ) ) ||
+                        entity.components.find( component => component.is( Components.Rectangle ) ) ||
+                        entity.components.find( component => component.is( Components.Circle ) );
 
                         switch ( true ) {
-                            case Object.getPrototypeOf( geometryComponent ) === Components.Rectangle:
-                            case Object.getPrototypeOf( geometryComponent ) === Components.Polygon:
+                            case geometryComponent.is( Components.Rectangle ):
+                            case geometryComponent.is( Components.Polygon ):
                                 graphics.lineStyle( 1, 0xff00ff, 1 );
                                 geometryComponent.data.vertices.forEach( ( vertex, idx, vertices ) => {
                                     switch ( idx ) {
@@ -185,8 +183,8 @@ const RenderSystem = function( options ) {
                                     }
                                 } );
                                 break;
-                            case Object.getPrototypeOf( geometryComponent ) === Components.Circle:
-                            case Object.getPrototypeOf( geometryComponent ) === Components.Container:
+                            case geometryComponent.is( Components.Circle ):
+                            case geometryComponent.is( Components.Container ):
                             defaut:
                                 break;
                         }

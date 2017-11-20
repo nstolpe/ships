@@ -85,7 +85,7 @@ module.exports = function( id, view, scale ) {
             const physicsSystem = PhysicsSystem();
             const renderSystem = RenderSystem( {
                 app: App,
-                backgroundColor: this.getEnvironment().components.find( c => Object.getPrototypeOf( c ) === Components.Color ).data,
+                backgroundColor: this.getEnvironment().components.find( component => component.is( Components.Color ) ).data,
                 graphics: new PIXI.Graphics(),
                 hub: hub
             } );
@@ -103,10 +103,7 @@ module.exports = function( id, view, scale ) {
         getEnvironment() {
             // finds the first environment entity
             const envFinder = e => {
-                return !!( e.components.find(
-                    c => Object.getPrototypeOf( c ) === Components.Name &&
-                    c.data === 'Environment' )
-                );
+                return !!( e.components.find( component => component.is( Components.Name ) && component.data === 'Environment' ) );
             };
             const environment = this.engine.entities.find( envFinder );
             return environment;
@@ -151,7 +148,7 @@ module.exports = function( id, view, scale ) {
                 case 'compound':
                     const children = Util.property( actor.geometry, 'children' );
                     component = Components.Container.create();
-                    const childrenComponent = entity.components.find( component => Object.getPrototypeOf( component ) === Components.Children );
+                    const childrenComponent = entity.components.find( component => component.is( Components.Children ) );
 
                     children.forEach( ( child, idx ) => {
                         const childEntity = childrenComponent.data[ idx ];
@@ -240,9 +237,9 @@ module.exports = function( id, view, scale ) {
             }
 
             if ( component ) {
-                const positionComponent = entity.components.find( component => Object.getPrototypeOf( component ) === Components.Position );
-                const rotationComponent = entity.components.find( component => Object.getPrototypeOf( component ) === Components.Rotation );
-                const scaleComponent = entity.components.find( component => Object.getPrototypeOf( component ) === Components.Scale );
+                const positionComponent = entity.components.find( component => component.is( Components.Position ) );
+                const rotationComponent = entity.components.find( component => component.is( Components.Rotation ) );
+                const scaleComponent = entity.components.find( component => component.is( Components.Scale ) );
 
                 Matter.Body.setPosition( component.data, positionComponent.data );
                 Matter.Body.setAngle( component.data, rotationComponent.data );
@@ -261,10 +258,10 @@ module.exports = function( id, view, scale ) {
             constraintQueue.forEach( options => {
                 const entity = options.entity;
                 const geometryComponentA = entity.components.find( component => {
-                    return Object.getPrototypeOf( component ) === Components.Polygon ||
-                        Object.getPrototypeOf( component ) === Components.CompoundBody ||
-                        Object.getPrototypeOf( component ) === Components.Rectangle ||
-                        Object.getPrototypeOf( component ) === Components.Circle;
+                    return component.is( Components.Polygon ) ||
+                        component.is( Components.CompoundBody ) ||
+                        component.is( Components.Rectangle ) ||
+                        component.is( Components.Circle );
                 } );
 
                 // bail if there's no geometry component
@@ -274,7 +271,7 @@ module.exports = function( id, view, scale ) {
 
                 if ( options.bodyB ) {
                     const geometryComponentB = this.engine.entities.find( entity => {
-                        const nameComponent = entity.components.find( Object.getPrototypeOf( component ) === Components.Name );
+                        const nameComponent = entity.components.find( component.is( Components.Name ) );
                         return nameComponent && nameComponent === options.bodyB;
                     } );
 
