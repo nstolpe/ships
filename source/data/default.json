@@ -16,11 +16,12 @@
             "position": { "x": 0, "y": 0 },
             "rotation": 0,
             "scale": 1,
-            "density": 0.001,
+            "density": 0.002,
             "restitution": 0.5,
             "friction": 0.0,
             "frictionAir": 0.01,
             "frictionStatic": 0.5,
+            "manager": "player",
             "geometry": {
                 "type": "polygon",
                 "vertices": [
@@ -45,8 +46,7 @@
                     "id": "turtle.png",
                     "tile": false
                 }
-            },
-            "manager": "player"
+            }
         },
         {
             "name": "boards-square",
@@ -115,6 +115,7 @@
             "position": { "x": 580, "y": 400 },
             "rotation": 0,
             "scale": 1,
+            "manager": "scene",
             "geometry": {
                 "type": "compound",
                 "display": {
@@ -202,8 +203,75 @@
                         }
                     }
                 ]
-            },
-            "manager": "scene"
+            }
+        },
+        {
+            "name": "left-bound",
+            "position": { "x": -2048, "y": 0 },
+            "scale": 1,
+            "rotation": 0,
+            "isStatic": true,
+            "geometry": {
+                "type": "rectangle",
+                "width": 128,
+                "height": 4096,
+                "display": {
+                    "type": "tiling-sprite",
+                    "spritesheet": "assets",
+                    "id": "boards.png"
+                }
+            }
+        },
+        {
+            "name": "top-bound",
+            "position": { "x": 0, "y": -2048 },
+            "scale": 1,
+            "rotation": 0,
+            "isStatic": true,
+            "geometry": {
+                "type": "rectangle",
+                "width": 4096,
+                "height": 128,
+                "display": {
+                    "type": "tiling-sprite",
+                    "spritesheet": "assets",
+                    "id": "boards.png"
+                }
+            }
+        },
+        {
+            "name": "right-bound",
+            "position": { "x": 2048, "y": 0 },
+            "scale": 1,
+            "rotation": 0,
+            "isStatic": true,
+            "geometry": {
+                "type": "rectangle",
+                "width": 128,
+                "height": 4096,
+                "display": {
+                    "type": "tiling-sprite",
+                    "spritesheet": "assets",
+                    "id": "boards.png"
+                }
+            }
+        },
+        {
+            "name": "bottom-bound",
+            "position": { "x": 0, "y": 2048 },
+            "scale": 1,
+            "rotation": 0,
+            "isStatic": true,
+            "geometry": {
+                "type": "rectangle",
+                "width": 4096,
+                "height": 128,
+                "display": {
+                    "type": "tiling-sprite",
+                    "spritesheet": "assets",
+                    "id": "boards.png"
+                }
+            }
         }
     ]
 }
