@@ -196,6 +196,7 @@ const RenderSystem = function( options ) {
         'registerSubscriptions': {
             value: function() {
                 hub.addSubscription( this, 'get-renderable-entities' );
+                hub.addSubscription( this, 'zoom' );
             }
         },
         'receiveMessage': {
@@ -206,6 +207,14 @@ const RenderSystem = function( options ) {
                             type: 'renderable-entities',
                             data: this.getRenderables
                         } );
+                        break;
+                    case 'zoom':
+                        let scale = App.stage.scale.x + message.data;
+                        if ( scale > 2.5 ) scale = 2.5;
+                        if ( scale < .25 ) scale = .25;
+
+                        App.stage.scale.set( scale, scale );
+                        console.log( App.stage.scale );
                         break;
                     default:
                         break;

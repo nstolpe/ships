@@ -187,7 +187,11 @@ module.exports = function( id, view, scale ) {
             let component;
             let options = {
                 label: actor.name,
-                density: actor.density || .001
+                density: Util.isNumeric( actor.density ) ? parseFloat( actor.density ) : .001,
+                restitution: Util.isNumeric( actor.restitution ) ? parseFloat( actor.restitution ) : 0,
+                friction: Util.isNumeric( actor.friction ) ? parseFloat( actor.friction ) : 0.1,
+                frictionAir: Util.isNumeric( actor.frictionAir ) ? parseFloat( actor.frictionAir ) : 0.01,
+                frictionStatic: Util.isNumeric( actor.frictionStatic ) ? parseFloat( actor.frictionStatic ) : 0.5
             };
 
             switch ( type ) {
@@ -288,6 +292,13 @@ window.addEventListener( 'keydown', e => {
             type = 'player-input-turn'
             data = 1 * .2;
             break;
+        // P
+        case 80:
+            type = 'player-input-boost'
+            data = 20;
+            break;
+        default:
+            break;
     }
 
     if ( type !== undefined && data !== undefined )
@@ -301,23 +312,33 @@ window.addEventListener( 'keyup', e => {
     switch ( e.which ) {
         // W
         case 87:
-            type = 'player-input-thrust';
-            data = 0;
+            if ( !e.repeat ) {
+                type = 'player-input-thrust';
+                data = 0;
+            }
             break;
         // S
         case 83:
-            type = 'player-input-thrust';
-            data = 0;
+            if ( !e.repeat ) {
+                type = 'player-input-thrust';
+                data = 0;
+            }
             break;
         // A
         case 65:
-            type = 'player-input-turn'
-            data = 0;
+            if ( !e.repeat ) {
+                type = 'player-input-turn';
+                data = 0;
+            }
             break;
         // D
         case 68:
-            type = 'player-input-turn'
-            data = 0;
+            if ( !e.repeat ) {
+                type = 'player-input-turn';
+                data = 0;
+            }
+            break;
+        default:
             break;
     }
 
@@ -328,4 +349,10 @@ window.addEventListener( 'keyup', e => {
 
 window.addEventListener( 'keydown', e => {
     // if ( e.which === 80 ) boost = true;
+}, false );
+
+window.addEventListener( 'wheel', e => {
+    // the zoom delta needs to be inverted and scaled.
+    if ( e.deltaY !== 0 )
+        hub.sendMessage( { type: 'zoom', data: e.deltaY * -0.001 } );
 }, false );

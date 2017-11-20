@@ -8,7 +8,8 @@ const System = ECS.System;
 
 const Forces = {
     thrust: 0,
-    rotation: 0
+    rotation: 0,
+    boost: 0
 };
 
 const PlayerManagerSystem = function( options ) {
@@ -34,14 +35,32 @@ const PlayerManagerSystem = function( options ) {
                     const rotationComponent = player.components.find( component => Object.getPrototypeOf( component ) === Components.Rotation );
                 // }
 
-                if ( Forces.thrust ) {
+                if ( Forces.thrust || Forces.boost ) {
+                        // get rotation as vector
                         let vec = Matter.Vector.create(
                             Math.cos( rotationComponent.data ),
                             Math.sin( rotationComponent.data )
                         );
+                        // normalize and multiply by thrust
                         vec = Matter.Vector.normalise( vec );
-                        vec = Matter.Vector.mult( vec, Forces.thrust );
-                        Matter.Body.applyForce( geometryComponent.data, positionComponent.data, vec );
+                        // vec = Matter.Vector.mult( vec, Forces.thrust );
+
+                        if ( Forces.thrust ) {
+                            Matter.Body.applyForce(
+                                geometryComponent.data,
+                                positionComponent.data,
+                                Matter.Vector.mult( vec, Forces.thrust )
+                            );
+                        }
+
+                        if ( Forces.boost ) {
+                            Matter.Body.applyForce(
+                                geometryComponent.data,
+                                positionComponent.data,
+                                Matter.Vector.mult( vec, Forces.boost )
+                            );
+                            Forces.boost = 0;
+                        }
                 }
 
                 if ( Forces.rotation )
@@ -60,6 +79,7 @@ const PlayerManagerSystem = function( options ) {
             value: function() {
                 hub.addSubscription( this, 'player-input-thrust' );
                 hub.addSubscription( this, 'player-input-turn' );
+                hub.addSubscription( this, 'player-input-boost' );
             }
         },
         'receiveMessage': {
@@ -70,6 +90,9 @@ const PlayerManagerSystem = function( options ) {
                         break;
                     case 'player-input-turn':
                         Forces.rotation = message.data;
+                        break;
+                    case 'player-input-boost':
+                        Forces.boost = message.data;
                         break;
                 }
             }
