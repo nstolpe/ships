@@ -6,6 +6,7 @@ const Emitter = require( './emitter.js' );
 const Vector = Matter.Vector;
 const Bodies = Matter.Bodies;
 const Body = Matter.Body;
+const Constraint = Matter.Constraint;
 const Sprite = PIXI.Sprite;
 const Container = PIXI.Container;
 const Application = PIXI.Application;
@@ -245,6 +246,11 @@ const Component = Object.create( Object.prototype, {
             );
         },
         configurable: true
+    },
+    'is': {
+        value: function( proto ) {
+            return Object.getPrototypeOf( this ) === proto;
+        }
     }
 } );
 
@@ -316,6 +322,20 @@ const Components ={
                 return Object.getPrototypeOf( this ).create(
                     this,
                     Bodies.rectangle( 0, 0, Number( width ), Number( height ), Object.assign( {}, options ) )
+                );
+            },
+            configurable: false
+        }
+    } ),
+    /**
+     * A component that stores a constraint object created from `Matter.Constraint`
+     */
+    Constraint: Object.create( Component, {
+        'create': {
+            value: function( options ) {
+                return Object.getPrototypeOf( this ).create(
+                    this,
+                    Constraint.create( options )
                 );
             },
             configurable: false
