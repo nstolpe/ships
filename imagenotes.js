@@ -1,3 +1,8 @@
+document.body.innerHTML = '';
+const view = document.body.appendChild( document.createElement( 'canvas' ) );
+view.width = 1000;
+view.height = 1000;
+const ctx = view.getContext( '2d' );
 function draw( ctx, points, background ) {
     // get canvas imageData
     const pixels = ctx.getImageData( 0, 0, ctx.canvas.height, ctx.canvas.width );
