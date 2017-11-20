@@ -26,6 +26,8 @@ const defaultConfig = {
     actors: []
 };
 
+const constraintQueue = [];
+
 module.exports = function( id, view, scale ) {
     const App = new PIXI.Application(
         view.clientWidth * scale,
@@ -78,10 +80,10 @@ module.exports = function( id, view, scale ) {
         postLoad() {
             this.loadEnvironment();
             this.loadActors( this.config.actors );
+            this.loadConstraints();
 
             const physicsSystem = PhysicsSystem();
             const renderSystem = RenderSystem( {
-                // @TODO make this less terrible
                 app: App,
                 backgroundColor: this.getEnvironment().components.find( c => Object.getPrototypeOf( c ) === Components.Color ).data,
                 graphics: new PIXI.Graphics(),
@@ -222,6 +224,7 @@ module.exports = function( id, view, scale ) {
                             Components.Parent.create( entity )
                         );
 
+                        // recursion. shouldn't get too crazy
                         const geometryComponent = this.loadGeometry( child, childEntity );
                         parts[ idx ] = geometryComponent.data;
 
@@ -245,9 +248,44 @@ module.exports = function( id, view, scale ) {
                 Matter.Body.setAngle( component.data, rotationComponent.data );
                 Matter.Body.scale( component.data, scaleComponent.data, scaleComponent.data );
                 entity.addComponents( component );
+
+                if ( actor.geometry.constraints )
+                    actor.geometry.constraints.forEach( constraint => {
+                        constraintQueue.push( Object.assign( { entity: entity }, constraint ) )
+                    } );
             }
 
             return component;
+        },
+        loadConstraints() {
+            constraintQueue.forEach( options => {
+                const entity = options.entity;
+                const geometryComponentA = entity.components.find( component => {
+                    return Object.getPrototypeOf( component ) === Components.Polygon ||
+                        Object.getPrototypeOf( component ) === Components.CompoundBody ||
+                        Object.getPrototypeOf( component ) === Components.Rectangle ||
+                        Object.getPrototypeOf( component ) === Components.Circle;
+                } );
+
+                // bail if there's no geometry component
+                if ( !geometryComponentA ) return;
+
+                options.bodyA = geometryComponentA.data;
+
+                if ( options.bodyB ) {
+                    const geometryComponentB = this.engine.entities.find( entity => {
+                        const nameComponent = entity.components.find( Object.getPrototypeOf( component ) === Components.Name );
+                        return nameComponent && nameComponent === options.bodyB;
+                    } );
+
+                    if ( geometryComponentB ) options.bodyB = geometryComponentB.data;
+                }
+
+                delete options.entity;
+
+                const constraintComponent = Components.Constraint.create( options );
+                entity.addComponents( constraintComponent );
+            } );
         },
         loadEnvironment() {
             const config = this.config;

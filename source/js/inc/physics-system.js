@@ -36,6 +36,13 @@ const PhysicsSystem = function( options ) {
                     if ( !entity.components.find( c => Object.getPrototypeOf( c ) === Components.Parent ) )
                         Matter.World.add( engine.world, [ geometryComponent.data ] );
 
+                    const constraintComponents = entity.components.filter( component => component.is( Components.Constraint ) );
+
+                    constraintComponents.forEach( constraintComponent => {
+                        console.log( constraintComponent );
+                        Matter.World.add( engine.world, [ constraintComponent.data ]);
+                    } );
+
                     this.updateEntity( entity, environment );
                 } );
 
