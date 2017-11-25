@@ -208,13 +208,13 @@ const RenderSystem = function( options ) {
                         } );
                         break;
                     // handles zoom
+                    // scale locked at .25 and 2.5. @TODO make configurable
                     case 'zoom':
                         let scale = App.stage.scale.x + message.data;
                         if ( scale > 2.5 ) scale = 2.5;
                         if ( scale < .25 ) scale = .25;
 
                         App.stage.scale.set( scale, scale );
-                        console.log( App.stage.scale );
                         break;
                     default:
                         break;
