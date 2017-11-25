@@ -39,7 +39,6 @@ const PhysicsSystem = function( options ) {
                     const constraintComponents = entity.components.filter( component => component.is( Components.Constraint ) );
 
                     constraintComponents.forEach( constraintComponent => {
-                        console.log( constraintComponent );
                         Matter.World.add( engine.world, [ constraintComponent.data ]);
                     } );
 
@@ -67,6 +66,10 @@ const PhysicsSystem = function( options ) {
                 // Matter.Render.run( render );
                 // Matter.Engine.run( engine );
                 // Matter.Events.on( engine, 'afterUpdate', this.update.bind( this ) );
+
+                Matter.Events.on ( engine, 'collisionStart collisionActive collisionEnd', function( e ) {
+                    console.log( e.pairs );
+                } );
             }
         },
         'getEntities': {

@@ -384,6 +384,7 @@ document.getElementById( 'view' ).addEventListener( 'keyup', e => {
 
 document.getElementById( 'view' ).addEventListener( 'wheel', e => {
     // the zoom delta needs to be inverted and scaled.
+    console.log( e.deltaY );
     if ( e.deltaY !== 0 )
         hub.sendMessage( { type: 'zoom', data: e.deltaY * -0.001 } );
 }, false );
