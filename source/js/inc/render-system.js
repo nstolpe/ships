@@ -114,28 +114,32 @@ const RenderSystem = function( options ) {
         },
         'updateRenderable': {
             value: function( renderable ) {
-                const geometryComponent = renderable.components.find( component => component.is( Components.Polygon ) ) ||
-                    renderable.components.find( component => component.is( Components.CompoundBody ) ) ||
-                    renderable.components.find( component => component.is( Components.Rectangle ) ) ||
-                    renderable.components.find( component => component.is( Components.Circle ) );
-                // @TODO add querying functions to components so these don't need to be so long and messy.
-                const spriteComponent = renderable.components.find( component => component.is( Components.Container ) ) ||
-                    renderable.components.find( component => component.is( Components.Sprite ) ) ||
-                    renderable.components.find( component => component.is( Components.TilingSprite ) );
-                const positionComponent = renderable.components.find( component => component.is( Components.Position ) );
-                const rotationComponent = renderable.components.find( component => component.is( Components.Rotation ) );
-                const scaleComponent = renderable.components.find( component => component.is( Components.Scale ) );
+                const geometryComponent =
+                    renderable.data.Polygon ||
+                    renderable.data.CompoundBody ||
+                    renderable.data.Rectangle ||
+                    renderable.data.Circle;
+                const spriteComponent =
+                    renderable.data.TilingSprite ||
+                    renderable.data.Container ||
+                    renderable.data.Sprite;
+                const parentComponent = renderable.data.Parent;
 
-                spriteComponent.data.position.x = geometryComponent.data.position.x;
-                spriteComponent.data.position.y = geometryComponent.data.position.y;
-                // not sure why, but outlines don't match up to sprite (so physics and sprite are off too)
-                // if the positionComponent is used here. rotation is ok thoguh
-                // spriteComponent.data.position.x = positionComponent.data.x;
-                // spriteComponent.data.position.y = positionComponent.data.y;
-                spriteComponent.data.scale.x = scaleComponent.data;
-                spriteComponent.data.scale.y = scaleComponent.data;
-                spriteComponent.data.rotation = geometryComponent.data.angle;
-                // spriteComponent.data.rotation = rotationComponent.data;
+                    // not sure why, but outlines don't match up to sprite (so physics and sprite are off too)
+                    // if the position Component is used here. so using geometryCompment instead
+                    // rotation Component is needed though, value from geometry gets weird.
+                    spriteComponent.data.position.x = geometryComponent.data.position.x;
+                    spriteComponent.data.position.y = geometryComponent.data.position.y;
+                    spriteComponent.data.scale.x = renderable.data.Scale.data;
+                    spriteComponent.data.scale.y = renderable.data.Scale.data;
+
+                    // rotation updates should come from parent geometry if this is a child renderable/component
+                    if ( parentComponent ) {
+                        const parent = parentComponent.data;
+                        spriteComponent.data.rotation = parent.data.Rotation.data;
+                    } else {
+                        spriteComponent.data.rotation = renderable.data.Rotation.data;
+                    }
             }
         },
         'getRenderables': {
