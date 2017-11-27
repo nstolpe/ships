@@ -11,7 +11,6 @@ const System = ECS.System;
 
 Matter.use( 'matter-forces' );
 
-
 const PhysicsSystem = function( options ) {
     let entities;
     const world = Matter.World.create( {
@@ -19,6 +18,7 @@ const PhysicsSystem = function( options ) {
     } );
 
     const engine = Matter.Engine.create( { world: world } );
+    let hub = options.hub;
 
     const system = Object.create( System, {
         'start': {
@@ -47,6 +47,7 @@ const PhysicsSystem = function( options ) {
                     this.updateEntity( entity, environment );
                 } );
 
+                this.bindEvents();
                 // // @TODO move this into function when debug setting on
                 // var render = Matter.Render.create( {
                 //     canvas: document.getElementById( 'render' ),
@@ -71,48 +72,6 @@ const PhysicsSystem = function( options ) {
 
                 // @TODO here now for implementation, but this needs to go to another system
                 // events: collisionStart collisionActive collisionEnd
-                Matter.Events.on ( engine, 'collisionStart', e => {
-                    e.pairs.forEach( pair => {
-                        if ( ( pair.bodyA.label === 'player' && pair.bodyB.label.indexOf('dock-target') > 0 ) ||
-                            ( pair.bodyB.label === 'player' && pair.bodyA.label.indexOf('dock-target') > 0 ) ) {
-                            let target;
-                            let spriteComponent;
-
-                            if ( pair.bodyA.label === 'player' )
-                                target = this.engine.entities.find( entity => entity.data.Name.data === pair.bodyB.label );
-                            else
-                                target = this.engine.entities.find( entity => entity.data.Name.data === pair.bodyA.label );
-
-                            spriteComponent =
-                                target.data.TilingSprite ||
-                                target.data.Container ||
-                                target.data.Sprite;
-
-                            spriteComponent.data.alpha = 0.5;
-                        }
-                    } );
-                } );
-                Matter.Events.on ( engine, 'collisionEnd', e => {
-                    e.pairs.forEach( pair => {
-                        if ( ( pair.bodyA.label === 'player' && pair.bodyB.label.indexOf('dock-target') > 0 ) ||
-                            ( pair.bodyB.label === 'player' && pair.bodyA.label.indexOf('dock-target') > 0 ) ) {
-                            let target;
-                            let spriteComponent;
-
-                            if ( pair.bodyA.label === 'player' )
-                                target = this.engine.entities.find( entity => entity.data.Name.data === pair.bodyB.label );
-                            else
-                                target = this.engine.entities.find( entity => entity.data.Name.data === pair.bodyA.label );
-
-                            spriteComponent =
-                                target.data.TilingSprite ||
-                                target.data.Container ||
-                                target.data.Sprite;
-
-                            spriteComponent.data.alpha = 0.25;
-                        }
-                    } );
-                } );
             }
         },
         'getEntities': {
@@ -184,6 +143,26 @@ const PhysicsSystem = function( options ) {
                 };
                 const environment = this.engine.entities.find( envFinder );
                 return environment;
+            }
+        },
+        'bindEvents': {
+            value: function(){
+                Matter.Events.on ( engine, 'collisionStart', e => {
+                    e.pairs.forEach( pair => {
+                        hub.sendMessage( {
+                            type: 'collision-start',
+                            data: { bodyA: pair.bodyA, bodyB: pair.bodyB }
+                        } );
+                    } );
+                } );
+                Matter.Events.on ( engine, 'collisionEnd', e => {
+                    e.pairs.forEach( pair => {
+                        hub.sendMessage( {
+                            type: 'collision-end',
+                            data: { bodyA: pair.bodyA, bodyB: pair.bodyB }
+                        } );
+                    } );
+                } );
             }
         }
     } );

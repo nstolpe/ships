@@ -82,7 +82,7 @@ module.exports = function( id, view, scale ) {
             this.loadActors( this.config.actors );
             this.loadConstraints();
 
-            const physicsSystem = PhysicsSystem();
+            const physicsSystem = PhysicsSystem( { hub: hub } );
             const renderSystem = RenderSystem( {
                 app: App,
                 backgroundColor: this.getEnvironment().components.find( component => component.is( Components.Color ) ).data,

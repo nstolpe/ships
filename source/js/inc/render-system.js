@@ -216,9 +216,12 @@ const RenderSystem = function( options ) {
             value: function() {
                 hub.addSubscription( this, 'get-renderable-entities' );
                 hub.addSubscription( this, 'zoom' );
+                hub.addSubscription( this, 'collision-start' );
+                hub.addSubscription( this, 'collision-end' );
             }
         },
         'receiveMessage': {
+            // action will probably be deprecated in turms.
             value: function( action, message ) {
                 switch ( message.type ) {
                     // returns renderable entities. unused.
@@ -236,6 +239,44 @@ const RenderSystem = function( options ) {
                         if ( scale < .25 ) scale = .25;
 
                         App.stage.scale.set( scale, scale );
+                        break;
+                    case 'collision-start':
+                        if ( ( message.data.bodyA.label === 'player' && message.data.bodyB.label.indexOf('dock-target') > 0 ) ||
+                            ( message.data.bodyB.label === 'player' && message.data.bodyA.label.indexOf('dock-target') > 0 ) ) {
+                            let target;
+                            let spriteComponent;
+
+                            if ( message.data.bodyA.label === 'player' )
+                                target = this.engine.entities.find( entity => entity.data.Name.data === message.data.bodyB.label );
+                            else
+                                target = this.engine.entities.find( entity => entity.data.Name.data === message.data.bodyA.label );
+
+                            spriteComponent =
+                                target.data.TilingSprite ||
+                                target.data.Container ||
+                                target.data.Sprite;
+
+                            spriteComponent.data.alpha = 0.5;
+                        }
+                        break;
+                    case 'collision-end':
+                        if ( ( message.data.bodyA.label === 'player' && message.data.bodyB.label.indexOf('dock-target') > 0 ) ||
+                            ( message.data.bodyB.label === 'player' && message.data.bodyA.label.indexOf('dock-target') > 0 ) ) {
+                            let target;
+                            let spriteComponent;
+
+                            if ( message.data.bodyA.label === 'player' )
+                                target = this.engine.entities.find( entity => entity.data.Name.data === message.data.bodyB.label );
+                            else
+                                target = this.engine.entities.find( entity => entity.data.Name.data === message.data.bodyA.label );
+
+                            spriteComponent =
+                                target.data.TilingSprite ||
+                                target.data.Container ||
+                                target.data.Sprite;
+
+                            spriteComponent.data.alpha = 0.25;
+                        }
                         break;
                     default:
                         break;
