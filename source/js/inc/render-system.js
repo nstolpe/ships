@@ -46,6 +46,8 @@ const RenderSystem = function( options ) {
                         renderable.components.find( component => component.is( Components.Sprite ) ) ||
                         renderable.components.find( component => component.is( Components.TilingSprite ) );
 
+                    spriteComponent.data.pivot.set( spriteComponent.data.width * 0.5, spriteComponent.data.height * 0.5 );
+
                     if ( !renderable.components.find( component => component.is( Components.Parent ) ) )
                         this.updateRenderable( renderable );
 
@@ -112,6 +114,10 @@ const RenderSystem = function( options ) {
         },
         'updateRenderable': {
             value: function( renderable ) {
+                const geometryComponent = renderable.components.find( component => component.is( Components.Polygon ) ) ||
+                    renderable.components.find( component => component.is( Components.CompoundBody ) ) ||
+                    renderable.components.find( component => component.is( Components.Rectangle ) ) ||
+                    renderable.components.find( component => component.is( Components.Circle ) );
                 // @TODO add querying functions to components so these don't need to be so long and messy.
                 const spriteComponent = renderable.components.find( component => component.is( Components.Container ) ) ||
                     renderable.components.find( component => component.is( Components.Sprite ) ) ||
@@ -120,12 +126,16 @@ const RenderSystem = function( options ) {
                 const rotationComponent = renderable.components.find( component => component.is( Components.Rotation ) );
                 const scaleComponent = renderable.components.find( component => component.is( Components.Scale ) );
 
-                spriteComponent.data.position.x = positionComponent.data.x;
-                spriteComponent.data.position.y = positionComponent.data.y;
-                spriteComponent.data.rotation = rotationComponent.data;
+                spriteComponent.data.position.x = geometryComponent.data.position.x;
+                spriteComponent.data.position.y = geometryComponent.data.position.y;
+                // not sure why, but outlines don't match up to sprite (so physics and sprite are off too)
+                // if the positionComponent is used here. rotation is ok thoguh
+                // spriteComponent.data.position.x = positionComponent.data.x;
+                // spriteComponent.data.position.y = positionComponent.data.y;
                 spriteComponent.data.scale.x = scaleComponent.data;
                 spriteComponent.data.scale.y = scaleComponent.data;
-                spriteComponent.data.pivot.set( spriteComponent.data.width * 0.5, spriteComponent.data.height * 0.5 );
+                spriteComponent.data.rotation = geometryComponent.data.angle;
+                // spriteComponent.data.rotation = rotationComponent.data;
             }
         },
         'getRenderables': {
@@ -167,7 +177,7 @@ const RenderSystem = function( options ) {
                         switch ( true ) {
                             case geometryComponent.is( Components.Rectangle ):
                             case geometryComponent.is( Components.Polygon ):
-                                graphics.lineStyle( 1, 0xff00ff, 1 );
+                                graphics.lineStyle( 1, 0x9dffb7, 1 );
                                 geometryComponent.data.vertices.forEach( ( vertex, idx, vertices ) => {
                                     switch ( idx ) {
                                         case 0:
@@ -184,6 +194,13 @@ const RenderSystem = function( options ) {
                                 } );
                                 break;
                             case geometryComponent.is( Components.Circle ):
+                                graphics.lineStyle( 1, 0x9dffb7, 1 );
+                                graphics.drawCircle(
+                                    geometryComponent.data.position.x,
+                                    geometryComponent.data.position.y,
+                                    geometryComponent.data.circleRadius
+                                );
+                                break;
                             case geometryComponent.is( Components.Container ):
                             defaut:
                                 break;
