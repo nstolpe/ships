@@ -120,6 +120,7 @@
                         "restitution": 0.5,
                         "friction": 0.0,
                         "isSensor": true,
+                        "alpha": 0.25,
                         "geometry": {
                             "type": "circle",
                             "radius": 72,
@@ -274,6 +275,7 @@
                         "restitution": 0.5,
                         "friction": 0.0,
                         "isSensor": true,
+                        "alpha": 0.25,
                         "geometry": {
                             "type": "circle",
                             "radius": 72,
