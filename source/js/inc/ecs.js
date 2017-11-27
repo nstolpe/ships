@@ -19,7 +19,7 @@ const EntityProto = Emitter( {
     'class': { value: 'Entity' },
     'id': { value: 0 },
     'data': {
-        value: undefined,
+        value: {},
         enumerable: true,
         writable: true
     },

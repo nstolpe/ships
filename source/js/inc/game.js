@@ -87,7 +87,8 @@ module.exports = function( id, view, scale ) {
                 app: App,
                 backgroundColor: this.getEnvironment().components.find( component => component.is( Components.Color ) ).data,
                 graphics: new PIXI.Graphics(),
-                hub: hub
+                hub: hub,
+                debug: true
             } );
             const playerManagerSystem = PlayerManagerSystem( { hub: hub } );
 
@@ -161,6 +162,12 @@ module.exports = function( id, view, scale ) {
                     break;
             }
 
+            // @TODO add more options?
+            if ( component && actor.alpha )
+                component.data.alpha = actor.alpha;
+            if ( component && actor.tint )
+                component.data.tint = actor.tint;
+
             if ( component ) entity.addComponents( component );
 
             return component;
@@ -191,7 +198,8 @@ module.exports = function( id, view, scale ) {
                 friction: Util.isNumeric( actor.friction ) ? parseFloat( actor.friction ) : 0.1,
                 frictionAir: Util.isNumeric( actor.frictionAir ) ? parseFloat( actor.frictionAir ) : 0.01,
                 frictionStatic: Util.isNumeric( actor.frictionStatic ) ? parseFloat( actor.frictionStatic ) : 0.5,
-                isStatic: !!actor.isStatic
+                isStatic: !!actor.isStatic,
+                isSensor: !!actor.isSensor
             };
 
             switch ( type ) {
@@ -384,7 +392,7 @@ document.getElementById( 'view' ).addEventListener( 'keyup', e => {
 
 document.getElementById( 'view' ).addEventListener( 'wheel', e => {
     // the zoom delta needs to be inverted and scaled.
-    console.log( e.deltaY );
+    console.log( e );
     if ( e.deltaY !== 0 )
         hub.sendMessage( { type: 'zoom', data: e.deltaY * -0.001 } );
 }, false );

@@ -113,7 +113,7 @@
                 "children": [
                     {
                         "name": "dock-001::dock-target",
-                        "position": { "x": 96, "y": 0 },
+                        "position": { "x": 96, "y": -58 },
                         "rotation": 0,
                         "scale": 0.5,
                         "density": 0.002,
@@ -121,6 +121,7 @@
                         "friction": 0.0,
                         "isSensor": true,
                         "alpha": 0.25,
+                        "tint": "0x4ae9f9",
                         "geometry": {
                             "type": "circle",
                             "radius": 72,
@@ -276,6 +277,7 @@
                         "friction": 0.0,
                         "isSensor": true,
                         "alpha": 0.25,
+                        "tint": "0x4ae9f9",
                         "geometry": {
                             "type": "circle",
                             "radius": 72,
@@ -465,6 +467,7 @@
             "frictionAir": 0.01,
             "frictionStatic": 0.5,
             "manager": "player",
+            "tint": "0xff009d",
             "geometry": {
                 "type": "polygon",
                 "vertices": [
