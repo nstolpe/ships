@@ -11,7 +11,9 @@ const System = ECS.System;
 
 Matter.use( 'matter-forces' );
 
+
 const PhysicsSystem = function( options ) {
+    let entities;
     const world = Matter.World.create( {
         gravity: { x: 0, y: 0, scale: 0.001 }
     } );
@@ -67,19 +69,29 @@ const PhysicsSystem = function( options ) {
                 // Matter.Engine.run( engine );
                 // Matter.Events.on( engine, 'afterUpdate', this.update.bind( this ) );
 
-                Matter.Events.on ( engine, 'collisionStart collisionActive collisionEnd', function( e ) {
-                    console.log( e.pairs );
+                // @TODO here now for implementation, but this needs to go to another system
+                // events: collisionStart collisionActive collisionEnd
+                Matter.Events.on ( engine, 'collisionStart', function( e ) {
+                    console.log( e.name );
+                    e.pairs.forEach( pair => console.log( pair ) );
+                } );
+                Matter.Events.on ( engine, 'collisionEnd', function( e ) {
+                    console.log( e.name );
+                    e.pairs.forEach( pair => console.log( pair ) );
                 } );
             }
         },
         'getEntities': {
             value: function() {
-                const entities = this.engine.entities.filter( entity => {
-                    return entity.components.find( component => component.is( Components.Polygon ) ) ||
-                           entity.components.find( component => component.is( Components.CompoundBody ) ) ||
-                           entity.components.find( component => component.is( Components.Rectangle ) ) ||
-                           entity.components.find( component => component.is( Components.Circle ) );
-                } );
+                if ( !entities ) {
+
+                    entities = this.engine.entities.filter( entity => {
+                        return entity.components.find( component => component.is( Components.Polygon ) ) ||
+                               entity.components.find( component => component.is( Components.CompoundBody ) ) ||
+                               entity.components.find( component => component.is( Components.Rectangle ) ) ||
+                               entity.components.find( component => component.is( Components.Circle ) );
+                    } );
+                }
 
                 return entities;
             }
