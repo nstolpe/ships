@@ -18,6 +18,25 @@ const ComponentsMap = new WeakMap();
 const EntityProto = Emitter( {
     'class': { value: 'Entity' },
     'id': { value: 0 },
+    'data': {
+        value: undefined,
+        enumerable: true,
+        writable: true
+    },
+    'flatten': {
+        value: function() {
+            const componentKeys = Object.keys( Components );
+            const flat = {};
+
+            // store each component on flat with its prototype as key
+            this.components.forEach( component => {
+                const componentKey = componentKeys.find( key => Components[ key ].isPrototypeOf( component ) );
+                flat[ componentKey ] = component;
+            } );
+
+            this.data = flat;
+        }
+    },
     /**
      * Returns a copy of the components array from components map.
      * Will error if EntityProto is used directly.
@@ -41,6 +60,8 @@ const EntityProto = Emitter( {
                 components.push( component )
                 this.emit( 'component-added', component );
             } );
+
+            this.flatten();
         }
     },
     'removeComponents': {
@@ -56,14 +77,17 @@ const EntityProto = Emitter( {
                 }
             } );
 
+            this.flatten();
             return spliced;
         }
     },
     'clearComponents': {
         value: function() {
             const components = ComponentsMap.get( this );
+            components.splice( 0, components.length );
+            this.flatten();
             this.emit( 'components-cleared' );
-            return components.splice( 0, components.length );
+            return components;
         }
     }
 } );
@@ -254,7 +278,7 @@ const Component = Object.create( Object.prototype, {
     }
 } );
 
-const Components ={
+const Components = {
     /**
      * A component that stores a 2d position in a `Matter.Vector`
      */
@@ -322,6 +346,20 @@ const Components ={
                 return Object.getPrototypeOf( this ).create(
                     this,
                     Bodies.rectangle( 0, 0, Number( width ), Number( height ), Object.assign( {}, options ) )
+                );
+            },
+            configurable: false
+        }
+    } ),
+    /**
+     * A component that stores a circle object created from `Matter.Bodies`
+     */
+    Circle: Object.create( Component, {
+        'create': {
+            value: function( radius, options ) {
+                return Object.getPrototypeOf( this ).create(
+                    this,
+                    Bodies.circle( 0, 0, Number( radius ), Object.assign( {}, options ) )
                 );
             },
             configurable: false
