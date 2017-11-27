@@ -71,13 +71,47 @@ const PhysicsSystem = function( options ) {
 
                 // @TODO here now for implementation, but this needs to go to another system
                 // events: collisionStart collisionActive collisionEnd
-                Matter.Events.on ( engine, 'collisionStart', function( e ) {
-                    console.log( e.name );
-                    e.pairs.forEach( pair => console.log( pair ) );
+                Matter.Events.on ( engine, 'collisionStart', e => {
+                    e.pairs.forEach( pair => {
+                        if ( ( pair.bodyA.label === 'player' && pair.bodyB.label.indexOf('dock-target') > 0 ) ||
+                            ( pair.bodyB.label === 'player' && pair.bodyA.label.indexOf('dock-target') > 0 ) ) {
+                            let target;
+                            let spriteComponent;
+
+                            if ( pair.bodyA.label === 'player' )
+                                target = this.engine.entities.find( entity => entity.data.Name.data === pair.bodyB.label );
+                            else
+                                target = this.engine.entities.find( entity => entity.data.Name.data === pair.bodyA.label );
+
+                            spriteComponent =
+                                target.data.TilingSprite ||
+                                target.data.Container ||
+                                target.data.Sprite;
+
+                            spriteComponent.data.alpha = 0.5;
+                        }
+                    } );
                 } );
-                Matter.Events.on ( engine, 'collisionEnd', function( e ) {
-                    console.log( e.name );
-                    e.pairs.forEach( pair => console.log( pair ) );
+                Matter.Events.on ( engine, 'collisionEnd', e => {
+                    e.pairs.forEach( pair => {
+                        if ( ( pair.bodyA.label === 'player' && pair.bodyB.label.indexOf('dock-target') > 0 ) ||
+                            ( pair.bodyB.label === 'player' && pair.bodyA.label.indexOf('dock-target') > 0 ) ) {
+                            let target;
+                            let spriteComponent;
+
+                            if ( pair.bodyA.label === 'player' )
+                                target = this.engine.entities.find( entity => entity.data.Name.data === pair.bodyB.label );
+                            else
+                                target = this.engine.entities.find( entity => entity.data.Name.data === pair.bodyA.label );
+
+                            spriteComponent =
+                                target.data.TilingSprite ||
+                                target.data.Container ||
+                                target.data.Sprite;
+
+                            spriteComponent.data.alpha = 0.25;
+                        }
+                    } );
                 } );
             }
         },
