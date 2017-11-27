@@ -132,6 +132,8 @@ const RenderSystem = function( options ) {
                     spriteComponent.data.position.y = geometryComponent.data.position.y;
                     spriteComponent.data.scale.x = renderable.data.Scale.data;
                     spriteComponent.data.scale.y = renderable.data.Scale.data;
+                    spriteComponent.data.alpha = renderable.data.Alpha.data;
+                    spriteComponent.data.tint = renderable.data.Tint.data;
 
                     // rotation updates should come from parent geometry if this is a child renderable/component
                     if ( parentComponent ) {
@@ -256,7 +258,8 @@ const RenderSystem = function( options ) {
                                 target.data.Container ||
                                 target.data.Sprite;
 
-                            spriteComponent.data.alpha = 0.5;
+                            // spriteComponent.data.alpha = 0.5;
+                            target.data.Alpha.data = 0.5;
                         }
                         break;
                     case 'collision-end':
@@ -275,7 +278,8 @@ const RenderSystem = function( options ) {
                                 target.data.Container ||
                                 target.data.Sprite;
 
-                            spriteComponent.data.alpha = 0.25;
+                            // spriteComponent.data.alpha = 0.25;
+                            target.data.Alpha.data = 0.25;
                         }
                         break;
                     default:

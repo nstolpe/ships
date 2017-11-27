@@ -132,45 +132,45 @@ module.exports = function( id, view, scale ) {
         loadSkinning( actor, entity ) {
             const type = Util.property( actor.geometry, 'display.type' );
             const resources = this.loader.resources;
-            let component;
+            let skinningComponent;
             let texture;
 
             switch ( type ) {
                 case 'sprite':
                     texture = this.getTexture( actor, resources );
-                    component = Components.Sprite.create( texture );
+                    skinningComponent = Components.Sprite.create( texture );
                     break;
                 case 'tiling-sprite':
                     texture = this.getTexture( actor, resources );
                     const w = Util.property(actor.geometry, 'width' );
                     const h = Util.property(actor.geometry, 'height' );
-                    component = Components.TilingSprite.create( texture, w, h );
+                    skinningComponent = Components.TilingSprite.create( texture, w, h );
                     break;
                 case 'compound':
                     const children = Util.property( actor.geometry, 'children' );
-                    component = Components.Container.create();
-                    const childrenComponent = entity.components.find( component => component.is( Components.Children ) );
+                    skinningComponent = Components.Container.create();
+                    const childrenComponent = entity.components.find( skinningComponent => skinningComponent.is( Components.Children ) );
 
                     children.forEach( ( child, idx ) => {
                         const childEntity = childrenComponent.data[ idx ];
                         const renderComponent = this.loadSkinning( child, childEntity );
                         childEntity.addComponents( renderComponent );
-                        component.data.addChild( renderComponent.data );
+                        skinningComponent.data.addChild( renderComponent.data );
                     } );
                     break;
                 default:
                     break;
             }
 
-            // @TODO add more options?
-            if ( component && actor.alpha )
-                component.data.alpha = actor.alpha;
-            if ( component && actor.tint )
-                component.data.tint = actor.tint;
+            if ( skinningComponent ) {
+                entity.addComponents(
+                    skinningComponent,
+                    Components.Alpha.create( actor.alpha ),
+                    Components.Tint.create( actor.tint )
+                );
+            }
 
-            if ( component ) entity.addComponents( component );
-
-            return component;
+            return skinningComponent;
         },
         getTexture( actor, resources ) {
             const resourceKey = 'spritesheets::' + Util.property( actor.geometry, 'display.spritesheet' );

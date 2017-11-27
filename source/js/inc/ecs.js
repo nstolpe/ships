@@ -3,6 +3,8 @@
 const PIXI = require( 'pixi.js' );
 const Matter = require( 'matter-js' );
 const Emitter = require( './emitter.js' );
+const Util = require( './util.js' );
+
 const Vector = Matter.Vector;
 const Bodies = Matter.Bodies;
 const Body = Matter.Body;
@@ -308,6 +310,30 @@ const Components = {
         'create': {
             value: function( scale ) {
                 return Object.getPrototypeOf( this ).create( this, Number( scale ) );
+            },
+            configurable: false
+        }
+    } ),
+    /**
+     * A component that stores a float alpha clamped between 0 and 1
+     */
+     Alpha: Object.create( Component, {
+        'create': {
+            value: function( alpha ) {
+                alpha = Util.isNumeric( alpha ) ? parseFloat( alpha ) : 1;
+                return Object.getPrototypeOf( this ).create( this, Util.clamp( alpha, 0, 1 ) );
+            },
+            configurable: false
+        }
+    } ),
+    /**
+     * A component that stores an int tint clamped between 0x000000 and 0xffffff
+     */
+     Tint: Object.create( Component, {
+        'create': {
+            value: function( tint ) {
+                tint = !Util.isNumeric( tint ) ? 0xffffff : Number.isInteger( tint ) ? tint : parseInt( tint, 16 );
+                return Object.getPrototypeOf( this ).create( this, Util.clamp( tint, 0x000000, 0xffffff ) );
             },
             configurable: false
         }

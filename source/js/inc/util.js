@@ -21,6 +21,9 @@ module.exports = {
 	toRadians( angle ) {
 		return angle * ( Math.PI / 180 );
 	},
+	clamp( num, low, high ) {
+		return num < low ? low : num > high ? high : num;
+	},
 	/**
 	 * Checks is a value is numeric
 	 * https://stackoverflow.com/questions/9716468/is-there-any-function-like-isnumeric-in-javascript-to-validate-numbers#answer-9716488
