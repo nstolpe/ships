@@ -29,6 +29,8 @@ const defaultConfig = {
 const constraintQueue = [];
 
 module.exports = function( id, view, scale ) {
+    let defaultMatter = Matter.Body.create();
+
     const App = new PIXI.Application(
         view.clientWidth * scale,
         view.clientHeight * scale,
@@ -178,7 +180,7 @@ module.exports = function( id, view, scale ) {
             return resources[ resourceKey ].textures[ textureKey ];
         },
         /**
-         * Loads gemometry from an `actor` from a config and turns it into
+         * Loads geometry from an `actor` from a config and turns it into
          * a geometry `component` for an `entity`
          *
          * @param {object} actor   Actor data from a config.
@@ -201,6 +203,19 @@ module.exports = function( id, view, scale ) {
                 isStatic: !!actor.isStatic,
                 isSensor: !!actor.isSensor
             };
+
+            // @TODO make these options all mergable into a default.
+            if ( actor.geometry.collisionFilter ) {
+                // maybe switch to js config files instead of json. can use hex ints
+                if ( actor.geometry.collisionFilter.category )
+                    actor.geometry.collisionFilter.category = parseInt( actor.geometry.collisionFilter.category, 16 );
+                if ( actor.geometry.collisionFilter.mask )
+                    actor.geometry.collisionFilter.mask = parseInt( actor.geometry.collisionFilter.mask, 16 );
+                if ( actor.geometry.collisionFilter.group )
+                    actor.geometry.collisionFilter.group = parseInt( actor.geometry.collisionFilter.group, 16 );
+
+                options.collisionFilter = Object.assign( Object.create( defaultMatter.collisionFilter ), actor.geometry.collisionFilter );
+            }
 
             switch ( type ) {
                 case 'polygon':
@@ -265,12 +280,11 @@ module.exports = function( id, view, scale ) {
         loadConstraints() {
             constraintQueue.forEach( options => {
                 const entity = options.entity;
-                const geometryComponentA = entity.components.find( component => {
-                    return component.is( Components.Polygon ) ||
-                        component.is( Components.CompoundBody ) ||
-                        component.is( Components.Rectangle ) ||
-                        component.is( Components.Circle );
-                } );
+                const geometryComponentA =
+                    entity.data.Polygon ||
+                    entity.data.CompoundBody ||
+                    entity.data.Rectangle ||
+                    entity.data.Circle;
 
                 // bail if there's no geometry component
                 if ( !geometryComponentA ) return;
@@ -278,18 +292,25 @@ module.exports = function( id, view, scale ) {
                 options.bodyA = geometryComponentA.data;
 
                 if ( options.bodyB ) {
-                    const geometryComponentB = this.engine.entities.find( entity => {
-                        const nameComponent = entity.components.find( component.is( Components.Name ) );
-                        return nameComponent && nameComponent === options.bodyB;
+                    const entityB = this.engine.entities.find( entity => {
+                        const nameComponent = entity.data.Name;
+                        return nameComponent && nameComponent.data === options.bodyB;
                     } );
 
-                    if ( geometryComponentB ) options.bodyB = geometryComponentB.data;
+                    if ( entityB ) {
+                        const geometryComponent =
+                            entityB.data.Polygon ||
+                            entityB.data.CompoundBody ||
+                            entityB.data.Circle ||
+                            entityB.data.Rectangle;
+                        if ( geometryComponent.data )
+                            options.bodyB = geometryComponent.data;
+                    }
                 }
 
                 delete options.entity;
 
-                const constraintComponent = Components.Constraint.create( options );
-                entity.addComponents( constraintComponent );
+                this.engine.addEntities( Entity( Components.Constraint.create( options ) ) );
             } );
         },
         loadEnvironment() {
@@ -318,28 +339,38 @@ document.getElementById( 'view' ).addEventListener( 'keydown', e => {
     switch ( e.which ) {
         // W
         case 87:
-            type = 'player-input-thrust';
-            data = 1 * .1;
+            if ( !e.repeat ) {
+                type = 'player-input-thrust';
+                data = 1 * .1;
+            }
             break;
         // S
         case 83:
-            type = 'player-input-thrust';
-            data = -1 * .1;
+            if ( !e.repeat ) {
+                type = 'player-input-thrust';
+                data = -1 * .1;
+            }
             break;
         // A
         case 65:
-            type = 'player-input-turn'
-            data = -1 * .2;
+            if ( !e.repeat ) {
+                type = 'player-input-turn'
+                data = -1 * .2;
+            }
             break;
         // D
         case 68:
-            type = 'player-input-turn'
-            data = 1 * .2;
+            if ( !e.repeat ) {
+                type = 'player-input-turn'
+                data = 1 * .2;
+            }
             break;
         // P
         case 80:
-            type = 'player-input-boost'
-            data = 20;
+            if ( !e.repeat ) {
+                type = 'player-input-boost'
+                data = 20;
+            }
             break;
         default:
             break;
@@ -356,31 +387,28 @@ document.getElementById( 'view' ).addEventListener( 'keyup', e => {
     switch ( e.which ) {
         // W
         case 87:
-            if ( !e.repeat ) {
-                type = 'player-input-thrust';
-                data = 0;
-            }
+            type = 'player-input-thrust';
+            data = 0;
             break;
         // S
         case 83:
-            if ( !e.repeat ) {
-                type = 'player-input-thrust';
-                data = 0;
-            }
+            type = 'player-input-thrust';
+            data = 0;
             break;
         // A
         case 65:
-            if ( !e.repeat ) {
-                type = 'player-input-turn';
-                data = 0;
-            }
+            type = 'player-input-turn';
+            data = 0;
             break;
         // D
         case 68:
-            if ( !e.repeat ) {
-                type = 'player-input-turn';
-                data = 0;
-            }
+            type = 'player-input-turn';
+            data = 0;
+            break;
+        // X
+        case 88:
+            type = 'player-input-dock';
+            data = 0;
             break;
         default:
             break;

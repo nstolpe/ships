@@ -13,6 +13,7 @@ Matter.use( 'matter-forces' );
 
 const PhysicsSystem = function( options ) {
     let entities;
+    let constraints;
     const world = Matter.World.create( {
         gravity: { x: 0, y: 0, scale: 0.001 }
     } );
@@ -38,13 +39,13 @@ const PhysicsSystem = function( options ) {
                     if ( !entity.components.find( component => component.is( Components.Parent ) ) )
                         Matter.World.add( engine.world, [ geometryComponent.data ] );
 
-                    const constraintComponents = entity.components.filter( component => component.is( Components.Constraint ) );
-
-                    constraintComponents.forEach( constraintComponent => {
-                        Matter.World.add( engine.world, [ constraintComponent.data ]);
-                    } );
-
                     this.updateEntity( entity, environment );
+                } );
+
+                const constraintEntities = this.getConstraints();
+
+                constraintEntities.forEach( constraintEntity => {
+                    Matter.World.add( engine.world, [ constraintEntity.data.Constraint.data ]);
                 } );
 
                 this.bindEvents();
@@ -87,6 +88,14 @@ const PhysicsSystem = function( options ) {
                 }
 
                 return entities;
+            }
+        },
+        'getConstraints': {
+            value: function() {
+                if ( !constraints )
+                    constraints = this.engine.entities.filter( entity => !!entity.data.Constraint );
+
+                return constraints;
             }
         },
         'updateEntity': {
