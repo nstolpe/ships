@@ -17,6 +17,7 @@ const RenderSystem = function( options ) {
     let debug = !!options.debug;
     let renderables;
     let player;
+    let constraints;
 
     App.renderer.backgroundColor = options.backgroundColor == null ? 0x000000 : options.backgroundColor;
 
@@ -160,6 +161,13 @@ const RenderSystem = function( options ) {
                 return renderables;
             }
         },
+        'getConstraints': {
+            value: function() {
+                if ( !constraints )
+                    constraints = this.engine.entities.filter( entity => !!entity.data.Constraint );
+                return constraints;
+            }
+        },
         'getPlayer': {
             value: function() {
                 if ( !player ) {
@@ -212,6 +220,22 @@ const RenderSystem = function( options ) {
                                 break;
                         }
                 } );
+
+                graphics.lineStyle( 1, 0xff0000, 1 );
+
+                this.getConstraints().forEach( constraintEntity => {
+                    let constraint = constraintEntity.data.Constraint.data;
+                    if ( constraint.bodyA ) {
+                        graphics.moveTo( constraint.bodyA.position.x + constraint.pointA.x, constraint.bodyA.position.y + constraint.pointA.y );
+                    } else {
+                        graphics.moveTo( constraint.pointA.x, constraint.pointA.y );
+                    }
+                    if ( constraint.bodyB ) {
+                        graphics.lineTo( constraint.bodyB.position.x + constraint.pointB.x, constraint.bodyB.position.y + constraint.pointB.y );
+                    } else {
+                        graphics.lineTo( constraint.pointB.x, constraint.pointB.y );
+                    }
+                } );
             }
         },
         'registerSubscriptions': {
@@ -243,8 +267,9 @@ const RenderSystem = function( options ) {
                         App.stage.scale.set( scale, scale );
                         break;
                     case 'collision-start':
-                        if ( ( message.data.bodyA.label === 'player' && message.data.bodyB.label.indexOf('dock-target') > 0 ) ||
-                            ( message.data.bodyB.label === 'player' && message.data.bodyA.label.indexOf('dock-target') > 0 ) ) {
+                        // this is better than checking the labels, but these hex numbers should be stored somewhere
+                        if ( ( message.data.bodyA.collisionFilter.category === 0x000002 && message.data.bodyB.collisionFilter.category === 0x000020 ) ||
+                            ( message.data.bodyB.collisionFilter.category === 0x000002 && message.data.bodyA.collisionFilter.category === 0x000020 ) ) {
                             let target;
                             let spriteComponent;
 
@@ -263,8 +288,8 @@ const RenderSystem = function( options ) {
                         }
                         break;
                     case 'collision-end':
-                        if ( ( message.data.bodyA.label === 'player' && message.data.bodyB.label.indexOf('dock-target') > 0 ) ||
-                            ( message.data.bodyB.label === 'player' && message.data.bodyA.label.indexOf('dock-target') > 0 ) ) {
+                        if ( ( message.data.bodyA.collisionFilter.category === 0x000002 && message.data.bodyB.collisionFilter.category === 0x000020 ) ||
+                            ( message.data.bodyB.collisionFilter.category === 0x000002 && message.data.bodyA.collisionFilter.category === 0x000020 ) ) {
                             let target;
                             let spriteComponent;
 
