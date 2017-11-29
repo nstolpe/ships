@@ -80,6 +80,8 @@ const PlayerManagerSystem = function( options ) {
                 hub.addSubscription( this, 'player-input-thrust' );
                 hub.addSubscription( this, 'player-input-turn' );
                 hub.addSubscription( this, 'player-input-boost' );
+                hub.addSubscription( this, 'collision-start' );
+                hub.addSubscription( this, 'collision-end' );
             }
         },
         'receiveMessage': {
@@ -93,6 +95,20 @@ const PlayerManagerSystem = function( options ) {
                         break;
                     case 'player-input-boost':
                         Forces.boost = message.data;
+                        break;
+                    case 'collision-start':
+                        if ( ( message.data.bodyA.collisionFilter.category === 0x000002 && message.data.bodyB.collisionFilter.category === 0x000020 ) ||
+                            ( message.data.bodyB.collisionFilter.category === 0x000002 && message.data.bodyA.collisionFilter.category === 0x000020 ) ) {
+                            console.log( 'enabling whatever this enables' );
+                        }
+                        break;
+                    case 'collision-end':
+                        if ( ( message.data.bodyA.collisionFilter.category === 0x000002 && message.data.bodyB.collisionFilter.category === 0x000020 ) ||
+                            ( message.data.bodyB.collisionFilter.category === 0x000002 && message.data.bodyA.collisionFilter.category === 0x000020 ) ) {
+                            console.log( 'disabling whatever this enables' );
+                        }
+                        break;
+                    default:
                         break;
                 }
             }
