@@ -30,7 +30,7 @@ const EntityProto = Emitter( {
             const componentKeys = Object.keys( Components );
             const flat = {};
 
-            // store each component on flat with its prototype as key
+            // store each component on flat with its prototype name as key
             this.components.forEach( component => {
                 const componentKey = componentKeys.find( key => Components[ key ].isPrototypeOf( component ) );
                 flat[ componentKey ] = component;
@@ -103,6 +103,7 @@ function Entity( ...components ) {
     } );
 
     ComponentsMap.set( entity, components );
+    entity.flatten();
     return entity;
 }
 
