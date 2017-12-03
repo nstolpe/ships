@@ -9,11 +9,13 @@ const Util = require( './util' );
 const Components = ECS.Components;
 const System = ECS.System;
 
+// @TODO make this optional/configurable. physics-plugin section or matter-plugin section.
 Matter.use( 'matter-forces' );
 
 const PhysicsSystem = function( options ) {
     let entities;
     let constraints;
+    // @TODO configurable.
     const world = Matter.World.create( {
         gravity: { x: 0, y: 0, scale: 0.001 }
     } );
@@ -25,7 +27,7 @@ const PhysicsSystem = function( options ) {
         'start': {
             value: function() {
                 // prototype handles `on` state and event emission
-                Object.getPrototypeOf( this ).start();
+                Object.getPrototypeOf( this ).start.call( this );
                 const entities = this.getEntities();
                 const environment = this.getEnvironment();
 
