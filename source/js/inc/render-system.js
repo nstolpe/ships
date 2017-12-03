@@ -1,6 +1,8 @@
 'use strict';
 
 const ECS = require( './ecs.js' );
+const Util = require( './util.js' );
+
 const Components = ECS.Components;
 const System = ECS.System;
 
@@ -33,7 +35,8 @@ const RenderSystem = function( options ) {
         'start': {
             value: function() {
                 // prototype handles `on` state and event emission
-                Object.getPrototypeOf( this ).start();
+                Object.getPrototypeOf( this ).start.call( this );
+
 
                 const renderables = this.getRenderables();
                 const player = this.getPlayer();
@@ -43,9 +46,10 @@ const RenderSystem = function( options ) {
                 // `compound` visuals will work as they'll be individual components
                 renderables.forEach( renderable => {
                     // @TODO better entity api
-                    const spriteComponent = renderable.components.find( component => component.is( Components.Container ) ) ||
-                        renderable.components.find( component => component.is( Components.Sprite ) ) ||
-                        renderable.components.find( component => component.is( Components.TilingSprite ) );
+                    const spriteComponent = renderable.data.Container ||
+                        renderable.data.Sprite ||
+                        renderable.data.Graphics ||
+                        renderable.data.TilingSprite;
 
                     spriteComponent.data.pivot.set( spriteComponent.data.width * 0.5, spriteComponent.data.height * 0.5 );
 
@@ -67,6 +71,7 @@ const RenderSystem = function( options ) {
                         App.stage.pivot.y = positionComponent.data.y;
                     }
                 }
+                App.stage.rotation = player.data.Rotation.data;
                 // better checking?
                 if ( typeof hub === 'object' )
                     this.registerSubscriptions();
@@ -103,7 +108,6 @@ const RenderSystem = function( options ) {
                 App.stage.pivot.x = positionComponent.data.x;
                 App.stage.pivot.y = positionComponent.data.y;
 
-
                 // @TODO draw anything, besides debug, that needs to be drawn by graphics
                 // @TODO generate graphics if it's not there
                 if ( typeof graphics.clear === 'function' ) {
@@ -123,6 +127,7 @@ const RenderSystem = function( options ) {
                 const spriteComponent =
                     renderable.data.TilingSprite ||
                     renderable.data.Container ||
+                    renderable.data.Graphics ||
                     renderable.data.Sprite;
                 const parentComponent = renderable.data.Parent;
 
@@ -136,6 +141,41 @@ const RenderSystem = function( options ) {
                     spriteComponent.data.alpha = renderable.data.Alpha.data;
                     spriteComponent.data.tint = renderable.data.Tint.data;
 
+                    if ( spriteComponent.is( Components.Graphics ) ) {
+                        spriteComponent.data.clear();
+
+                        if ( renderable.data.Fill.data )
+                            spriteComponent.data.beginFill( renderable.data.Fill.data );
+
+                        if ( renderable.data.Stroke.data )
+                            spriteComponent.data.lineStyle( renderable.data.Stroke.data.width, renderable.data.Stroke.data.color, renderable.data.Alpha.data );
+
+                        switch ( Object.getPrototypeOf( geometryComponent ) ) {
+                            case Components.Circle:
+                                spriteComponent.data.drawCircle( 0, 0, geometryComponent.data.circleRadius - renderable.data.Stroke.data.width );
+                                break;
+                            case Components.Rectangle:
+                                const stroke = Util.property( renderable.data, 'Stroke.data.width' );
+                                const halfStroke = stroke * 0.5;
+                                const vertices = Util.property( geometryComponent.data, 'vertices' );
+
+                                let wDiff = vertices[ 0 ].x - vertices[ 1 ].x;
+                                let hDiff = vertices[ 0 ].y - vertices[ 1 ].y;
+                                let width = Math.sqrt( wDiff * wDiff + hDiff * hDiff );
+                                wDiff = vertices[ 0 ].x - vertices[ 3 ].x;
+                                hDiff = vertices[ 0 ].y - vertices[ 3 ].y;
+                                let height = Math.sqrt( wDiff * wDiff + hDiff * hDiff );
+                                spriteComponent.data.drawRect( halfStroke - width * 0.5 , halfStroke - height * 0.5, width - stroke, height - stroke );
+                                break;
+                            case Components.Polygon:
+                                break;
+                            case Components.CompoundBody:
+                                break;
+                        }
+
+                        if ( renderable.data.Fill.data )
+                            spriteComponent.data.endFill();
+                    }
                     // rotation updates should come from parent geometry if this is a child renderable/component
                     if ( parentComponent ) {
                         const parent = parentComponent.data;
@@ -149,12 +189,13 @@ const RenderSystem = function( options ) {
             value: function() {
                 if ( !renderables ) {
                     renderables = this.engine.entities.filter( entity => {
-                        return entity.components.find( component => component.is( Components.Position ) ) &&
-                               entity.components.find( component => component.is( Components.Rotation ) ) &&
-                               entity.components.find( component => component.is( Components.Scale ) ) &&
-                               ( entity.components.find( component => component.is( Components.Container ) ) ||
-                                 entity.components.find( component => component.is( Components.Sprite ) ) ||
-                                 entity.components.find( component => component.is( Components.TilingSprite ) ) );
+                        return entity.data.Position &&
+                               entity.data.Rotation &&
+                               entity.data.Scale &&
+                               ( entity.data.Container ||
+                                 entity.data.Sprite ||
+                                 entity.data.TilingSprite ||
+                                 entity.data.Graphics );
                     } );
                 }
 
