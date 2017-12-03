@@ -102,30 +102,31 @@ const PhysicsSystem = function( options ) {
         },
         'updateEntity': {
             value: function( entity, environment ) {
-                const geometryComponent = entity.components.find( component => {
-                    return component.is( Components.Polygon ) ||
-                        component.is( Components.CompoundBody ) ||
-                        component.is( Components.Rectangle ) ||
-                        component.is( Components.Circle );
-                } );
-                const positionComponent = entity.components.find( component => component.is( Components.Position ) );
-                const rotationComponent = entity.components.find( component => component.is( Components.Rotation ) );
-                const scaleComponent = entity.components.find( component => component.is( Components.Scale ) );
-                const forces = environment.components.filter( component => component.is( Components.Force ) );
-                const nameComponent = entity.components.find( component => component.is( Components.Name ) );
-                const parentComponent = entity.components.find( component => component.is( Components.Parent ) );
+                const geometryComponent =
+                    entity.data.Polygon ||
+                    entity.data.CompoundBody ||
+                    entity.data.Rectangle ||
+                    entity.data.Circle;
+                const positionComponent = entity.data.Position;
+                const rotationComponent = entity.data.Rotation;
+                const scaleComponent = entity.data.Scale;
+                const force = environment.data.Force;
+                const nameComponent = entity.data.Name;
+                const parentComponent = entity.data.Parent;
 
                 geometryComponent.data.plugin.forces = [];
-                forces.forEach( force => {
+
+                // forces.forEach( force => {
                     const forceVector = Util.angleToVector( Util.toRadians( force.data.direction ) );
                     geometryComponent.data.plugin.forces.push( {
                         x: forceVector.x * force.data.magnitude,
                         y: forceVector.y * force.data.magnitude
                     } );
-                } );
+                // } );
 
                 positionComponent.data.y = geometryComponent.data.position.y;
                 positionComponent.data.x = geometryComponent.data.position.x;
+
                 // if there's a parent component, rotation comes from it
                 if ( parentComponent ) {
                     const parentGeoComp = parentComponent.data.components.find( component => component.is( Components.CompoundBody ) );

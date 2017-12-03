@@ -307,8 +307,8 @@ const Components = {
      */
     Scale: Object.create( Component, {
         'create': {
-            value: function( scale ) {
-                return Object.getPrototypeOf( this ).create( this, Number( scale ) );
+            value: function( x, y ) {
+                return Object.getPrototypeOf( this ).create( this, Vector.create( Number( x ), Number( y ) ) );
             },
             configurable: false
         }

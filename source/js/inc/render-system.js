@@ -51,7 +51,7 @@ const RenderSystem = function( options ) {
                         renderable.data.Graphics ||
                         renderable.data.TilingSprite;
 
-                    spriteComponent.data.pivot.set( spriteComponent.data.width * 0.5, spriteComponent.data.height * 0.5 );
+                    // spriteComponent.data.pivot.set( spriteComponent.data.width * 0.5, spriteComponent.data.height * 0.5 );
 
                     if ( !renderable.components.find( component => component.is( Components.Parent ) ) )
                         this.updateRenderable( renderable );
@@ -136,8 +136,8 @@ const RenderSystem = function( options ) {
                     // rotation Component is needed though, value from geometry gets weird.
                     spriteComponent.data.position.x = geometryComponent.data.position.x;
                     spriteComponent.data.position.y = geometryComponent.data.position.y;
-                    spriteComponent.data.scale.x = renderable.data.Scale.data;
-                    spriteComponent.data.scale.y = renderable.data.Scale.data;
+                    // spriteComponent.data.scale.x = renderable.data.Scale.data.x;
+                    // spriteComponent.data.scale.y = renderable.data.Scale.data.y;
                     spriteComponent.data.alpha = renderable.data.Alpha.data;
                     spriteComponent.data.tint = renderable.data.Tint.data;
 
@@ -155,8 +155,8 @@ const RenderSystem = function( options ) {
                                 spriteComponent.data.drawCircle( 0, 0, geometryComponent.data.circleRadius - renderable.data.Stroke.data.width );
                                 break;
                             case Components.Rectangle:
-                                const stroke = Util.property( renderable.data, 'Stroke.data.width' );
-                                const halfStroke = stroke * 0.5;
+                                const strokeWidth = Util.property( renderable.data, 'Stroke.data.width' ) || 0;
+                                const halfStroke = strokeWidth * 0.5 || 0;
                                 const vertices = Util.property( geometryComponent.data, 'vertices' );
 
                                 let wDiff = vertices[ 0 ].x - vertices[ 1 ].x;
@@ -165,7 +165,7 @@ const RenderSystem = function( options ) {
                                 wDiff = vertices[ 0 ].x - vertices[ 3 ].x;
                                 hDiff = vertices[ 0 ].y - vertices[ 3 ].y;
                                 let height = Math.sqrt( wDiff * wDiff + hDiff * hDiff );
-                                spriteComponent.data.drawRect( halfStroke - width * 0.5 , halfStroke - height * 0.5, width - stroke, height - stroke );
+                                spriteComponent.data.drawRect( halfStroke - width * 0.5 , halfStroke - height * 0.5, width - strokeWidth, height - strokeWidth );
                                 break;
                             case Components.Polygon:
                                 break;

@@ -30,22 +30,22 @@ const defaultConfig = {
 
 const constraintQueue = [];
 
-module.exports = function( id, view, scale ) {
+module.exports = function( id, view, resolution ) {
     let defaultMatter = Matter.Body.create();
 
     const App = new PIXI.Application(
-        view.clientWidth * scale,
-        view.clientHeight * scale,
+        view.clientWidth * resolution,
+        view.clientHeight * resolution,
         {
             view: view,
-            resolution: scale,
+            resolution: resolution,
             autoresize: true
         }
     );
     return {
         id: id,
         view: view,
-        scale: scale,
+        resolution: resolution,
         dataPath: 'assets/data',
         config: defaultConfig,
         engine: Engine(),
@@ -117,9 +117,9 @@ module.exports = function( id, view, scale ) {
             actors.forEach( ( actor ) => {
                 const entity = Entity(
                     Components.Name.create( actor.name ),
-                    Components.Position.create( Util.property( actor.position, 'x' ), Util.property( actor.position, 'y' ) ),
+                    Components.Position.create( Util.property( actor.position, 'x' ) || 0, Util.property( actor.position, 'y' ) ) || 0,
                     Components.Rotation.create( actor.rotation ),
-                    Components.Scale.create( actor.scale )
+                    Components.Scale.create( Util.property( actor.scale, 'x' ) || 1 , Util.property( actor.scale, 'y' ) ) || 1,
                 );
 
                 this.loadGeometry( actor, entity );
@@ -185,6 +185,12 @@ module.exports = function( id, view, scale ) {
                     Components.Tint.create( actor.tint )
                 );
             }
+
+            skinningComponent.data.pivot.set( skinningComponent.data.width * 0.5, skinningComponent.data.height * 0.5 );
+            // @TODO geometry and visuals need to be separate in config, w/ independent scales.
+            let scale = Util.property( actor.geometry, 'display.scale' );
+            if ( scale )
+                skinningComponent.data.scale.set( scale.x, scale.y );
 
             return skinningComponent;
         },
@@ -252,9 +258,9 @@ module.exports = function( id, view, scale ) {
                     children.forEach( ( child, idx ) => {
                         const childEntity = Entity(
                             Components.Name.create( child.name ),
-                            Components.Position.create( Util.property( child.position, 'x' ), Util.property( child.position, 'y' ) ),
+                            Components.Position.create( Util.property( child.position, 'x' ) || 0, Util.property( child.position, 'y' ) ) || 0,
                             Components.Rotation.create( child.rotation ),
-                            Components.Scale.create( child.scale ),
+                            Components.Scale.create(  Util.property( child.scale, 'x' ) || 1, Util.property( child.scale, 'y' ) ) || 1,
                             Components.Parent.create( entity )
                         );
 
@@ -274,19 +280,17 @@ module.exports = function( id, view, scale ) {
             }
 
             if ( component ) {
-                const positionComponent = entity.components.find( component => component.is( Components.Position ) );
-                const rotationComponent = entity.components.find( component => component.is( Components.Rotation ) );
-                const scaleComponent = entity.components.find( component => component.is( Components.Scale ) );
+                const positionComponent = entity.data.Position;
+                const rotationComponent = entity.data.Rotation;
+                const scaleComponent = entity.data.Scale;
 
                 Matter.Body.setPosition( component.data, positionComponent.data );
                 Matter.Body.setAngle( component.data, rotationComponent.data );
-                Matter.Body.scale( component.data, scaleComponent.data, scaleComponent.data );
+                Matter.Body.scale( component.data, scaleComponent.data.x, scaleComponent.data.y );
                 entity.addComponents( component );
 
                 if ( actor.geometry.constraints )
-                    actor.geometry.constraints.forEach( constraint => {
-                        constraintQueue.push( Object.assign( { entity: entity }, constraint ) )
-                    } );
+                    actor.geometry.constraints.forEach( constraint => constraintQueue.push( Object.assign( { entity: entity }, constraint ) ) );
             }
 
             return component;
@@ -406,14 +410,14 @@ function activateInputs() {
             case 87:
                 if ( !e.repeat ) {
                     type = 'player-input-thrust';
-                    data = 1 * .1;
+                    data = 1 * .05;
                 }
                 break;
             // S
             case 83:
                 if ( !e.repeat ) {
                     type = 'player-input-thrust';
-                    data = -1 * .1;
+                    data = -1 * .05;
                 }
                 break;
             // A
