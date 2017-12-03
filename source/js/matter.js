@@ -5,7 +5,6 @@ window.decomp = decomp;
 const Matter = require( 'matter-js' );
 const MatterAttractors = require( 'matter-attractors' );
 const MatterForces = require( './inc/matter-forces' );
-const Config = require( './inc/game.js' );
 // Matter.use( 'matter-attractors' );
 Matter.use( 'matter-forces' );
 
