@@ -9,10 +9,8 @@ const Vector = Matter.Vector;
 const Bodies = Matter.Bodies;
 const Body = Matter.Body;
 const Constraint = Matter.Constraint;
-const Sprite = PIXI.Sprite;
 const Container = PIXI.Container;
 const Application = PIXI.Application;
-const TilingSprite = PIXI.extras.TilingSprite;
 
 // weakmap for private data (components array) accessible w/ prototype methods
 const ComponentsMap = new WeakMap();
@@ -307,7 +305,7 @@ const Components = {
     /**
      * A component that stores a scalar float scale
      */
-     Scale: Object.create( Component, {
+    Scale: Object.create( Component, {
         'create': {
             value: function( scale ) {
                 return Object.getPrototypeOf( this ).create( this, Number( scale ) );
@@ -318,7 +316,7 @@ const Components = {
     /**
      * A component that stores a float alpha clamped between 0 and 1
      */
-     Alpha: Object.create( Component, {
+    Alpha: Object.create( Component, {
         'create': {
             value: function( alpha ) {
                 alpha = Util.isNumeric( alpha ) ? parseFloat( alpha ) : 1;
@@ -330,7 +328,7 @@ const Components = {
     /**
      * A component that stores an int tint clamped between 0x000000 and 0xffffff
      */
-     Tint: Object.create( Component, {
+    Tint: Object.create( Component, {
         'create': {
             value: function( tint ) {
                 tint = !Util.isNumeric( tint ) ? 0xffffff : Number.isInteger( tint ) ? tint : parseInt( tint, 16 );
@@ -412,7 +410,7 @@ const Components = {
     Sprite: Object.create( Component, {
         'create': {
             value: function( texture ) {
-                return Object.getPrototypeOf( this ).create( this, new Sprite( texture ) );
+                return Object.getPrototypeOf( this ).create( this, new PIXI.Sprite( texture ) );
             },
             configurable: false
         }
@@ -423,7 +421,18 @@ const Components = {
     TilingSprite: Object.create( Component, {
         'create': {
             value: function( texture, width, height ) {
-                return Object.getPrototypeOf( this ).create( this, new TilingSprite( texture, width, height ) );
+                return Object.getPrototypeOf( this ).create( this, new PIXI.extras.TilingSprite( texture, width, height ) );
+            },
+            configurable: false
+        }
+    } ),
+    /**
+     * A component that stores a `PIXI.Graphics`
+     */
+    Graphics: Object.create( Component, {
+        'create': {
+            value: function() {
+                return Object.getPrototypeOf( this ).create( this, new PIXI.Graphics() );
             },
             configurable: false
         }
@@ -501,6 +510,22 @@ const Components = {
         'create': {
             value: function() {
                 return Object.getPrototypeOf( this ).create( this, true );
+            },
+            configurable: false
+        }
+    } ),
+    Stroke: Object.create( Component, {
+        'create': {
+            value: function( color, width ) {
+                return Object.getPrototypeOf( this ).create( this, { color: color, width: width } );
+            },
+            configurable: false
+        }
+    } ),
+    Fill: Object.create( Component, {
+        'create': {
+            value: function( color ) {
+                return Object.getPrototypeOf( this ).create( this, color );
             },
             configurable: false
         }
