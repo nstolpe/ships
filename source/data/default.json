@@ -443,6 +443,47 @@
             }
         },
         {
+            "name": "graphics-circle",
+            "position": { "x": 500, "y": 986 },
+            "rotation": 0,
+            "scale": 1,
+            "restitution": 0.5,
+            "friction": 0.0,
+            "alpha": 1,
+            "geometry": {
+                "type": "circle",
+                "radius": 168,
+                "width": 336,
+                "height": 336,
+                "display": {
+                    "type": "graphics",
+                    "fill": "0xff00ff",
+                    "stroke": "0x00ffff",
+                    "stroke-width": "4"
+                }
+            }
+        },
+        {
+            "name": "graphics-rectang;e",
+            "position": { "x": -654, "y": 743 },
+            "rotation": 0,
+            "scale": 1,
+            "restitution": 0.5,
+            "friction": 0.0,
+            "alpha": 1,
+            "geometry": {
+                "type": "rectangle",
+                "width": 200,
+                "height": 200,
+                "display": {
+                    "type": "graphics",
+                    "fill": "0x5555ff",
+                    "stroke": "0xffffff",
+                    "stroke-width": "20"
+                }
+            }
+        },
+        {
             "name": "left-bound",
             "position": { "x": -2048, "y": 0 },
             "scale": 1,
