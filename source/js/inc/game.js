@@ -119,7 +119,7 @@ module.exports = function( id, view, resolution ) {
                     Components.Name.create( actor.name ),
                     Components.Position.create( Util.property( actor.position, 'x' ) || 0, Util.property( actor.position, 'y' ) ) || 0,
                     Components.Rotation.create( actor.rotation ),
-                    Components.Scale.create( Util.property( actor.scale, 'x' ) || 1 , Util.property( actor.scale, 'y' ) ) || 1,
+                    Components.Scale.create( Util.property( actor.scale, 'x' ) || 1 , Util.property( actor.scale, 'y' ) ) || 1
                 );
 
                 this.loadGeometry( actor, entity );

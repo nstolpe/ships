@@ -116,6 +116,7 @@ const PhysicsSystem = function( options ) {
 
                 geometryComponent.data.plugin.forces = [];
 
+                // @TODO currents should be sensors that add a force to colliding objects.
                 // forces.forEach( force => {
                     const forceVector = Util.angleToVector( Util.toRadians( force.data.direction ) );
                     geometryComponent.data.plugin.forces.push( {
