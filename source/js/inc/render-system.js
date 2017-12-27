@@ -36,10 +36,9 @@ const RenderSystem = function( options ) {
             value: function() {
                 // prototype handles `on` state and event emission
                 Object.getPrototypeOf( this ).start.call( this );
-                this.entitySources.push( 'getRenderables', 'getPlayer', 'getConstraints' );
                 this.setEntities();
-                const renderables = this.getRenderables();
-                const player = this.getPlayer();
+                const renderables = this.entities.renderables();
+                const player = this.entities.player();
 
                 // get visual and transform data and create a child for the `PIXI.application` stage
                 // @TODO only handles Sprites. needs at support TilingSprite and other possibilities.
@@ -109,14 +108,14 @@ const RenderSystem = function( options ) {
         'update': {
             value: function( delta ) {
                 // console.log('update render');
-                const renderables = this.getRenderables();
+                const renderables = this.entities.renderables();
 
                 this.resize();
 
                 renderables.forEach( renderable => this.updateRenderable( renderable ) );
 
                 // keeps the camera centerd on the player
-                const player = this.getPlayer();
+                const player = this.entities.player();
                 const positionComponent = player.components.find( component => component.is( Components.Position ) );
                 App.stage.pivot.x = positionComponent.data.x;
                 App.stage.pivot.y = positionComponent.data.y;
@@ -198,42 +197,6 @@ const RenderSystem = function( options ) {
                     }
             }
         },
-        'getRenderables': {
-            value: function( refresh ) {
-                if ( refresh || !renderables ) {
-                    renderables = this.engine.entities.filter( entity => {
-                        return entity.data.Position &&
-                               entity.data.Rotation &&
-                               entity.data.Scale &&
-                               ( entity.data.Container ||
-                                 entity.data.Sprite ||
-                                 entity.data.TilingSprite ||
-                                 entity.data.Graphics );
-                    } );
-                }
-
-                return renderables;
-            }
-        },
-        'getConstraints': {
-            value: function( refresh ) {
-                if ( refresh || !constraints )
-                    constraints = this.engine.entities.filter( entity => !!entity.data.Constraint );
-                return constraints;
-            }
-        },
-        // @TODO consolidate to something composable that player-manager-system can also use.
-        'getPlayer': {
-            value: function( refresh ) {
-                if ( refresh || !player ) {
-                    player = this.getRenderables().find( entity => {
-                        return entity.components.find( component => component.is( Components.PlayerManager ) );
-                    } );
-                }
-
-                return player;
-            }
-        },
         'drawDebug': {
             value: function( entities ) {
                 // Draws bounding shapes.
@@ -278,7 +241,7 @@ const RenderSystem = function( options ) {
 
                 graphics.lineStyle( 1, 0xff0000, 1 );
 
-                this.getConstraints().forEach( constraintEntity => {
+                this.entities.constraints().forEach( constraintEntity => {
                     let constraint = constraintEntity.data.Constraint.data;
                     if ( constraint.bodyA ) {
                         graphics.moveTo( constraint.bodyA.position.x + constraint.pointA.x, constraint.bodyA.position.y + constraint.pointA.y );
@@ -309,7 +272,7 @@ const RenderSystem = function( options ) {
                     case 'get-renderable-entities':
                         hub.sendMessage( {
                             type: 'renderable-entities',
-                            data: this.getRenderables
+                            data: this.entities.renderables
                         } );
                         break;
                     // handles zoom
@@ -368,6 +331,41 @@ const RenderSystem = function( options ) {
             }
         }
     } );
+
+    // attach entity getter functions here.
+    Object.assign( system.entities, {
+        renderables( refresh ) {
+            if ( refresh || !renderables ) {
+                renderables = system.engine.entities.filter( entity => {
+                    return entity.data.Position &&
+                           entity.data.Rotation &&
+                           entity.data.Scale &&
+                           ( entity.data.Container ||
+                             entity.data.Sprite ||
+                             entity.data.TilingSprite ||
+                             entity.data.Graphics );
+                } );
+            }
+
+            return renderables;
+        },
+        constraints( refresh ) {
+            if ( refresh || !constraints )
+                constraints = system.engine.entities.filter( entity => !!entity.data.Constraint );
+            return constraints;
+        },
+        // @TODO consolidate to something composable that player-manager-system can also use.
+        player( refresh ) {
+            if ( refresh || !player ) {
+                player = system.entities.renderables().find( entity => {
+                    return entity.components.find( component => component.is( Components.PlayerManager ) );
+                } );
+            }
+
+            return player;
+        }
+    } );
+
 
     return system;
 }

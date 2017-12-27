@@ -13,7 +13,7 @@ const System = ECS.System;
 Matter.use( 'matter-forces' );
 
 const PhysicsSystem = function( options ) {
-    let entities;
+    let bodies;
     let constraints;
     // @TODO configurable.
     const world = Matter.World.create( {
@@ -28,10 +28,9 @@ const PhysicsSystem = function( options ) {
             value: function() {
                 // prototype handles `on` state and event emission
                 Object.getPrototypeOf( this ).start.call( this );
-                this.entitySources.push( 'getEntities', 'getEnvironment' );
                 this.setEntities();
-                const entities = this.getEntities();
-                const environment = this.getEnvironment();
+                const entities = this.entities.bodies();
+                const environment = this.entities.environment();
 
                 entities.forEach( entity => {
                     const geometryComponent = entity.components.find( component => component.is( Components.Polygon ) ) ||
@@ -46,7 +45,7 @@ const PhysicsSystem = function( options ) {
                     this.updateEntity( entity, environment );
                 } );
 
-                const constraintEntities = this.getConstraints();
+                const constraintEntities = this.entities.constraints();
 
                 constraintEntities.forEach( constraintEntity => {
                     Matter.World.add( engine.world, [ constraintEntity.data.Constraint.data ]);
@@ -77,29 +76,6 @@ const PhysicsSystem = function( options ) {
 
                 // @TODO here now for implementation, but this needs to go to another system
                 // events: collisionStart collisionActive collisionEnd
-            }
-        },
-        'getEntities': {
-            value: function() {
-                if ( !entities ) {
-
-                    entities = this.engine.entities.filter( entity => {
-                        return entity.components.find( component => component.is( Components.Polygon ) ) ||
-                               entity.components.find( component => component.is( Components.CompoundBody ) ) ||
-                               entity.components.find( component => component.is( Components.Rectangle ) ) ||
-                               entity.components.find( component => component.is( Components.Circle ) );
-                    } );
-                }
-
-                return entities;
-            }
-        },
-        'getConstraints': {
-            value: function() {
-                if ( !constraints )
-                    constraints = this.engine.entities.filter( entity => !!entity.data.Constraint );
-
-                return constraints;
             }
         },
         'updateEntity': {
@@ -141,23 +117,11 @@ const PhysicsSystem = function( options ) {
         },
         'update': {
             value: function( delta ) {
-                const entities = this.getEntities();
-                const environment = this.getEnvironment();
+                const entities = this.entities.bodies();
+                const environment = this.entities.environment();
 
                 entities.forEach( entity => this.updateEntity( entity, environment ) );
                 Matter.Engine.update( engine, delta );
-            }
-        },
-        'getEnvironment': {
-            value: function() {
-                // finds the first environment entity
-                const envFinder = entity => {
-                    return !!( entity.components.find(
-                        component => component.is( Components.Name ) && component.data === 'Environment' )
-                    );
-                };
-                const environment = this.engine.entities.find( envFinder );
-                return environment;
             }
         },
         'bindEvents': {
@@ -182,6 +146,37 @@ const PhysicsSystem = function( options ) {
         }
     } );
 
+    Object.assign( system.entities, {
+        bodies() {
+            if ( !bodies ) {
+
+                bodies = system.engine.entities.filter( entity => {
+                    return entity.components.find( component => component.is( Components.Polygon ) ) ||
+                           entity.components.find( component => component.is( Components.CompoundBody ) ) ||
+                           entity.components.find( component => component.is( Components.Rectangle ) ) ||
+                           entity.components.find( component => component.is( Components.Circle ) );
+                } );
+            }
+
+            return bodies;
+        },
+        constraints() {
+            if ( !constraints )
+                constraints = system.engine.entities.filter( entity => !!entity.data.Constraint );
+
+            return constraints;
+        },
+        environment() {
+            // finds the first environment entity
+            const envFinder = entity => {
+                return !!( entity.components.find(
+                    component => component.is( Components.Name ) && component.data === 'Environment' )
+                );
+            };
+            const environment = system.engine.entities.find( envFinder );
+            return environment;
+        }
+    } );
     return system;
 }
 

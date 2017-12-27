@@ -38,7 +38,6 @@ const PlayerManagerSystem = function( options ) {
             value: function() {
                 // prototype handles `on` state and event emission
                 Object.getPrototypeOf( this ).start.call( this );
-                this.entitySources.push( 'getPlayer' );
                 this.setEntities();
                 this.registerSubscriptions();
             },
@@ -48,7 +47,7 @@ const PlayerManagerSystem = function( options ) {
             // add the forces and torque below to the plugin data of the geometry instead, have matter plugin add all together.
             // Add those forces to plugin data in message/event handler.
             value: function( delta ) {
-                const player = this.getPlayer();
+                const player = this.entities.player();
                 const geometryComponent = player.components.find( component => {
                     return component.is( Components.Polygon ) ||
                     component.is( Components.CompoundBody ) ||
@@ -88,18 +87,6 @@ const PlayerManagerSystem = function( options ) {
                 if ( Forces.torque ) {
                     geometryComponent.data.torque = Forces.torque;
                 }
-            }
-        },
-        // @TODO consolidate to something composable that render-system can also use.
-        'getPlayer': {
-            value: function() {
-                if ( !player ) {
-                    player = this.engine.entities.find( entity => {
-                        return entity.components.find( component => component.is( Components.PlayerManager ) );
-                    } );
-                }
-
-                return player;
             }
         },
         'registerSubscriptions': {
@@ -191,6 +178,19 @@ const PlayerManagerSystem = function( options ) {
                         break;
                 }
             }
+        }
+    } );
+
+    Object.assign( system.entities, {
+        // @TODO consolidate to something composable that render-system can also use.
+        player( refresh ) {
+            if ( refresh || !player ) {
+                player = system.entities.renderables().find( entity => {
+                    return entity.components.find( component => component.is( Components.PlayerManager ) );
+                } );
+            }
+
+            return player;
         }
     } );
 
