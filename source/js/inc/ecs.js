@@ -57,7 +57,11 @@ const EntityProto = Emitter( {
             const components = ComponentsMap.get( this );
 
             additions.forEach( component => {
-                components.push( component )
+                const callbacks = component.addCallbacks || [];
+                components.push( component );
+                callbacks.forEach( callback => {
+                    typeof callback === 'function' && callback( component, this )
+                } );
                 this.emit( 'component-added', component );
             } );
 
@@ -72,6 +76,12 @@ const EntityProto = Emitter( {
             subtractions.forEach( component => {
                 let index = components.indexOf( component );
                 if ( index >= 0 ) {
+                    const callbacks = component.removeCallbacks || [];
+
+                    callbacks.forEach( callback => {
+                        typeof callback === 'function' && callback.call( component, this )
+                    } );
+
                     spliced.push( components.splice( index, 1 )[ 0 ] );
                     this.emit( 'component-removed', component );
                 }
@@ -126,6 +136,7 @@ const EngineProto = Emitter( {
             additions.forEach( entity => {
                 entities.push( entity );
                 this.emit( 'entity-added', entity );
+                SystemsMap.get( this ).forEach( system => system.evaluateEntity( entity ) );
             } );
         }
     },
@@ -241,6 +252,16 @@ const System = Emitter( {
             this.started = false;
             this.emit( 'stop' );
         }
+    },
+    'setEntities': {
+        value: function() {
+            this.entitySources.forEach( ( source ) => {
+                typeof this[ source ] === 'function' && this[ source ]( true )
+            } );
+        }
+    },
+    'entitySources': {
+        value: []
     }
 } );
 
@@ -276,6 +297,12 @@ const Component = Object.create( Object.prototype, {
         value: function( proto ) {
             return Object.getPrototypeOf( this ) === proto;
         }
+    },
+    'addCallbacks': {
+        value: []
+    },
+    'removeCallbacks': {
+        value: []
     }
 } );
 
@@ -349,6 +376,11 @@ const Components = {
                 );
             },
             configurable: false
+        },
+        'addCallbacks': {
+            value: [
+                ( component, entity ) => component.data.plugin.entity = entity
+            ]
         }
     } ),
     CompoundBody: Object.create( Component, {

@@ -1,8 +1,8 @@
 "use strict";
 
 const PIXI = require( 'pixi.js' );
-// @TODO fix w/ browserify shim. https://github.com/liabru/matter-js/issues/365
 const decomp = require('poly-decomp');
+// @TODO fix w/ browserify shim. https://github.com/liabru/matter-js/issues/365
 window.decomp = decomp;
 const Matter = require( 'matter-js' );
 const VJS = require( 'virtualjoystick.js' );
@@ -13,6 +13,7 @@ const ECS = require( './ecs.js' );
 const RenderSystem = require( './render-system.js' );
 const PhysicsSystem = require( './physics-system.js' );
 const PlayerManagerSystem = require( './player-manager-system.js' );
+const UISystem = require( './ui-system.js' );
 
 const Entity = ECS.Entity;
 const Components = ECS.Components;
@@ -92,15 +93,17 @@ module.exports = function( id, view, resolution ) {
                 backgroundColor: this.getEnvironment().components.find( component => component.is( Components.Color ) ).data,
                 graphics: new PIXI.Graphics(),
                 hub: hub,
-                debug: true
+                // debug: true
             } );
             const playerManagerSystem = PlayerManagerSystem( { hub: hub } );
+            const uiSystem = UISystem( { app: App, hub: hub } );
 
-            this.engine.addSystems( playerManagerSystem, physicsSystem, renderSystem )
+            this.engine.addSystems( playerManagerSystem, physicsSystem, renderSystem, uiSystem );
 
             physicsSystem.start();
             renderSystem.start();
             playerManagerSystem.start();
+            uiSystem.start();
 
             // engine updates are trigerred by pixi ticker.
             App.ticker.add( this.engine.update.bind( this.engine ) );
@@ -186,6 +189,8 @@ module.exports = function( id, view, resolution ) {
                 );
             }
 
+            // set interactive to true. @TODO why only the above checked for?
+            skinningComponent.data.interactive = true;
             skinningComponent.data.pivot.set( skinningComponent.data.width * 0.5, skinningComponent.data.height * 0.5 );
             // @TODO geometry and visuals need to be separate in config, w/ independent scales.
             let scale = Util.property( actor.geometry, 'display.scale' );
@@ -279,6 +284,7 @@ module.exports = function( id, view, resolution ) {
                     break;
             }
 
+            // @TODO is this necessary? log something if it is?
             if ( component ) {
                 const positionComponent = entity.data.Position;
                 const rotationComponent = entity.data.Rotation;
@@ -287,8 +293,10 @@ module.exports = function( id, view, resolution ) {
                 Matter.Body.setPosition( component.data, positionComponent.data );
                 Matter.Body.setAngle( component.data, rotationComponent.data );
                 Matter.Body.scale( component.data, scaleComponent.data.x, scaleComponent.data.y );
+
                 entity.addComponents( component );
 
+                // @TODO constraints need to go in their own config structure and get their own init functions.
                 if ( actor.geometry.constraints )
                     actor.geometry.constraints.forEach( constraint => constraintQueue.push( Object.assign( { entity: entity }, constraint ) ) );
             }
@@ -372,10 +380,10 @@ function activateInputs() {
         const xDiff = this._stickX - this._baseX;
         const yDiff = this._stickY - this._baseY;
         const distance = Math.sqrt( xDiff * xDiff + yDiff * yDiff );
-        console.log( 'x: ' + this.deltaX() );
-        console.log( 'y: ' + this.deltaY() );
-        console.log( `%cangle: ${ angle }`, 'color: white; background-color: black;' );
-        console.log( `%cdistance: ${ distance }`, 'color: cyan; background-color: red;' );
+        // console.log( 'x: ' + this.deltaX() );
+        // console.log( 'y: ' + this.deltaY() );
+        // console.log( `%cangle: ${ angle }`, 'color: white; background-color: black;' );
+        // console.log( `%cdistance: ${ distance }`, 'color: cyan; background-color: red;' );
         // if ( up || down )
         //     hub.sendMessage( { type: 'player-input-thrust', data: up ? 1 * .1: -1 * .1} );
         // else
@@ -386,10 +394,14 @@ function activateInputs() {
         // else
         //     hub.sendMessage( { type: 'player-input-turn', data: 0 } );
 
-        if ( this.deltaY() )
-            hub.sendMessage( { type: 'player-input-thrust', data: 1 * .1 * -this.deltaY() / this._travelRadius } );
-        if ( this.deltaX() )
+        if ( this.deltaY() ) {
+            // console.log( 1 * .1 * -this.deltaY() / this._travelRadius )
+            hub.sendMessage( { type: 'player-input-thrust', data: 1 * .05 * -this.deltaY() / this._travelRadius } );
+        }
+        if ( this.deltaX() ) {
+            // console.log( 1 * .1 * this.deltaX() / this._travelRadius )
             hub.sendMessage( { type: 'player-input-turn', data: 1 * .2 * this.deltaX() / this._travelRadius } );
+        }
 
 //     -90
 //      |
@@ -503,10 +515,12 @@ function activateInputs() {
 
     document.getElementById( 'view' ).addEventListener( 'wheel', e => {
         // the zoom delta needs to be inverted and scaled.
-        console.log( e );
         if ( e.deltaY !== 0 )
             hub.sendMessage( { type: 'zoom', data: e.deltaY * -0.001 } );
     }, false );
+
+    // disable context clicks so PIXI can catch them
+    document.getElementById( 'view' ).addEventListener( 'contextmenu', e => e.preventDefault(), false );
 }
 
 activateInputs();

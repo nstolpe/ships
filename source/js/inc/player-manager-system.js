@@ -15,7 +15,8 @@ const Forces = {
 
 const PlayerManagerSystem = function( options ) {
     const hub = options.hub;
-
+    let player;
+    // @TODO better name. at least.
     let targetOverlaid = {
         actor: undefined,
         target: undefined,
@@ -37,6 +38,8 @@ const PlayerManagerSystem = function( options ) {
             value: function() {
                 // prototype handles `on` state and event emission
                 Object.getPrototypeOf( this ).start.call( this );
+                this.entitySources.push( 'getPlayer' );
+                this.setEntities();
                 this.registerSubscriptions();
             },
         },
@@ -45,7 +48,7 @@ const PlayerManagerSystem = function( options ) {
             // add the forces and torque below to the plugin data of the geometry instead, have matter plugin add all together.
             // Add those forces to plugin data in message/event handler.
             value: function( delta ) {
-                const player = this.getEntities()[0];
+                const player = this.getPlayer();
                 const geometryComponent = player.components.find( component => {
                     return component.is( Components.Polygon ) ||
                     component.is( Components.CompoundBody ) ||
@@ -87,12 +90,16 @@ const PlayerManagerSystem = function( options ) {
                 }
             }
         },
-        'getEntities': {
+        // @TODO consolidate to something composable that render-system can also use.
+        'getPlayer': {
             value: function() {
-                const entities = this.engine.entities.filter( entity => {
-                    return entity.components.find( component => component.is( Components.PlayerManager ) );
-                } );
-                return entities;
+                if ( !player ) {
+                    player = this.engine.entities.find( entity => {
+                        return entity.components.find( component => component.is( Components.PlayerManager ) );
+                    } );
+                }
+
+                return player;
             }
         },
         'registerSubscriptions': {

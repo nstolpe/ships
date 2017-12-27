@@ -28,6 +28,8 @@ const PhysicsSystem = function( options ) {
             value: function() {
                 // prototype handles `on` state and event emission
                 Object.getPrototypeOf( this ).start.call( this );
+                this.entitySources.push( 'getEntities', 'getEnvironment' );
+                this.setEntities();
                 const entities = this.getEntities();
                 const environment = this.getEnvironment();
 

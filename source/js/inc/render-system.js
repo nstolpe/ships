@@ -36,8 +36,8 @@ const RenderSystem = function( options ) {
             value: function() {
                 // prototype handles `on` state and event emission
                 Object.getPrototypeOf( this ).start.call( this );
-
-
+                this.entitySources.push( 'getRenderables', 'getPlayer', 'getConstraints' );
+                this.setEntities();
                 const renderables = this.getRenderables();
                 const player = this.getPlayer();
 
@@ -72,6 +72,19 @@ const RenderSystem = function( options ) {
                     }
                 }
                 App.stage.rotation = player.data.Rotation.data;
+                App.stage.interactive = true;
+                let bounds = App.stage.getBounds();
+                App.stage.hitArea = new PIXI.Rectangle( bounds.x, bounds.y, bounds.width, bounds.height );
+                App.stage.addListener( 'pointerdown', e => {
+                    if ( e.data.originalEvent.which === 3 ) {
+                        if ( e.target === e.currentTarget ) {
+                            hub.sendMessage( {
+                                type: 'touch-click',
+                                data: e.data.getLocalPosition(App.stage)
+                            } );
+                        }
+                    }
+                } );
                 // better checking?
                 if ( typeof hub === 'object' )
                     this.registerSubscriptions();
@@ -152,7 +165,7 @@ const RenderSystem = function( options ) {
 
                         switch ( Object.getPrototypeOf( geometryComponent ) ) {
                             case Components.Circle:
-                                spriteComponent.data.drawCircle( 0, 0, geometryComponent.data.circleRadius - renderable.data.Stroke.data.width );
+                                spriteComponent.data.drawCircle( 0, 0, geometryComponent.data.circleRadius - renderable.data.Stroke.data.width * 0.5 );
                                 break;
                             case Components.Rectangle:
                                 const strokeWidth = Util.property( renderable.data, 'Stroke.data.width' ) || 0;
@@ -186,8 +199,8 @@ const RenderSystem = function( options ) {
             }
         },
         'getRenderables': {
-            value: function() {
-                if ( !renderables ) {
+            value: function( refresh ) {
+                if ( refresh || !renderables ) {
                     renderables = this.engine.entities.filter( entity => {
                         return entity.data.Position &&
                                entity.data.Rotation &&
@@ -203,15 +216,16 @@ const RenderSystem = function( options ) {
             }
         },
         'getConstraints': {
-            value: function() {
-                if ( !constraints )
+            value: function( refresh ) {
+                if ( refresh || !constraints )
                     constraints = this.engine.entities.filter( entity => !!entity.data.Constraint );
                 return constraints;
             }
         },
+        // @TODO consolidate to something composable that player-manager-system can also use.
         'getPlayer': {
-            value: function() {
-                if ( !player ) {
+            value: function( refresh ) {
+                if ( refresh || !player ) {
                     player = this.getRenderables().find( entity => {
                         return entity.components.find( component => component.is( Components.PlayerManager ) );
                     } );
