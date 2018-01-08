@@ -136,8 +136,9 @@ const EngineProto = Emitter( {
             additions.forEach( entity => {
                 entities.push( entity );
                 this.emit( 'entity-added', entity );
-                SystemsMap.get( this ).forEach( system =>
-                    {system.setEntities( entity ) } );
+                SystemsMap.get( this ).forEach( system => {
+                        system.setEntities();
+                } );
             } );
         }
     },
@@ -260,7 +261,7 @@ const System = Emitter( {
     'setEntities': {
         value: function() {
             Object.keys( this.entities ).forEach( e => {
-                this.entities[ e ]();
+                this.entities[ e ]( true );
             } );
         }
     },

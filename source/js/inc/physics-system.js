@@ -29,21 +29,21 @@ const PhysicsSystem = function( options ) {
                 // prototype handles `on` state and event emission
                 Object.getPrototypeOf( this ).start.call( this );
                 this.setEntities();
-                const entities = this.entities.bodies();
+                // const bodies = this.entities.bodies();
                 const environment = this.entities.environment();
 
-                entities.forEach( entity => {
-                    const geometryComponent = entity.components.find( component => component.is( Components.Polygon ) ) ||
-                           entity.components.find( component => component.is( Components.CompoundBody ) ) ||
-                           entity.components.find( component => component.is( Components.Rectangle ) ) ||
-                           entity.components.find( component => component.is( Components.Circle ) );
+                // bodies.forEach( entity => {
+                //     const geometryComponent = entity.components.find( component => component.is( Components.Polygon ) ) ||
+                //            entity.components.find( component => component.is( Components.CompoundBody ) ) ||
+                //            entity.components.find( component => component.is( Components.Rectangle ) ) ||
+                //            entity.components.find( component => component.is( Components.Circle ) );
 
-                    // prevents compound children from being added.
-                    if ( !entity.components.find( component => component.is( Components.Parent ) ) )
-                        Matter.World.add( engine.world, [ geometryComponent.data ] );
+                //     // prevents compound children from being added.
+                //     if ( !entity.components.find( component => component.is( Components.Parent ) ) )
+                //         Matter.World.add( engine.world, [ geometryComponent.data ] );
 
-                    this.updateEntity( entity, environment );
-                } );
+                //     this.updateEntity( entity, environment );
+                // } );
 
                 const constraintEntities = this.entities.constraints();
 
@@ -147,26 +147,84 @@ const PhysicsSystem = function( options ) {
     } );
 
     Object.assign( system.entities, {
-        bodies() {
+        bodies( refresh ) {
+            const environment = system.entities.environment();
             if ( !bodies ) {
-
                 bodies = system.engine.entities.filter( entity => {
                     return entity.components.find( component => component.is( Components.Polygon ) ) ||
                            entity.components.find( component => component.is( Components.CompoundBody ) ) ||
                            entity.components.find( component => component.is( Components.Rectangle ) ) ||
                            entity.components.find( component => component.is( Components.Circle ) );
                 } );
+
+                bodies.forEach( entity => {
+                    const geometryComponent = entity.components.find( component => component.is( Components.Polygon ) ) ||
+                           entity.components.find( component => component.is( Components.CompoundBody ) ) ||
+                           entity.components.find( component => component.is( Components.Rectangle ) ) ||
+                           entity.components.find( component => component.is( Components.Circle ) );
+
+                    // prevents compound children from being added.
+                    if ( !entity.components.find( component => component.is( Components.Parent ) ) )
+                        Matter.World.add( engine.world, [ geometryComponent.data ] );
+
+                    system.updateEntity( entity, environment );
+                } );
+            } else if ( refresh ) {
+                const refreshed = system.engine.entities.filter( entity => {
+                    return entity.components.find( component => component.is( Components.Polygon ) ) ||
+                           entity.components.find( component => component.is( Components.CompoundBody ) ) ||
+                           entity.components.find( component => component.is( Components.Rectangle ) ) ||
+                           entity.components.find( component => component.is( Components.Circle ) );
+                } );
+
+                refreshed.forEach( body => {
+                    if ( bodies.indexOf( body ) < 0 ) {
+                        const geometryComponent = body.components.find( component => component.is( Components.Polygon ) ) ||
+                           body.components.find( component => component.is( Components.CompoundBody ) ) ||
+                           body.components.find( component => component.is( Components.Rectangle ) ) ||
+                           body.components.find( component => component.is( Components.Circle ) );
+
+                        Matter.Body.setPosition( geometryComponent.data, body.data.Position.data );
+                        Matter.Body.setAngle( geometryComponent.data, body.data.Rotation.data );
+                        Matter.Body.scale( geometryComponent.data, body.data.Scale.data.x, body.data.Scale.data.y );
+                        // prevents compound children from being added.
+                        if ( !body.components.find( component => component.is( Components.Parent ) ) )
+                            Matter.World.add( engine.world, [ geometryComponent.data ] );
+
+                        system.updateEntity( body, environment );
+                    }
+                } );
+
+                bodies.forEach( body => {
+                    if ( refreshed.indexOf( body ) < 0 ) {
+                        const geometryComponent = body.components.find( component => component.is( Components.Polygon ) ) ||
+                           body.components.find( component => component.is( Components.CompoundBody ) ) ||
+                           body.components.find( component => component.is( Components.Rectangle ) ) ||
+                           body.components.find( component => component.is( Components.Circle ) );
+
+                        // prevents compound children from being removed.
+                        if ( !body.components.find( component => component.is( Components.Parent ) ) )
+                            Matter.World.remove( engine.world, [ geometryComponent.data ], true );
+
+                        this.updateEntity( body, environment );
+                    }
+                } );
+
+                bodies = refreshed;
             }
 
             return bodies;
         },
-        constraints() {
-            if ( !constraints )
+        constraints( refresh ) {
+            if ( !constraints ) {
                 constraints = system.engine.entities.filter( entity => !!entity.data.Constraint );
+            } else if ( refresh ) {
+                const refreshed = system.engine.entities.filter( entity => !!entity.data.Constraint );
+            }
 
             return constraints;
         },
-        environment() {
+        environment( refresh ) {
             // finds the first environment entity
             const envFinder = entity => {
                 return !!( entity.components.find(

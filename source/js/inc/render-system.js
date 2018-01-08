@@ -45,22 +45,24 @@ const RenderSystem = function( options ) {
                 // `compound` visuals will work as they'll be individual components
                 renderables.forEach( renderable => {
                     // @TODO better entity api
-                    const spriteComponent = renderable.data.Container ||
-                        renderable.data.Sprite ||
-                        renderable.data.Graphics ||
-                        renderable.data.TilingSprite;
+                    // const spriteComponent = renderable.data.Container ||
+                    //     renderable.data.Sprite ||
+                    //     renderable.data.Graphics ||
+                    //     renderable.data.TilingSprite;
 
-                    // spriteComponent.data.pivot.set( spriteComponent.data.width * 0.5, spriteComponent.data.height * 0.5 );
+                    // // spriteComponent.data.pivot.set( spriteComponent.data.width * 0.5, spriteComponent.data.height * 0.5 );
 
-                    if ( !renderable.components.find( component => component.is( Components.Parent ) ) )
-                        this.updateRenderable( renderable );
+                    // if ( !renderable.components.find( component => component.is( Components.Parent ) ) )
+                    //     this.updateRenderable( renderable );
 
-                    App.stage.addChild( spriteComponent.data );
+                    // App.stage.addChild( spriteComponent.data );
                 } );
 
                 App.stage.addChild( graphics );
 
                 // Set stage to player position
+                // @TODO this should happen somewhere else, won't always use player. callback?
+                // also needs to be reused at other times...resize at least
                 if ( player ) {
                     const positionComponent = player.components.find( component => component.is( Components.Position ) );
                     if ( positionComponent ) {
@@ -75,11 +77,19 @@ const RenderSystem = function( options ) {
                 let bounds = App.stage.getBounds();
                 App.stage.hitArea = new PIXI.Rectangle( bounds.x, bounds.y, bounds.width, bounds.height );
                 App.stage.addListener( 'pointerdown', e => {
+                    console.log( 'pointerdown ' + e.data.originalEvent.which );
                     if ( e.data.originalEvent.which === 3 ) {
                         if ( e.target === e.currentTarget ) {
+                            const bounds = e.data.originalEvent.target.getBoundingClientRect();
                             hub.sendMessage( {
                                 type: 'touch-click',
-                                data: e.data.getLocalPosition(App.stage)
+                                data: {
+                                    render: e.data.getLocalPosition( App.stage ),
+                                    ui: {
+                                        x: e.data.originalEvent.clientX - bounds.left,
+                                        y: e.data.originalEvent.clientY - bounds.top
+                                    }
+                                }
                             } );
                         }
                     }
@@ -102,6 +112,17 @@ const RenderSystem = function( options ) {
                         App.view.clientWidth * App.renderer.resolution,
                         App.view.clientHeight * App.renderer.resolution
                     );
+                    // @TODO as above in `start()`, this should be configurable and should be
+                    // broken out for reuse.
+                    if ( this.entities.player() ) {
+                        const positionComponent = this.entities.player().data.Position;
+                        if ( positionComponent ) {
+                            App.stage.position.x = ( App.renderer.width / App.renderer.resolution ) / 2;
+                            App.stage.position.y = ( App.renderer.height / App.renderer.resolution ) / 2;
+                            App.stage.pivot.x = positionComponent.data.x;
+                            App.stage.pivot.y = positionComponent.data.y;
+                        }
+                    }
                 }
             }
         },
@@ -335,7 +356,7 @@ const RenderSystem = function( options ) {
     // attach entity getter functions here.
     Object.assign( system.entities, {
         renderables( refresh ) {
-            if ( refresh || !renderables ) {
+            if ( !renderables ) {
                 renderables = system.engine.entities.filter( entity => {
                     return entity.data.Position &&
                            entity.data.Rotation &&
@@ -345,6 +366,58 @@ const RenderSystem = function( options ) {
                              entity.data.TilingSprite ||
                              entity.data.Graphics );
                 } );
+
+                renderables.forEach( renderable => {
+                    const spriteComponent = renderable.data.Container ||
+                        renderable.data.Sprite ||
+                        renderable.data.Graphics ||
+                        renderable.data.TilingSprite;
+
+                    if ( !renderable.components.find( component => component.is( Components.Parent ) ) )
+                        system.updateRenderable( renderable );
+
+                    App.stage.addChild( spriteComponent.data );
+                } );
+            } else if ( refresh ) {
+                const refreshed = system.engine.entities.filter( entity => {
+                    return entity.data.Position &&
+                           entity.data.Rotation &&
+                           entity.data.Scale &&
+                           ( entity.data.Container ||
+                             entity.data.Sprite ||
+                             entity.data.TilingSprite ||
+                             entity.data.Graphics );
+                } );
+
+                refreshed.forEach( ref => {
+                    if ( renderables.indexOf( ref ) < 0 ) {
+                        const spriteComponent = ref.data.Container ||
+                            ref.data.Sprite ||
+                            ref.data.Graphics ||
+                            ref.data.TilingSprite;
+
+                        if ( !ref.components.find( component => component.is( Components.Parent ) ) )
+                            system.updateRenderable( ref );
+
+                        App.stage.addChild( spriteComponent.data );
+                    }
+                } );
+
+                renderables.forEach( renderable => {
+                    if ( refreshed.indexOf( renderable ) < 0 ) {
+                        const spriteComponent = renderable.data.Container ||
+                            renderable.data.Sprite ||
+                            renderable.data.Graphics ||
+                            renderable.data.TilingSprite;
+
+                        if ( !renderable.components.find( component => component.is( Components.Parent ) ) )
+                            system.updateRenderable( renderable );
+
+                        App.stage.removeChild( spriteComponent.data );
+                    }
+                } );
+
+                renderables = refreshed;
             }
 
             return renderables;
