@@ -521,6 +521,7 @@ function activateInputs() {
 
     // disable context clicks so PIXI can catch them
     document.getElementById( 'view' ).addEventListener( 'contextmenu', e => e.preventDefault(), false );
+    document.getElementById( 'view-wrapper' ).addEventListener( 'contextmenu', e => e.preventDefault(), false );
 }
 
 activateInputs();
