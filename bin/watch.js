@@ -50,7 +50,8 @@ chokidar.watch( jsPath + '*.js', {
  * On change, parses through all files in `jsPath` directory (default: `source/js`), matches
  * calls to `require()`, looks for the file name inside them, and recompiles the files under `jsPath`.
  */
-chokidar.watch( jsPath + 'inc/*.js', {
+// chokidar.watch( jsPath + 'inc/*.js', {
+chokidar.watch( jsPath + 'inc/', {
 		ignored: /(^|[\/\\])\../
 	} )
 	.on( 'change', function( filePath ) {
@@ -68,7 +69,7 @@ chokidar.watch( jsPath + 'inc/*.js', {
 		for ( let i = 0, l = scripts.length; i < l; i++ ) {
 			// contents of one of the javascript files under `jsPath`
 			let fileText = fs.readFileSync( jsPath + scripts[ i ], 'utf8' );
-			
+
 			// match each `require( '...' )` statement
 			// but first this, otherwise the exec doesn't get all matches? @TODO Fix. Text matches in Node CLI and Chrome browser console.
 			fileText.match( reqRx );
@@ -91,13 +92,13 @@ chokidar.watch( jsPath + 'inc/*.js', {
 					console.log( `recompiling \`${ jsBuildPath + scripts[ i ] }\` due to changes to \`${ filePath }\`` );
 
 					proc.on( 'close', code => {
-						if ( code === 1 ) 
+						if ( code === 1 )
 							console.error( `✖ "browserify ${ filePath } -o ${ jsBuildPath + fileName }" failed` );
 						else
 							console.log( 'Watching scripts...' );
 					} );
 
-					// no need to keep looking after one has been matched, recompiling the top level will 
+					// no need to keep looking after one has been matched, recompiling the top level will
 					// pull in changes of included files
 					break;
 				}
@@ -109,7 +110,11 @@ chokidar.watch( jsPath + 'inc/*.js', {
  * watches source/images for changes and copies them to imageBuildPath
  */
 chokidar.watch( imagePath, {
-		ignored: /(^|[\/\\])\../
+		ignored: /(^|[\/\\])\../,
+			awaitWriteFinish: {
+				stabilityThreshold: 2000,
+				pollInterval: 100,
+			},
 	} )
 	.on( 'change', function( filePath ) {
 		console.log( filePath );
@@ -131,7 +136,11 @@ chokidar.watch( imagePath, {
  * Watches the `spriteSheetPath` (default: 'source/spritesheets') for changes
  */
 chokidar.watch( spritesheetPath, {
-		ignored: /(^|[\/\\])\../
+		ignored: /(^|[\/\\])\../,
+		awaitWriteFinish: {
+			stabilityThreshold: 2000,
+			pollInterval: 100,
+		},
 	} )
 	.on( 'change', function( filePath ) {
 		const proc = spawn( 'cp', [ filePath, spritesheetBuildPath ], {
