@@ -81,4 +81,16 @@ draw( ctx, [ {
     31,
     203,
     255
-] )
+] );
+
+function drawGL() {
+    const canvas = document.getElementById('view');
+    let gl = canvas.getContext('webgl');
+
+    if (!gl)
+        return console.log('Unable to intialize WebGL.');
+
+    gl.clearColor(0.0, 0.0, 0.0, 1.0);
+    gl.clear(gl.COLOR_BUFFER_BIT);
+}
+
