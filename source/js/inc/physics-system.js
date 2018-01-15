@@ -151,17 +151,18 @@ const PhysicsSystem = function( options ) {
             const environment = system.entities.environment();
             if ( !bodies ) {
                 bodies = system.engine.entities.filter( entity => {
-                    return entity.components.find( component => component.is( Components.Polygon ) ) ||
-                           entity.components.find( component => component.is( Components.CompoundBody ) ) ||
-                           entity.components.find( component => component.is( Components.Rectangle ) ) ||
-                           entity.components.find( component => component.is( Components.Circle ) );
+                    return entity.data.Polygon ||
+                        entity.data.CompoundBody ||
+                        entity.data.Rectangle ||
+                        entity.data.Circle;
                 } );
 
                 bodies.forEach( entity => {
-                    const geometryComponent = entity.components.find( component => component.is( Components.Polygon ) ) ||
-                           entity.components.find( component => component.is( Components.CompoundBody ) ) ||
-                           entity.components.find( component => component.is( Components.Rectangle ) ) ||
-                           entity.components.find( component => component.is( Components.Circle ) );
+                    const geometryComponent =
+                        entity.data.Polygon ||
+                        entity.data.CompoundBody ||
+                        entity.data.Rectangle ||
+                        entity.data.Circle;
 
                     // prevents compound children from being added.
                     if ( !entity.components.find( component => component.is( Components.Parent ) ) )
@@ -171,24 +172,24 @@ const PhysicsSystem = function( options ) {
                 } );
             } else if ( refresh ) {
                 const refreshed = system.engine.entities.filter( entity => {
-                    return entity.components.find( component => component.is( Components.Polygon ) ) ||
-                           entity.components.find( component => component.is( Components.CompoundBody ) ) ||
-                           entity.components.find( component => component.is( Components.Rectangle ) ) ||
-                           entity.components.find( component => component.is( Components.Circle ) );
+                    return entity.data.Polygon ||
+                        entity.data.CompoundBody ||
+                        entity.data.Rectangle ||
+                        entity.data.Circle;
                 } );
 
                 refreshed.forEach( body => {
                     if ( bodies.indexOf( body ) < 0 ) {
-                        const geometryComponent = body.components.find( component => component.is( Components.Polygon ) ) ||
-                           body.components.find( component => component.is( Components.CompoundBody ) ) ||
-                           body.components.find( component => component.is( Components.Rectangle ) ) ||
-                           body.components.find( component => component.is( Components.Circle ) );
+                        const geometryComponent = body.data.Polygon ||
+                            body.data.CompoundBody ||
+                            body.data.Rectangle ||
+                            body.data.Circle;
 
                         Matter.Body.setPosition( geometryComponent.data, body.data.Position.data );
                         Matter.Body.setAngle( geometryComponent.data, body.data.Rotation.data );
                         Matter.Body.scale( geometryComponent.data, body.data.Scale.data.x, body.data.Scale.data.y );
                         // prevents compound children from being added.
-                        if ( !body.components.find( component => component.is( Components.Parent ) ) )
+                        if ( !body.data.Parent )
                             Matter.World.add( engine.world, [ geometryComponent.data ] );
 
                         system.updateEntity( body, environment );
@@ -197,13 +198,13 @@ const PhysicsSystem = function( options ) {
 
                 bodies.forEach( body => {
                     if ( refreshed.indexOf( body ) < 0 ) {
-                        const geometryComponent = body.components.find( component => component.is( Components.Polygon ) ) ||
-                           body.components.find( component => component.is( Components.CompoundBody ) ) ||
-                           body.components.find( component => component.is( Components.Rectangle ) ) ||
-                           body.components.find( component => component.is( Components.Circle ) );
+                        const geometryComponent = body.data.Polygon ||
+                            body.data.CompoundBody ||
+                            body.data.Rectangle ||
+                            body.data.Circle;
 
                         // prevents compound children from being removed.
-                        if ( !body.components.find( component => component.is( Components.Parent ) ) )
+                        if ( !body.data.Parent )
                             Matter.World.remove( engine.world, [ geometryComponent.data ], true );
 
                         this.updateEntity( body, environment );
