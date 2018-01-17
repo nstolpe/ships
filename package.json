@@ -16,7 +16,6 @@
   "author": "nils",
   "license": "ISC",
   "dependencies": {
-    "browserify": "^14.4.0",
     "eventemitter3": "^2.0.3",
     "express": "^4.14.0",
     "express-handlebars": "^3.0.0",
@@ -27,11 +26,21 @@
     "pixi-particles": "^2.1.5",
     "pixi.js": "^4.3.5",
     "poly-decomp": "^0.2.1",
+    "react": "^16.2.0",
+    "react-dom": "^16.2.0",
     "turms": "^0.1.1",
     "virtualjoystick.js": "file:../virtualjoystick.js"
   },
   "devDependencies": {
+    "browserify": "^14.4.0",
+    "browserify-shim": "^3.8.14",
     "chokidar": "^1.6.1"
+  },
+  "browserify": {
+    "transform": [ "browserify-shim" ]
+  },
+  "browserify-shim": {
+    "./node_modules/poly-decomp": "poly-decomp"
   },
   "false": {}
 }
