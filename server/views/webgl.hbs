@@ -1,0 +1,85 @@
+<!doctype html>
+
+<html>
+	<head>
+		<title>Canvas Ship</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<style media="screen" type="text/css">
+			* { margin: 0; padding: 0; }
+			html, body { height: 100%; font-size: 0; }
+			.view-wrapper {
+				display: inline-block;
+				width: 100%;
+				height: 100%;
+			}
+			.view {
+				width: 100%;
+				height: 100%;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="view-wrapper" class="view-wrapper">
+			<canvas id="view" tabindex="1" class="view"></canvas>
+		</div>
+		<script>
+			const canvas = document.getElementById('view');
+			let gl = canvas.getContext('webgl');
+
+			if (!gl)
+				throw new Error('Unable to intialize WebGL.');
+
+			gl.clearColor(0.0, 0.0, 0.0, 1.0);
+			gl.clear(gl.COLOR_BUFFER_BIT);
+
+			const shaderSource = {
+				vertex:
+					`attribute vec4 aVertexPosition;
+
+					uniform mat4 uModelViewMatrix;
+					uniform mat4 uProjectionMatrix;
+
+					void main() {
+						gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
+					}`,
+				fragment:
+					`void main() {
+						gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+					}`
+			};
+
+			const ShaderProgram = function(context, source) {
+				const loadShader = function(context, type, source) {
+					const shader = gl.createShader(type);
+					gl.shaderSource(shader, source);
+					gl.compileShader(shader);
+
+					if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+						consolt.log('An error occurred compiling the shaders: ' + gl.getShaderInfoLog(shader));
+						gl.deleteShader(shader);
+						return null;
+					}
+
+					return shader;
+				};
+
+				const vertexShader = loadShader(gl, gl.VERTEX_SHADER, source.vertex);
+				const fragmentShader = loadShader(gl, gl.FRAGMENT_SHADER, source.fragment);
+				const shaderProgram = gl.createProgram();
+				gl.attachShader(shaderProgram, vertexShader);
+				gl.attachShader(shaderProgram, fragmentShader);
+				gl.linkProgram(shaderProgram);
+
+				if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
+					console.log('Unable to initialize the shader program: ' + gl.getProgramInfoLog(shaderProgram));
+					return null;
+				}
+
+				return shaderProgram;
+			};
+
+			const shaderProgram = ShaderProgram(gl, shaderSource);
+			// drawGL();
+		</script>
+	</body>
+</html>
