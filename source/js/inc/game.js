@@ -3,7 +3,7 @@
 const PIXI = require( 'pixi.js' );
 const decomp = require('poly-decomp');
 // @TODO fix w/ browserify shim. https://github.com/liabru/matter-js/issues/365
-window.decomp = decomp;
+// window.decomp = decomp;
 const Matter = require( 'matter-js' );
 const VJS = require( 'virtualjoystick.js' );
 window.VJS = VJS;
@@ -13,7 +13,7 @@ const ECS = require( './ecs.js' );
 const RenderSystem = require( './render-system.js' );
 const PhysicsSystem = require( './physics-system.js' );
 const PlayerManagerSystem = require( './player-manager-system.js' );
-const UISystem = require( './ui-system.js' );
+const UIController = require( './ui-controller.js' );
 
 const Entity = ECS.Entity;
 const Components = ECS.Components;
@@ -96,14 +96,15 @@ module.exports = function( id, view, resolution ) {
                 // debug: true
             } );
             const playerManagerSystem = PlayerManagerSystem( { hub: hub } );
-            const uiSystem = UISystem( { app: App, hub: hub } );
+            const uiController = UIController( { app: App, hub: hub } );
 
-            this.engine.addSystems( playerManagerSystem, physicsSystem, renderSystem, uiSystem );
+            this.engine.addSystems( playerManagerSystem, physicsSystem, renderSystem );
 
             physicsSystem.start();
             renderSystem.start();
             playerManagerSystem.start();
-            uiSystem.start();
+
+            uiController.init();
 
             // engine updates are trigerred by pixi ticker.
             App.ticker.add( this.engine.update.bind( this.engine ) );
