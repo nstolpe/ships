@@ -26,15 +26,56 @@ const UIController = function(options) {
         'init': {
             value: function() {
                 this.registerSubscriptions();
-                // ReactDOM.render(
-                //   <App />,
-                //   wrapper
-                // );
+                // draw some react debug ui stuff.
             }
         },
         'registerSubscriptions': {
             value: function() {
                 hub.addSubscription(this, 'touch-click');
+            }
+        },
+        'openMenu': {
+            value: function(x, y) {
+                let menu = document.getElementById('menu');
+                let left = x;
+                let top = y;
+
+                if (menu) {
+
+                } else {
+                    menu = document.createElement('div');
+                    menu.id = 'menu';
+                    menu.style.backgroundColor = '#ffffff';
+                    menu.style.position = 'absolute';
+                    menu.style.fontSize = '14px';
+                    wrapper.appendChild(menu);
+                }
+
+
+                if (left + parseInt(getComputedStyle(menu).width, 10) > parseInt( getComputedStyle(wrapper).width, 10))
+                    left = parseInt(getComputedStyle(wrapper).width, 10) - parseInt( getComputedStyle(menu).width, 10);
+                if (top + parseInt(getComputedStyle(menu).height, 10) > parseInt( getComputedStyle(wrapper).height, 10))
+                    top = parseInt(getComputedStyle(wrapper).height, 10) - parseInt( getComputedStyle(menu).height, 10);
+                menu.style.left = left + 'px';
+                menu.style.top = top + 'px';
+                ReactDOM.render(
+                  <ul className="menu">
+                    <li>
+                        <li>create</li>
+                        <li>
+                            <a href="#" onClick={ (e) => console.log('circle') }>circle</a>
+                        </li>
+                        <li>
+                            <a href="#" onClick={ (e) => console.log('rectangle') }>rectangle</a>
+                        </li>
+                        <li>
+                            <a href="#" onClick={ (e) => console.log('polygon') }>polygon</a>
+                        </li>
+                    </li>
+                    <li>two</li>
+                  </ul>,
+                  menu
+                );
             }
         },
         'receiveMessage': {
@@ -53,25 +94,7 @@ const UIController = function(options) {
                         //     ECS.Components.Alpha.create( 1 ),
                         //     ECS.Components.Tint.create( 0xffffff ),
                         // ) );
-                        const menu = document.getElementById('menu') || (() => {
-                            const menu = document.createElement('div');
-                            menu.id = 'menu';
-                            menu.style.width = '100px';
-                            menu.style.height = '100px';
-                            menu.style.backgroundColor = '#ffffff';
-                            menu.style.position = 'absolute';
-                            return menu;
-                        })();
-
-                        let left = message.data.ui.x;
-                        let top = message.data.ui.y;
-                        if (left + parseInt(getComputedStyle(menu).width, 10) > parseInt( getComputedStyle(wrapper).width, 10))
-                            left = parseInt(getComputedStyle(wrapper).width, 10) - parseInt( getComputedStyle(menu).width, 10);
-                        if (top + parseInt(getComputedStyle(menu).height, 10) > parseInt( getComputedStyle(wrapper).height, 10))
-                            top = parseInt(getComputedStyle(wrapper).height, 10) - parseInt( getComputedStyle(menu).height, 10);
-                        menu.style.left = left + 'px';
-                        menu.style.top = top + 'px';
-                        wrapper.appendChild(menu);
+                        this.openMenu(message.data.ui.x, message.data.ui.y);
                         console.log('touch-click from uisystem');
                         break;
                     default:

@@ -1,12 +1,11 @@
 "use strict";
 
 const PIXI = require( 'pixi.js' );
+// matter needs `poly-decomp` attached to window or global as decomp
 const decomp = require('poly-decomp');
-// @TODO fix w/ browserify shim. https://github.com/liabru/matter-js/issues/365
-// window.decomp = decomp;
+window.decomp = decomp;
 const Matter = require( 'matter-js' );
 const VJS = require( 'virtualjoystick.js' );
-window.VJS = VJS;
 const Turms = require( 'turms' );
 const Util = require( './util.js' );
 const ECS = require( './ecs.js' );
