@@ -1,23 +1,20 @@
 "use strict";
 
-const PIXI = require( 'pixi.js' );
-// matter needs `poly-decomp` attached to window or global as decomp
-const decomp = require('poly-decomp');
+import * as PIXI from 'pixi.js';
+// matter-js needs `poly-decomp` attached to window or global as decomp
+import * as decomp from 'poly-decomp';
 window.decomp = decomp;
-const Matter = require( 'matter-js' );
-const VJS = require( 'virtualjoystick.js' );
-const Turms = require( 'turms' );
-const Util = require( './util.js' );
-const ECS = require( './ecs.js' );
-const RenderSystem = require( './render-system.js' );
-const PhysicsSystem = require( './physics-system.js' );
-const PlayerManagerSystem = require( './player-manager-system.js' );
-const UIController = require( './ui-controller.js' );
+import * as Matter from 'matter-js';
+import VJS from 'virtualjoystick.js';
+import * as Util from './util.js';
+import RenderSystem from './render-system.js';
+import PhysicsSystem from './physics-system.js';
+import PlayerManagerSystem from './player-manager-system.js';
+import ScreenManager from './screen-manager.js';
+import { Hub } from 'turms';
+import { Entity, Components, Engine } from './ecs.js';
 
-const Entity = ECS.Entity;
-const Components = ECS.Components;
-const Engine = ECS.Engine;
-const hub = Turms.Hub();
+const hub = Hub();
 
 const defaultConfig = {
     spritesheets: [],
@@ -30,38 +27,54 @@ const defaultConfig = {
 
 const constraintQueue = [];
 
-module.exports = function( id, view, resolution ) {
+// options: {
+//   id,
+//   viewAttributes: { clasName, id, style}
+//   wrapper,
+//   resolution,
+// }
+module.exports = function(options) {
     let defaultMatter = Matter.Body.create();
 
-    const App = new PIXI.Application(
-        view.clientWidth * resolution,
-        view.clientHeight * resolution,
-        {
-            view: view,
-            resolution: resolution,
-            autoresize: true
-        }
-    );
     return {
-        id: id,
-        view: view,
-        resolution: resolution,
+        id: options.id,
+        app: null,
+        view: null,
+        resolution: options.resolution,
         dataPath: 'assets/data',
         config: defaultConfig,
         engine: Engine(),
         loader: PIXI.loader,
+        screenManager: null,
         spritesheetTemplate: filename => {
-            return `assets/spritesheets/${ filename }.json`;
+            return `assets/spritesheets/${filename}.json`;
         },
         spritesheetKey: filename => {
-            return `spritesheets::${ filename }`;
+            return `spritesheets::${filename}`;
         },
         load() {
+            this.preLoad();
             this.loader
-                .add( 'config', `${ this.dataPath }/${ this.id }.json` )
-                .load( this.loadResources.bind( this ) );
+                .add('config', `${this.dataPath}/${this.id}.json`)
+                .load(this.loadResources.bind(this));
 
             return this;
+        },
+        preLoad() {
+            const screenManager = ScreenManager(Object.assign({ hub: hub, debug: false }, options)).init();
+            const view = screenManager.view;
+
+            this.screenManager = screenManager;
+
+            this.app = new PIXI.Application(
+                view.clientWidth * this.resolution,
+                view.clientHeight * this.resolution,
+                {
+                    view,
+                    resolution: this.resolution,
+                    autoresize: true
+                }
+            );
         },
         /**
          * Loads all of the resources from a config.
@@ -70,43 +83,39 @@ module.exports = function( id, view, resolution ) {
             const loader = this.loader;
             const config = loader.resources.config;
             // store incoming config
-            Object.assign( this.config, config.data );
+            Object.assign(this.config, config.data);
 
             // queue all sprite sheets for loading.
             // @TODO add other resources (sounds, etc) here once ready.
-            this.config[ 'spritesheets' ].forEach( ( e, i, a ) => {
-                this.loader.add( this.spritesheetKey( e ), this.spritesheetTemplate( e ) );
-            } );
+            this.config['spritesheets'].forEach((e, i, a) => {
+                this.loader.add(this.spritesheetKey(e), this.spritesheetTemplate(e));
+            });
 
             // load everything
-            this.loader.load( this.postLoad.bind( this ) );
+            this.loader.load(this.postLoad.bind(this));
         },
         postLoad() {
             this.loadEnvironment();
-            this.loadActors( this.config.actors );
+            this.loadActors(this.config.actors);
             this.loadConstraints();
-
-            const physicsSystem = PhysicsSystem( { hub: hub } );
-            const renderSystem = RenderSystem( {
-                app: App,
-                backgroundColor: this.getEnvironment().components.find( component => component.is( Components.Color ) ).data,
+            const physicsSystem = PhysicsSystem({ hub: hub });
+            const renderSystem = RenderSystem({
+                app: this.app,
+                backgroundColor: this.getEnvironment().components.find(component => component.is(Components.Color)).data,
                 graphics: new PIXI.Graphics(),
                 hub: hub,
                 // debug: true
             } );
-            const playerManagerSystem = PlayerManagerSystem( { hub: hub } );
-            const uiController = UIController( { app: App, hub: hub } );
+            const playerManagerSystem = PlayerManagerSystem({ hub: hub });
 
-            this.engine.addSystems( playerManagerSystem, physicsSystem, renderSystem );
+            this.engine.addSystems(playerManagerSystem, physicsSystem, renderSystem);
 
             physicsSystem.start();
             renderSystem.start();
             playerManagerSystem.start();
 
-            uiController.init();
-
             // engine updates are trigerred by pixi ticker.
-            App.ticker.add( this.engine.update.bind( this.engine ) );
+            this.app.ticker.add( this.engine.update.bind( this.engine ) );
         },
         getEnvironment() {
             // finds the first environment entity
@@ -354,7 +363,7 @@ module.exports = function( id, view, resolution ) {
 
             this.engine.addEntities( entity );
         }
-    }
+    };
 }
 
 // @TODO move this out. parameterize selectors
