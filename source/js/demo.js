@@ -10,10 +10,6 @@ const env = Object.assign({
 
 const game = Game({
     id: env.id,
-    viewAttributes: {
-        id: 'view',
-        className: 'view',
-    },
-    wrapperSelector: '#view-wrapper',
+    element: document.getElementById('game'),
     resolution: window.devicePixelRatio
 }).load();

@@ -1,9 +1,7 @@
 "use strict";
 
 import * as PIXI from 'pixi.js';
-// matter-js needs `poly-decomp` attached to window or global as decomp
 import * as decomp from 'poly-decomp';
-window.decomp = decomp;
 import * as Matter from 'matter-js';
 import VJS from 'virtualjoystick.js';
 import * as Util from './util.js';
@@ -13,6 +11,9 @@ import PlayerManagerSystem from './player-manager-system.js';
 import ScreenManager from './screen-manager.js';
 import { Hub } from 'turms';
 import { Entity, Components, Engine } from './ecs.js';
+
+// matter-js needs `poly-decomp` attached to window or global as decomp
+window.decomp = decomp;
 
 const hub = Hub();
 
@@ -38,6 +39,7 @@ module.exports = function(options) {
 
     return {
         id: options.id,
+        element: options.element,
         app: null,
         view: null,
         resolution: options.resolution,
@@ -61,20 +63,23 @@ module.exports = function(options) {
             return this;
         },
         preLoad() {
-            const screenManager = ScreenManager(Object.assign({ hub: hub, debug: false }, options)).init();
-            const view = screenManager.view;
-
-            this.screenManager = screenManager;
-
+            this.element.innerHTML = '';
+            this.view = document.createElement('canvas');
+            this.view.className = 'view';
+            this.view.id = 'view';
+            this.view.tabIndex = 0;
+            this.element.appendChild(this.view);
             this.app = new PIXI.Application(
-                view.clientWidth * this.resolution,
-                view.clientHeight * this.resolution,
+                this.view.clientWidth * this.resolution,
+                this.view.clientHeight * this.resolution,
                 {
-                    view,
+                    view: this.view,
                     resolution: this.resolution,
                     autoresize: true
                 }
             );
+
+            this.screenManager = ScreenManager(Object.assign({ hub: hub, app: this.app, debug: false }, options)).init();
         },
         /**
          * Loads all of the resources from a config.
@@ -95,6 +100,7 @@ module.exports = function(options) {
             this.loader.load(this.postLoad.bind(this));
         },
         postLoad() {
+            activateInputs();
             this.loadEnvironment();
             this.loadActors(this.config.actors);
             this.loadConstraints();
@@ -370,7 +376,7 @@ module.exports = function(options) {
 function activateInputs() {
     const touchJoystick = Object.create( VJS.prototype );
     VJS.call( touchJoystick, {
-        container: document.getElementById( 'view-wrapper' ),
+        container: document.getElementById('screen'),
         limitStickTravel: true,
         stickRadius: 20,
         baseRadius: 40,
@@ -530,7 +536,5 @@ function activateInputs() {
 
     // disable context clicks so PIXI can catch them
     document.getElementById( 'view' ).addEventListener( 'contextmenu', e => e.preventDefault(), false );
-    document.getElementById( 'view-wrapper' ).addEventListener( 'contextmenu', e => e.preventDefault(), false );
+    document.getElementById( 'game' ).addEventListener( 'contextmenu', e => e.preventDefault(), false );
 }
-
-activateInputs();
