@@ -8,22 +8,6 @@ import { Stage, Graphics, render, Text } from "react-pixi-fiber";
 import PropTypes from "prop-types";
 
 //@TODO get this out of here
-class Screen extends Stage {
-    render() {
-        const defaultStyle = {
-            width: '100%',
-            height: '100%',
-        };
-        const screenStyle = Object.assign(defaultStyle, this.props.screenStyle);
-        const viewStyle = Object.assign(defaultStyle, this.props.viewStyle);
-        return (
-            <div className={this.props.screenClass || 'screen'} style={screenStyle}>
-                <canvas style={viewStyle} className={this.props.viewClass || 'view'} ref={ref => (this._canvas = ref)}/>
-            </div>
-        );
-    }
-}
-
 /**
  * @param {object}  options                  Key/value set of options
  * @param {object}  options.hub              Turms.Hub instance
