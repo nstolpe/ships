@@ -49,12 +49,12 @@ class Thirixarax extends React.Component {
         graphics.beginFill(0x00ff00);
         graphics.drawRect(100, 100, 50, 50);
         graphics.endFill();
-        setInterval(() => {
-            graphics.y++;
-            graphics.x++;
-            sprite.y += 5;
-            sprite.x += 5;
-        }, 200);
+        this.app.ticker.add( delta => {
+            graphics.x += delta;
+            graphics.y += delta;
+            sprite.x += delta * .5;
+            sprite.y += delta * .5;
+        });
     }
     render() {
         const props = Object.assign({
@@ -62,9 +62,8 @@ class Thirixarax extends React.Component {
             className: 'view'
         }, this.props);
 
-        const on = (e) => {
+        const on = e => {
             e.persist();
-            console.log(e.nativeEvent);
             this.setState((prev, props) => {
                 const state = {
                     menu: {
