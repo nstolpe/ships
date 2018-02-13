@@ -1,14 +1,13 @@
 "use strict";
 
-import React from "react";
-import ReactDOM from "react-dom";
-import * as PIXI from 'pixi.js';
-import * as decomp from 'poly-decomp';
-import * as ActivateInputs from './activate-inputs.js';
-import * as Util from './util.js';
-import ScreenManager from './screen-manager.js';
-import { Hub } from 'turms';
-// import { Entity, Components, Engine } from './ecs.js';
+const React = require('react');
+const ReactDOM = require('react-dom');
+const PIXI = require('pixi.js');
+const decomp = require('poly-decomp');
+const ActivateInputs = require('./activate-inputs.js');
+const Util = require('./util.js');
+const ScreenManager = require('./screen-manager.js');
+const Hub = require('turms').Hub;
 
 // matter-js needs `poly-decomp` attached to window or global as decomp
 window.decomp = decomp;
