@@ -4,18 +4,26 @@ import React from "react";
 import ReactDOM from "react-dom";
 import * as PIXI from 'pixi.js';
 import * as decomp from 'poly-decomp';
-import * as Matter from 'matter-js';
 import * as ActivateInputs from './activate-inputs.js';
 import * as Util from './util.js';
-import RenderSystem from './render-system.js';
-import PhysicsSystem from './physics-system.js';
-import PlayerManagerSystem from './player-manager-system.js';
 import ScreenManager from './screen-manager.js';
 import { Hub } from 'turms';
-import { Entity, Components, Engine } from './ecs.js';
+// import { Entity, Components, Engine } from './ecs.js';
 
 // matter-js needs `poly-decomp` attached to window or global as decomp
 window.decomp = decomp;
+// below rely on matter (or are matter), which relies on decomp on window,
+// but imports get moved up and requires stay here.
+// @TODO consider passing matter to these modules factory methods instead.
+// or make everything require.
+const Matter = require('matter-js');
+const PhysicsSystem = require('./physics-system.js');
+const RenderSystem = require('./render-system.js');
+const PlayerManagerSystem = require('./player-manager-system.js');
+const ECS = require('./ecs.js');
+const Entity = ECS.Entity;
+const Components = ECS.Components;
+const Engine = ECS.Engine;
 
 const hub = Hub();
 
