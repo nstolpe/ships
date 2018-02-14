@@ -37,7 +37,12 @@ const defaultConfig = {
 
 const constraintQueue = [];
 
+/**
+ * creates a game object based on `options`
+ * @TODO document options.
+ */
 module.exports = function(options) {
+    // create a default Matter.Body for use with some calculations.
     let defaultMatter = Matter.Body.create();
 
     return {
@@ -57,26 +62,29 @@ module.exports = function(options) {
         spritesheetKey: filename => {
             return `spritesheets::${filename}`;
         },
+        /**
+         * Entry point, kicks off loading.
+         */
         load() {
-            this.preLoad();
+            this.preLoad(options);
             this.loader
                 .add('config', `${this.dataPath}/${this.id}.json`)
                 .load(this.loadResources.bind(this));
 
             return this;
         },
-        preLoad() {
-            const view = <canvas id="view" tabIndex='0' className='view'/>;
-            this.element.innerHTML = '';
-            this.view = document.createElement('canvas');
-            this.view.className = 'view';
-            this.view.id = 'view';
-            this.view.tabIndex = 0;
-            // this.element.appendChild(this.view);
+        /**
+         * Clears out the parent element, adds a React canvas component that will
+         * be used by the PIXI application.
+         */
+        preLoad(options) {
+            // @TODO move game into react component, so this isn't so hackish.
+            const view = <canvas id="view" tabIndex="0" ref={ref => this.view = ref} className='view'/>;
             ReactDOM.render(view, this.element);
-            this.view = document.getElementById('view');
+            // this.view = document.getElementById('view');
             // @TODO allow hidef through option, use resolution 1
-            // seehttps://github.com/pixijs/pixi.js/issues/3833
+            // see https://github.com/pixijs/pixi.js/issues/3833
+            // move PIXI app stuff to setupPIXI()
             this.app = new PIXI.Application(
                 this.view.clientWidth * this.resolution,
                 this.view.clientHeight * this.resolution,
@@ -86,6 +94,7 @@ module.exports = function(options) {
                     autoresize: true
                 }
             );
+            // instantiate and initialize the screenmanager
             this.screenManager = ScreenManager(Object.assign({ hub: hub, app: this.app, debug: false }, options)).init();
         },
         /**
@@ -103,9 +112,12 @@ module.exports = function(options) {
                 this.loader.add(this.spritesheetKey(e), this.spritesheetTemplate(e));
             });
 
-            // load everything
+            // load everything and trigger the `postLoad` when it's done
             this.loader.load(this.postLoad.bind(this));
         },
+        /**
+         * Sets up things that need load to be finished first.
+         */
         postLoad() {
             // activates all inputs
             ActivateInputs.activate(hub);
@@ -131,6 +143,9 @@ module.exports = function(options) {
             // engine updates are trigerred by pixi ticker.
             this.app.ticker.add(this.engine.update.bind(this.engine));
         },
+        /**
+         * Returns the environment entity.
+         */
         getEnvironment() {
             // finds the first environment entity
             const envFinder = e => {
@@ -139,8 +154,13 @@ module.exports = function(options) {
             const environment = this.engine.entities.find(envFinder);
             return environment;
         },
+        /**
+         * Sets up everything for the actors from the config.
+         * @param actors {array}  An array of actor objects.
+         */
         loadActors(actors) {
             actors.forEach((actor) => {
+                // create a basic entity for the actor
                 const entity = Entity(
                     Components.Name.create(actor.name),
                     Components.Position.create(Util.property(actor.position, 'x') || 0, Util.property(actor.position, 'y')) || 0,
@@ -153,12 +173,19 @@ module.exports = function(options) {
                 if (actor.manager === 'player')
                     entity.addComponents(Components.PlayerManager.create());
 
+                // if the actor has display data, load it
                 if (actor.geometry.display)
                     this.loadSkinning(actor, entity);
 
                 this.engine.addEntities(entity);
             });
         },
+        /**
+         * Creates renderable components for an actor.
+         * Visual components store PIXI Sprites, Graphics, etc.
+         * @param actor {object}   An actor object @TODO document actor.
+         * @param entity {object}  An `ECS.Entity` that will receive visual component(s).
+         */
         loadSkinning(actor, entity) {
             const type = Util.property(actor.geometry, 'display.type');
             const resources = this.loader.resources;
@@ -204,22 +231,22 @@ module.exports = function(options) {
                     break;
             }
 
-            if (skinningComponent) {
-                entity.addComponents(
-                    skinningComponent,
-                    Components.Alpha.create(actor.alpha),
-                    Components.Tint.create(actor.tint)
-                );
-            }
-
-            // set interactive to true. @TODO why only the above checked for?
+            // set interactive to true. @TODO should be configurable. default on in editor.
             skinningComponent.data.interactive = true;
             skinningComponent.data.cursor = 'pointer';
+            // @TODO allow configurable pivot.
             skinningComponent.data.pivot.set(skinningComponent.data.width * 0.5, skinningComponent.data.height * 0.5);
             // @TODO geometry and visuals need to be separate in config, w/ independent scales.
-            let scale = Util.property(actor.geometry, 'display.scale');
-            if (scale)
-                skinningComponent.data.scale.set(scale.x, scale.y);
+            skinningComponent.data.scale.set(
+                ((val = Util.property(actor.geometry, 'display.scale.x')) => val != null ? val : 1)(),
+                ((val = Util.property(actor.geometry, 'display.scale.y')) => val != null ? val : 1)()
+            );
+
+            entity.addComponents(
+                skinningComponent,
+                Components.Alpha.create(actor.alpha != null ? actor.alpha : 1),
+                Components.Tint.create(actor.tint != null ? actor.tint: 0xffffff)
+            );
 
             return skinningComponent;
         },
