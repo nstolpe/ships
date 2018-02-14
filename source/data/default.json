@@ -105,6 +105,7 @@
                     {
                         "pointA": { "x": 0,"y": -36 },
                         "pointB": { "x": 0, "y": -54 },
+                        "bodyA": "dock-001-dock-target",
                         "bodyB": "dock-001",
                         "stiffness": 0.3,
                         "damping": 0
@@ -112,6 +113,7 @@
                     {
                         "pointA": { "x": -36,"y": -36 },
                         "pointB": { "x": -36, "y": -54 },
+                        "bodyA": "dock-001-dock-target",
                         "bodyB": "dock-001",
                         "stiffness": 0.3,
                         "damping": 0
@@ -119,6 +121,7 @@
                     {
                         "pointA": { "x": 36,"y": -36 },
                         "pointB": { "x": 36, "y": -54 },
+                        "bodyA": "dock-001-dock-target",
                         "bodyB": "dock-001",
                         "stiffness": 0.3,
                         "damping": 0
@@ -141,24 +144,28 @@
                     {
                         "pointA": { "x": -128,"y": -128 },
                         "pointB": { "x": 448,"y": 268 },
+                        "bodyA": "dock-001",
                         "stiffness": 0.01,
                         "damping": 0.0
                     },
                     {
                         "pointA": { "x": 128,"y": -128 },
                         "pointB": { "x": 712,"y": 268 },
+                        "bodyA": "dock-001",
                         "stiffness": 0.01,
                         "damping": 0.0
                     },
                     {
                         "pointA": { "x": 128,"y": 128 },
                         "pointB": { "x": 712,"y": 532 },
+                        "bodyA": "dock-001",
                         "stiffness": 0.01,
                         "damping": 0.0
                     },
                     {
                         "pointA": { "x": -128,"y": 128 },
                         "pointB": { "x": 448,"y": 532 },
+                        "bodyA": "dock-001",
                         "stiffness": 0.01,
                         "damping": 0.0
                     }
@@ -293,6 +300,7 @@
                     {
                         "pointA": { "x": 0,"y": -36 },
                         "pointB": { "x": 0, "y": -54 },
+                        "bodyA": "dock-002-dock-target",
                         "bodyB": "dock-002",
                         "stiffness": 0.3,
                         "damping": 0
@@ -300,6 +308,7 @@
                     {
                         "pointA": { "x": -36,"y": -36 },
                         "pointB": { "x": -36, "y": -54 },
+                        "bodyA": "dock-002-dock-target",
                         "bodyB": "dock-002",
                         "stiffness": 0.3,
                         "damping": 0
@@ -307,6 +316,7 @@
                     {
                         "pointA": { "x": 36,"y": -36 },
                         "pointB": { "x": 36, "y": -54 },
+                        "bodyA": "dock-002-dock-target",
                         "bodyB": "dock-002",
                         "stiffness": 0.3,
                         "damping": 0
@@ -329,24 +339,28 @@
                     {
                         "pointA": { "x": -128,"y": -128 },
                         "pointB": { "x": -432,"y": -1132 },
+                        "bodyA": "dock-002",
                         "stiffness": 0.01,
                         "damping": 0.0
                     },
                     {
                         "pointA": { "x": 128,"y": -128 },
                         "pointB": { "x": -168,"y": -1132 },
+                        "bodyA": "dock-002",
                         "stiffness": 0.01,
                         "damping": 0.0
                     },
                     {
                         "pointA": { "x": 128,"y": 128 },
                         "pointB": { "x": -168,"y": -868 },
+                        "bodyA": "dock-002",
                         "stiffness": 0.01,
                         "damping": 0.0
                     },
                     {
                         "pointA": { "x": -128,"y": 128 },
                         "pointB": { "x": -432,"y": -868 },
+                        "bodyA": "dock-002",
                         "stiffness": 0.01,
                         "damping": 0.0
                     }
