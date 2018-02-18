@@ -1,9 +1,9 @@
 'use strict';
 
-const Matter = require( 'matter-js' );
+const Matter = require('matter-js');
 
-const ECS = require( './ecs.js' );
-const Util = require( './util.js' );
+const ECS = require('./ecs.js');
+const Util = require('./util.js');
 const Components = ECS.Components;
 const System = ECS.System;
 
@@ -13,14 +13,14 @@ const Forces = {
     boost: 0
 };
 
-const PlayerManagerSystem = function( options ) {
+const PlayerManagerSystem = function(options) {
     const hub = options.hub;
     let player;
     // @TODO better name. at least.
     let targetOverlaid = {
         actor: undefined,
         target: undefined,
-        set( actor, target ) {
+        set(actor, target) {
             this.actor = actor;
             this.target = target;
         },
@@ -33,11 +33,11 @@ const PlayerManagerSystem = function( options ) {
         }
     };
 
-    const system = Object.create( System, {
+    const system = Object.create(System, {
         'start': {
             value: function() {
                 // prototype handles `on` state and event emission
-                Object.getPrototypeOf( this ).start.call( this );
+                Object.getPrototypeOf(this).start.call(this);
                 this.setEntities();
                 this.registerSubscriptions();
             },
@@ -46,62 +46,63 @@ const PlayerManagerSystem = function( options ) {
             // This logic should move out of here, and player-manager-system could probably lose update.
             // add the forces and torque below to the plugin data of the geometry instead, have matter plugin add all together.
             // Add those forces to plugin data in message/event handler.
-            value: function( delta ) {
+            value: function(delta) {
                 const player = this.entities.player();
-                const geometryComponent = player.components.find( component => {
-                    return component.is( Components.Polygon ) ||
-                    component.is( Components.CompoundBody ) ||
-                    component.is( Components.Rectangle ) ||
-                    component.is( Components.Circle );
-                } );
-                const positionComponent = player.components.find( component => component.is( Components.Position ) );
-                const rotationComponent = player.components.find( component => component.is( Components.Rotation ) );
+                const geometryComponent = player.components.find(component => {
+                    return component.is(Components.Polygon) ||
+                    component.is(Components.CompoundBody) ||
+                    component.is(Components.Rectangle) ||
+                    component.is(Components.Circle);
+                });
+                const positionComponent = player.components.find(component => component.is(Components.Position));
+                const rotationComponent = player.components.find(component => component.is(Components.Rotation));
 
-                if ( Forces.thrust || Forces.boost ) {
+                if (Forces.thrust || Forces.boost) {
                         // get rotation as vector
                         let vec = Matter.Vector.create(
-                            Math.cos( rotationComponent.data ),
-                            Math.sin( rotationComponent.data )
-                        );
+                            Math.cos(rotationComponent.data),
+                            Math.sin(rotationComponent.data)
+                       );
                         // normalize rotation/direction
-                        vec = Matter.Vector.normalise( vec );
+                        vec = Matter.Vector.normalise(vec);
 
-                        if ( Forces.thrust ) {
+                        if (Forces.thrust) {
                             Matter.Body.applyForce(
                                 geometryComponent.data,
                                 positionComponent.data,
-                                Matter.Vector.mult( vec, Forces.thrust )
-                            );
+                                Matter.Vector.mult(vec, Forces.thrust)
+                           );
                         }
 
-                        if ( Forces.boost ) {
+                        if (Forces.boost) {
                             Matter.Body.applyForce(
                                 geometryComponent.data,
                                 positionComponent.data,
-                                Matter.Vector.mult( vec, Forces.boost )
-                            );
+                                Matter.Vector.mult(vec, Forces.boost)
+                           );
                             Forces.boost = 0;
                         }
                 }
 
-                if ( Forces.torque ) {
+                if (Forces.torque) {
                     geometryComponent.data.torque = Forces.torque;
                 }
             }
         },
         'registerSubscriptions': {
             value: function() {
-                hub.addSubscription( this, 'player-input-thrust' );
-                hub.addSubscription( this, 'player-input-turn' );
-                hub.addSubscription( this, 'player-input-boost' );
+                hub.addSubscription(this, 'player-input-thrust');
+                hub.addSubscription(this, 'player-input-turn');
+                hub.addSubscription(this, 'player-input-boost');
+                hub.addSubscription(this, 'player-input-rotate-viewport');
                 // @TODO collision doesn't belong here. RenderSystem should handle it graphics changes.
-                hub.addSubscription( this, 'collision-start' );
-                hub.addSubscription( this, 'collision-end' );
-                hub.addSubscription( this, 'player-input-dock' );
+                hub.addSubscription(this, 'collision-start');
+                hub.addSubscription(this, 'collision-end');
+                hub.addSubscription(this, 'player-input-dock');
             }
         },
         'receiveMessage': {
-            value: function( action, message ) {
+            value: function(action, message) {
                 const actorCategory = 0x000002;
                 const targetCategory = 0x000020;
                 let actor;
@@ -109,7 +110,7 @@ const PlayerManagerSystem = function( options ) {
                 let categoryA;
                 let categoryB;
 
-                switch ( message.type ) {
+                switch (message.type) {
                     case 'player-input-thrust':
                         Forces.thrust = message.data;
                         break;
@@ -124,54 +125,54 @@ const PlayerManagerSystem = function( options ) {
                     // if actor is player, enable interaction input. Do targetCategory/actorCategory stuff there.
                     // Can do stuff with other collision types there too.
                     case 'collision-start':
-                        categoryA = Util.property( message.data, 'bodyA.collisionFilter.category' );
-                        categoryB = Util.property( message.data, 'bodyB.collisionFilter.category' );
+                        categoryA = Util.property(message.data, 'bodyA.collisionFilter.category');
+                        categoryB = Util.property(message.data, 'bodyB.collisionFilter.category');
 
-                        const hasGeometry = ( data, body) => {
-                            return Util.property( data, 'Polygon.data' ) === body ||
-                                Util.property( data, 'CompoundBody.data' ) === body ||
-                                Util.property( data, 'Rectangle.data' ) === body ||
-                                Util.property( data, 'Circle.data' ) === body
+                        const hasGeometry = (data, body) => {
+                            return Util.property(data, 'Polygon.data') === body ||
+                                Util.property(data, 'CompoundBody.data') === body ||
+                                Util.property(data, 'Rectangle.data') === body ||
+                                Util.property(data, 'Circle.data') === body
                         }
 
-                        if ( ( categoryA === actorCategory && categoryB === targetCategory ) ||
-                            ( categoryB === actorCategory && categoryA === targetCategory ) ) {
+                        if ((categoryA === actorCategory && categoryB === targetCategory) ||
+                            (categoryB === actorCategory && categoryA === targetCategory)) {
 
-                            if ( categoryA === actorCategory ) {
-                                actor = this.engine.entities.find( e => {
-                                    const body = Util.property( message.data, 'bodyA' );
-                                    return hasGeometry( e.data, body );
-                                } );
-                                target = this.engine.entities.find( e => {
-                                    const body = Util.property( message.data, 'bodyB' );
-                                    return hasGeometry( e.data, body );
-                                } );
+                            if (categoryA === actorCategory) {
+                                actor = this.engine.entities.find(e => {
+                                    const body = Util.property(message.data, 'bodyA');
+                                    return hasGeometry(e.data, body);
+                                });
+                                target = this.engine.entities.find(e => {
+                                    const body = Util.property(message.data, 'bodyB');
+                                    return hasGeometry(e.data, body);
+                                });
                             } else {
-                                actor = this.engine.entities.find( e => {
-                                    const body = Util.property( message.data, 'bodyA' );
-                                    return hasGeometry( e.data, body );
-                                } );
-                                target = this.engine.entities.find( e => {
-                                    const body = Util.property( message.data, 'bodyB' );
-                                    return hasGeometry( e.data, body );
-                                } );
+                                actor = this.engine.entities.find(e => {
+                                    const body = Util.property(message.data, 'bodyA');
+                                    return hasGeometry(e.data, body);
+                                });
+                                target = this.engine.entities.find(e => {
+                                    const body = Util.property(message.data, 'bodyB');
+                                    return hasGeometry(e.data, body);
+                                });
                             }
 
-                            targetOverlaid.set( actor, target );
+                            targetOverlaid.set(actor, target);
                         }
                         break;
                     case 'collision-end':
-                        categoryA = Util.property( message, 'data.bodyA.collisionFilter.category' );
-                        categoryB = Util.property( message, 'data.bodyB.collisionFilter.category' );
+                        categoryA = Util.property(message, 'data.bodyA.collisionFilter.category');
+                        categoryB = Util.property(message, 'data.bodyB.collisionFilter.category');
 
-                        if ( ( categoryA === actorCategory && categoryB === targetCategory ) ||
-                            ( categoryB === actorCategory && categoryA === targetCategory ) ) {
+                        if ((categoryA === actorCategory && categoryB === targetCategory) ||
+                            (categoryB === actorCategory && categoryA === targetCategory)) {
                             targetOverlaid.reset();
                         }
                         break;
                     case 'player-input-dock':
-                        if ( targetOverlaid.active() ) {
-                            console.log( targetOverlaid );
+                        if (targetOverlaid.active()) {
+                            console.log(targetOverlaid);
                         }
                         break;
                     default:
@@ -179,20 +180,20 @@ const PlayerManagerSystem = function( options ) {
                 }
             }
         }
-    } );
+    });
 
-    Object.assign( system.entities, {
+    Object.assign(system.entities, {
         // @TODO consolidate to something composable that render-system can also use.
-        player( refresh ) {
-            if ( refresh || !player ) {
-                player = system.entities.renderables().find( entity => {
-                    return entity.components.find( component => component.is( Components.PlayerManager ) );
-                } );
+        player(refresh) {
+            if (refresh || !player) {
+                player = system.entities.renderables().find(entity => {
+                    return entity.components.find(component => component.is(Components.PlayerManager));
+                });
             }
 
             return player;
         }
-    } );
+    });
 
     return system;
 }
