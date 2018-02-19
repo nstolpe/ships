@@ -1,5 +1,5 @@
 const PIXI = require( 'pixi.js' );
-const WaterManager = require( './inc/water-manager.js' );
+const WaterManager = require( './lib/water-manager.js' );
 
 console.log('shader');
 
@@ -26,7 +26,7 @@ source.anchor.set( 0.5 );
 // Add it to the screen
 app.stage.addChild( source );
 
-var vertShader = 
+var vertShader =
 	`precision highp float;
 	attribute vec2 aVertexPosition;
 	attribute vec2 aTextureCoord;
@@ -92,7 +92,7 @@ function ColorManager( uniforms ) {
 				return ( 1 - amount ) * origin + amount * target;
 			},
 			shader: {
-				vertex: 
+				vertex:
 					`precision highp float;
 					attribute vec2 aVertexPosition;
 					attribute vec2 aTextureCoord;
@@ -128,7 +128,7 @@ function ColorManager( uniforms ) {
 						float a = ((y2 - y3)*(x - x3) + (x3 - x2)*(y - y3)) / denominator;
 						float b = ((y3 - y1)*(x - x3) + (x1 - x3)*(y - y3)) / denominator;
 						float c = 1.0 - a - b;
-						
+
 						return 0.0 <= a && a <= 1.0 && 0.0 <= b && b <= 1.0 && 0.0 <= c && c <= 1.0;
 						// return true;
 					}
@@ -154,21 +154,23 @@ function ColorManager( uniforms ) {
 		}
 	}
 
-// let colorManager = ColorManager( {
-// 	dimensions: { type: 'v2', value: [ width, height ] },
-// 	color: { type: 'v3', value: [ 1, 1, 1 ] }
-// } ).init();
+let colorManager = ColorManager( {
+	dimensions: { type: 'v2', value: [ width, height ] },
+	color: { type: 'v3', value: [ 1, 1, 1 ] }
+} ).init();
 
 let waterManager = WaterManager( {
 	uResolution: { type: 'v2', value: [ width, height ] },
 } ).init();
 
-source.filters = [ waterManager.shader.shader ];
-// source.filters = [ colorManager.shader.shader ];
+source.filters = [
+	waterManager.shader.shader,
+	colorManager.shader.shader
+];
 
 function animate( delta ) {
 	waterManager.update( delta );
-	// colorManager.update( delta );
+	colorManager.update( delta );
 }
 window.f = new PIXI.Filter();
 
@@ -185,7 +187,7 @@ timeInput.addEventListener( 'blur', function( e ) {
 
 timeForm.addEventListener( 'submit', function( e ) {
 	e.preventDefault();
-	
+
 	if ( timeInput.value === undefined )
 		timeInput.value = 0.0;
 

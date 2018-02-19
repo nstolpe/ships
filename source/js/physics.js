@@ -2,9 +2,9 @@
 
 const math = require( 'mathjs' );
 const PIXI = require( 'pixi.js' );
-const Util = require( './inc/util.js' );
-const Vec2 = require( './inc/vector2.js');
-const Shapes = require( './inc/shapes.js' );
+const Util = require( './lib/util.js' );
+const Vec2 = require( './lib/vector2.js');
+const Shapes = require( './lib/shapes.js' );
 const Sprite = PIXI.Sprite;
 const loader = PIXI.loader;
 const view = document.getElementById('view');

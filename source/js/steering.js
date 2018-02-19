@@ -1,11 +1,11 @@
 'use strict'
 
-const Util = require( './inc/util.js' );
-const SteeringKeyboard = require( './inc/steering-keyboard.js' );
-const GameModels = require( './inc/game-models.js' );
-const EmitterManager = require( './inc/emitter-manager.js' );
-const CollisionPolygon = require( './inc/collision-polygon.js' );
-const Vec2 = require( './inc/vector2.js');
+const Util = require( './lib/util.js' );
+const SteeringKeyboard = require( './lib/steering-keyboard.js' );
+const GameModels = require( './lib/game-models.js' );
+const EmitterManager = require( './lib/emitter-manager.js' );
+const CollisionPolygon = require( './lib/collision-polygon.js' );
+const Vec2 = require( './lib/vector2.js');
 
 window.math = require( 'mathjs' );
 const PIXI = require( 'pixi.js' );
@@ -18,7 +18,7 @@ const viewHeight = document.body.offsetHeight;
 const app = new PIXI.Application( viewWidth, viewHeight, { view: view, backgroundColor : 0x051224, resolution: scale, autoResize: true } );
 const Particles = require( 'pixi-particles' );
 
-const Config = require( './inc/config-old.js' )( PIXI, app );
+const Config = require( './lib/config-old.js' )( PIXI, app );
 
 window.app = app;
 // view.style.width = viewWidth + 'px';

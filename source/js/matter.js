@@ -4,7 +4,7 @@ const decomp = require('poly-decomp');
 window.decomp = decomp;
 const Matter = require( 'matter-js' );
 const MatterAttractors = require( 'matter-attractors' );
-const MatterForces = require( './inc/matter-forces' );
+const MatterForces = require( './lib/matter-forces' );
 // Matter.use( 'matter-attractors' );
 Matter.use( 'matter-forces' );
 
