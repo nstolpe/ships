@@ -35,8 +35,6 @@ const defaultConfig = {
     actors: []
 };
 
-const constraintQueue = [];
-
 /**
  * creates a game object based on `options`
  * @TODO document options.
@@ -117,13 +115,14 @@ module.exports = function(options) {
         },
         /**
          * Sets up things that need load to be finished first.
+         * @TODO last loading step, the entity setup can move to another package.
          */
         postLoad() {
             // activates all inputs
             ActivateInputs.activate(hub);
             this.loadEnvironment();
             this.loadActors(this.config.actors);
-            this.loadConstraints();
+            this.loadConstraints(this.config.constraints);
             const physicsSystem = PhysicsSystem({ hub: hub });
             const renderSystem = RenderSystem({
                 app: this.app,
@@ -145,6 +144,7 @@ module.exports = function(options) {
         },
         /**
          * Returns the environment entity.
+         * @TODO entity stuff
          */
         getEnvironment() {
             // finds the first environment entity
@@ -282,13 +282,13 @@ module.exports = function(options) {
 
             // @TODO make these options all mergable into a default.
             if (actor.geometry.collisionFilter) {
-                // maybe switch to js config files instead of json. can use hex ints
-                if (actor.geometry.collisionFilter.category)
-                    actor.geometry.collisionFilter.category = parseInt(actor.geometry.collisionFilter.category, 16);
-                if (actor.geometry.collisionFilter.mask)
-                    actor.geometry.collisionFilter.mask = parseInt(actor.geometry.collisionFilter.mask, 16);
-                if (actor.geometry.collisionFilter.group)
-                    actor.geometry.collisionFilter.group = parseInt(actor.geometry.collisionFilter.group, 16);
+                const collisionKeys = ['category', 'mask', 'group'];
+
+                // maybe switch to js for config so hex ints don't need to be converted from strings.
+                Object.keys(actor.geometry.collisionFilter).forEach( filterProp => {
+                    if (collisionKeys.indexOf(filterProp) >= 0)
+                        actor.geometry.collisionFilter[filterProp] = parseInt(actor.geometry.collisionFilter[filterProp], 16);
+                });
 
                 options.collisionFilter = Object.assign(Object.create(defaultMatter.collisionFilter), actor.geometry.collisionFilter);
             }
@@ -346,33 +346,31 @@ module.exports = function(options) {
                 Matter.Body.scale(component.data, scaleComponent.data.x, scaleComponent.data.y);
 
                 entity.addComponents(component);
-
-                // @TODO constraints need to go in their own config structure and get their own init functions.
-                if (actor.geometry.constraints)
-                    actor.geometry.constraints.forEach(constraint => constraintQueue.push(Object.assign({ entity: entity }, constraint)));
             }
 
             return component;
         },
-        loadConstraints() {
-            constraintQueue.forEach(options => {
-                const entity = options.entity;
-                const geometryComponentA =
-                    entity.data.Polygon ||
-                    entity.data.CompoundBody ||
-                    entity.data.Rectangle ||
-                    entity.data.Circle;
+        /**
+         * Creates entities from an array of constraint configurations.
+         */
+        loadConstraints(constraints) {
+            constraints.forEach(constraint => {
+                const options = {};
+                if (constraint.bodyA) {
+                    const entityA = this.engine.entities.find(entity => entity.data.Name.data === constraint.bodyA );
 
-                // bail if there's no geometry component
-                if (!geometryComponentA) return;
-
-                options.bodyA = geometryComponentA.data;
-
-                if (options.bodyB) {
-                    const entityB = this.engine.entities.find(entity => {
-                        const nameComponent = entity.data.Name;
-                        return nameComponent && nameComponent.data === options.bodyB;
-                    });
+                    if (entityA) {
+                        const geometryComponent =
+                            entityA.data.Polygon ||
+                            entityA.data.CompoundBody ||
+                            entityA.data.Circle ||
+                            entityA.data.Rectangle;
+                        constraint.bodyA = geometryComponent.data;
+                        options.bodyA = geometryComponent.data;
+                    }
+                }
+                if (constraint.bodyB) {
+                    const entityB = this.engine.entities.find(entity => entity.data.Name.data === constraint.bodyB );
 
                     if (entityB) {
                         const geometryComponent =
@@ -380,14 +378,12 @@ module.exports = function(options) {
                             entityB.data.CompoundBody ||
                             entityB.data.Circle ||
                             entityB.data.Rectangle;
-                        if (geometryComponent.data)
-                            options.bodyB = geometryComponent.data;
+                        constraint.bodyB = geometryComponent.data;
+                        options.bodyB = geometryComponent.data;
                     }
                 }
 
-                delete options.entity;
-
-                this.engine.addEntities(Entity(Components.Constraint.create(options)));
+                this.engine.addEntities(Entity(Components.Constraint.create(constraint)));
             });
         },
         loadEnvironment() {
