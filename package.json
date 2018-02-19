@@ -8,9 +8,10 @@
     "build-static-images": "cp -r source/images/* .static/assets/images/",
     "watch-server": "cd server && nodemon -e js,hbs -w ./ -w views server.js",
     "compile-scripts": "for js in source/js/*.js; do bin/compile-script.sh \"$js\"; done;",
-    "start": "npm run setup && npm run build-static-images && npm run build-static-spritesheets && npm run compile-scripts && node bin/watch.js & npm run watch-server",
+    "start": "npm run setup && npm run build-static-images && npm run build-static-spritesheets && npm run globify & node bin/watch.js & npm run watch-server",
     "setup": "mkdir -p .static/assets/spritesheets && mkdir -p .static/assets/images && mkdir -p .static/assets/js && mkdir -p .static/assets/data",
     "stop": "echo \"This just stopped\"",
+    "globify": "globify \"source/js/*.js\" --outfile=.static/assets/js -w",
     "build-static-site": "bin/compile-static-to-pages.sh"
   },
   "author": "nils",
@@ -29,7 +30,8 @@
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
     "turms": "^0.1.1",
-    "virtualjoystick.js": "file:../virtualjoystick.js"
+    "virtualjoystick.js": "file:../virtualjoystick.js",
+    "watchify": "^3.10.0"
   },
   "devDependencies": {
     "babel": "^6.23.0",
@@ -40,6 +42,7 @@
     "browserify": "^14.5.0",
     "browserify-shim": "^3.8.14",
     "chokidar": "^1.6.1",
+    "globify": "^2.3.0",
     "react-pixi-fiber": "^0.2.2"
   },
   "browserify": {
@@ -49,13 +52,16 @@
         {
           "presets": [
             "react",
-            ["env", {
+            [
+              "env",
+              {
                 "targets": {
                   "browsers": [
                     "last 1 Chrome versions"
                   ]
                 }
-            }]
+              }
+            ]
           ]
         }
       ]
