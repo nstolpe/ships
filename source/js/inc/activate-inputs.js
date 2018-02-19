@@ -118,6 +118,9 @@ module.exports = {
                 hub.sendMessage({ type: type, data: data });
         }, false);
 
+        // @TODO all this needs to be configurable.
+        // see https://github.com/kittykatattack/learningPixi/blob/master/examples/12_keyboardMovement.html
+        // for reference (only create keyup and keydown listener though, that filters Keys inside)
         document.getElementById('view').addEventListener('keyup', e => {
             let type;
             let data;

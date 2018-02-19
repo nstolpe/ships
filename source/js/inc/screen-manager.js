@@ -6,7 +6,6 @@ import ReactDOM from "react-dom";
 import { Stage, Graphics, render, Text } from "react-pixi-fiber";
 // import { render } from 'react-dom';
 import PropTypes from "prop-types";
-
 //@TODO get this out of here
 /**
  * @param {object}  options                  Key/value set of options

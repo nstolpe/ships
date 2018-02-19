@@ -101,6 +101,11 @@ const PlayerManagerSystem = function(options) {
                 hub.addSubscription(this, 'player-input-dock');
             }
         },
+        /**
+         * Receives a message.
+         * @TODO make use of action, and call action(message) so the switch can go.
+         * build actions and subscriptions from config data.
+         */
         'receiveMessage': {
             value: function(action, message) {
                 const actorCategory = 0x000002;
