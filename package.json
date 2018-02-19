@@ -4,14 +4,11 @@
   "description": "A canvas ship game",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build-static-spritesheets": "cp source/spritesheets/* .static/assets/spritesheets/",
-    "build-static-images": "cp -r source/images/* .static/assets/images/",
     "watch-server": "cd server && nodemon -e js,hbs -w ./ -w views server.js",
-    "compile-scripts": "for js in source/js/*.js; do bin/compile-script.sh \"$js\"; done;",
-    "start": "npm run setup && npm run build-static-images && npm run build-static-spritesheets && npm run globify & node bin/watch.js & npm run watch-server",
-    "setup": "mkdir -p .static/assets/spritesheets && mkdir -p .static/assets/images && mkdir -p .static/assets/js && mkdir -p .static/assets/data",
+    "start": "node bin/clean.js && npm run watch-scripts & node bin/watch-assets.js & npm run watch-server",
     "stop": "echo \"This just stopped\"",
-    "globify": "globify \"source/js/*.js\" --outfile=.static/assets/js -w",
+    "build-scripts": "globify \"source/js/*.js\" --outfile=.static/assets/js",
+    "watch-scripts": "globify \"source/js/*.js\" --outfile=.static/assets/js -w",
     "build-static-site": "bin/compile-static-to-pages.sh"
   },
   "author": "nils",
@@ -42,6 +39,7 @@
     "browserify": "^14.5.0",
     "browserify-shim": "^3.8.14",
     "chokidar": "^1.6.1",
+    "fs-extra": "^5.0.0",
     "globify": "^2.3.0",
     "react-pixi-fiber": "^0.2.2"
   },
