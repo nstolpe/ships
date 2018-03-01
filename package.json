@@ -5,11 +5,12 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch-server": "cd server && nodemon -e js,hbs -w ./ -w views server.js",
-    "start": "node bin/clean.js && npm run watch-scripts & node bin/watch-assets.js & npm run watch-server",
+    "start": "node bin/clean.js && node bin/watch-assets.js & npm run watch-server & npm run watch-scripts",
     "stop": "echo \"This just stopped\"",
-    "build-scripts": "globify \"source/js/*.js\" --outfile=.static/assets/js",
-    "watch-scripts": "globify \"source/js/*.js\" --outfile=.static/assets/js -w",
-    "build-static-site": "bin/compile-static-to-pages.sh"
+    "watch-scripts": "globify \"source/js/*.js\" --outfile=.static/assets/js --verbose -w",
+    "build-static-site": "bin/compile-static-to-pages.sh",
+    "notify": "node bin/notify.js",
+    "color": "bin/color.sh"
   },
   "author": "nils",
   "license": "ISC",
@@ -39,8 +40,10 @@
     "browserify": "^14.5.0",
     "browserify-shim": "^3.8.14",
     "chokidar": "^1.6.1",
+    "freedesktop-notifications": "^1.2.2",
     "fs-extra": "^5.0.0",
     "globify": "^2.3.0",
+    "growly": "^1.3.0",
     "react-pixi-fiber": "^0.2.2"
   },
   "browserify": {
@@ -55,7 +58,7 @@
               {
                 "targets": {
                   "browsers": [
-                    "last 1 Chrome versions"
+                    "last 2 versions"
                   ]
                 }
               }
