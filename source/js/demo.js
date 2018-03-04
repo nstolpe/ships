@@ -12,4 +12,4 @@ const game = Game({
     id: env.id,
     element: document.getElementById('game'),
     resolution: window.devicePixelRatio
-}).load();
+}).start();

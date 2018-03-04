@@ -100,12 +100,15 @@ module.exports = {
      *     property(foo, 'baz.gaz.bar');
      *     > 'bar'
      *
+     * @param source     {object}
+     * @param keys {string|array}
+     * @param fallback
      * @return varies
      */
-    property: (source, keys) => {
+    property: (source, keys, fallback) => {
         const kkeys = typeof keys === 'string' ?
             keys.split('.') :
             !Array.isArray(keys) ? [] : keys;
-        return kkeys.reduce((obj, key) => obj && obj[key] ? obj[key] : undefined, source);
+        return kkeys.reduce((obj, key) => obj && obj[key] ? obj[key] : fallback, source);
     }
 };
