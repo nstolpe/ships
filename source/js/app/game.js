@@ -4,9 +4,9 @@ const React = require('react');
 const ReactDOM = require('react-dom');
 const PIXI = require('pixi.js');
 const decomp = require('poly-decomp');
-const ActivateInputs = require('./activate-inputs.js');
-const Util = require('./util.js');
-const ScreenManager = require('./screen-manager.js');
+const ActivateInputs = require('app/activate-inputs.js');
+const Util = require('app/util.js');
+const ScreenManager = require('app/screen-manager.js');
 const Hub = require('turms').Hub;
 
 // matter-js needs `poly-decomp` attached to window or global as decomp
@@ -16,24 +16,15 @@ window.decomp = decomp;
 // @TODO consider passing matter to these modules factory methods instead.
 // or make everything require.
 const Matter = require('matter-js');
-const PhysicsSystem = require('./physics-system.js');
-const RenderSystem = require('./render-system.js');
-const PlayerManagerSystem = require('./player-manager-system.js');
-const ECS = require('./ecs.js');
+const PhysicsSystem = require('app/physics-system.js');
+const RenderSystem = require('app/render-system.js');
+const PlayerManagerSystem = require('app/player-manager-system.js');
+const ECS = require('app/ecs.js');
+const Loader = require('app/loaders/loader');
 const Entity = ECS.Entity;
 const Components = ECS.Components;
 const Engine = ECS.Engine;
 
-const hub = Hub();
-
-const defaultConfig = {
-    spritesheets: [],
-    environment: {
-        forces:[],
-        background: 0x000000
-    },
-    actors: []
-};
 
 /**
  * creates a game object based on `options`
@@ -42,6 +33,15 @@ const defaultConfig = {
 module.exports = function(options) {
     // create a default Matter.Body for use with some calculations.
     let defaultMatter = Matter.Body.create();
+
+    const defaultConfig = {
+        spritesheets: [],
+        environment: {
+            forces:[],
+            background: 0x000000
+        },
+        actors: []
+    };
 
     return {
         id: options.id,
@@ -54,20 +54,34 @@ module.exports = function(options) {
         engine: Engine(),
         loader: PIXI.loader,
         screenManager: null,
-        spritesheetTemplate: filename => {
-            return `assets/spritesheets/${filename}.json`;
+        hub: Hub(),
+        receiveMessage(action, message) {
+            switch (message.type) {
+                case 'config-loaded':
+                    this.updateConfig(Util.property(message.data, 'config', {}))
+                    break;
+                case 'assets-loaded':
+                    this.startSystems();
+                    break;
+                default:
+                    break;
+            }
         },
-        spritesheetKey: filename => {
-            return `spritesheets::${filename}`;
+        updateConfig(newconfig) {
+            Object.assign(this.config, newconfig);
         },
         /**
          * Entry point, kicks off loading.
          */
-        load() {
-            this.preLoad(options);
-            this.loader
-                .add('config', `${this.dataPath}/${this.id}.json`)
-                .load(this.loadResources.bind(this));
+        start() {
+            const loader = Loader(this.hub,{
+                id: this.id,
+                dataPath: this.dataPath
+            });
+            this.setUpScreen(options);
+            this.hub.addSubscription(this, 'config-loaded');
+            this.hub.addSubscription(this, 'assets-loaded');
+            loader.load();
 
             return this;
         },
@@ -75,7 +89,7 @@ module.exports = function(options) {
          * Clears out the parent element, adds a React canvas component that will
          * be used by the PIXI application.
          */
-        preLoad(options) {
+        setUpScreen(options) {
             // @TODO move game into react component, so this isn't so hackish.
             const view = <canvas id="view" tabIndex="0" ref={ref => this.view = ref} className='view'/>;
             ReactDOM.render(view, this.element);
@@ -93,45 +107,27 @@ module.exports = function(options) {
                 }
             );
             // instantiate and initialize the screenmanager
-            this.screenManager = ScreenManager(Object.assign({ hub: hub, app: this.app, debug: false }, options)).init();
-        },
-        /**
-         * Loads all of the resources from a config.
-         */
-        loadResources() {
-            const loader = this.loader;
-            const config = loader.resources.config;
-            // store incoming config
-            Object.assign(this.config, config.data);
-
-            // queue all sprite sheets for loading.
-            // @TODO add other resources (sounds, etc) here once ready.
-            this.config['spritesheets'].forEach((e, i, a) => {
-                this.loader.add(this.spritesheetKey(e), this.spritesheetTemplate(e));
-            });
-
-            // load everything and trigger the `postLoad` when it's done
-            this.loader.load(this.postLoad.bind(this));
+            this.screenManager = ScreenManager(Object.assign({ hub: this.hub, app: this.app, debug: false }, options)).init();
         },
         /**
          * Sets up things that need load to be finished first.
          * @TODO last loading step, the entity setup can move to another package.
          */
-        postLoad() {
+        startSystems() {
             // activates all inputs
-            ActivateInputs.activate(hub);
+            ActivateInputs.activate(this.hub);
             this.loadEnvironment();
             this.loadActors(this.config.actors);
             this.loadConstraints(this.config.constraints);
-            const physicsSystem = PhysicsSystem({ hub: hub });
+            const physicsSystem = PhysicsSystem({ hub: this.hub });
             const renderSystem = RenderSystem({
                 app: this.app,
                 backgroundColor: this.getEnvironment().components.find(component => component.is(Components.Color)).data,
                 graphics: new PIXI.Graphics(),
-                hub: hub,
+                hub: this.hub,
                 // debug: true
             });
-            const playerManagerSystem = PlayerManagerSystem({ hub: hub });
+            const playerManagerSystem = PlayerManagerSystem({ hub: this.hub });
 
             this.engine.addSystems(playerManagerSystem, physicsSystem, renderSystem);
 

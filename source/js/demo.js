@@ -1,8 +1,8 @@
 'use strict';
 
 const Turms = require('turms');
-const Util = require('./lib/util.js');
-const Game = require('./lib/game.js');
+const Util = require('app/util.js');
+const Game = require('app/game.js');
 
 const env = Object.assign({
     id: 'default'
