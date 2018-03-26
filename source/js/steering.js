@@ -1,36 +1,36 @@
 'use strict'
 
-const Util = require( './lib/util.js' );
-const SteeringKeyboard = require( './lib/steering-keyboard.js' );
-const GameModels = require( './lib/game-models.js' );
-const EmitterManager = require( './lib/emitter-manager.js' );
-const CollisionPolygon = require( './lib/collision-polygon.js' );
-const Vec2 = require( './lib/vector2.js');
+const Util = require('app/util.js');
+const SteeringKeyboard = require('app/steering-keyboard.js');
+const GameModels = require('app/game-models.js');
+const EmitterManager = require('app/emitter-manager.js');
+const CollisionPolygon = require('app/collision-polygon.js');
+const Vec2 = require('app/vector2.js');
 
-window.math = require( 'mathjs' );
-const PIXI = require( 'pixi.js' );
+window.math = require('mathjs');
+const PIXI = require('pixi.js');
 const Sprite = PIXI.Sprite;
 const loader = PIXI.loader;
 const view = document.getElementById('view');
 const scale = window.devicePixelRatio;
 const viewWidth = document.body.offsetWidth;
 const viewHeight = document.body.offsetHeight;
-const app = new PIXI.Application( viewWidth, viewHeight, { view: view, backgroundColor : 0x051224, resolution: scale, autoResize: true } );
-const Particles = require( 'pixi-particles' );
+const app = new PIXI.Application(viewWidth, viewHeight, { view: view, backgroundColor : 0x051224, resolution: scale, autoResize: true });
+const Particles = require('pixi-particles');
 
-const Config = require( './lib/config-old.js' )( PIXI, app );
+const Config = require('app/config-old.js')(PIXI, app);
 
 window.app = app;
 // view.style.width = viewWidth + 'px';
 // view.style.height = viewHeight + 'px';
 
 loader
-	.add( 'assets/spritesheets/ships.json' )
-	.add( 'emitter', 'assets/data/emitter.json' )
-	.add( 'particle', 'assets/images/pixel.png' )
-	.add( 'boards', 'assets/images/boards.png' )
-	.add( 'circle-target', 'assets/images/circle-target.png' )
-	.load( setup );
+	.add('assets/spritesheets/ships.json')
+	.add('emitter', 'assets/data/emitter.json')
+	.add('particle', 'assets/images/pixel.png')
+	.add('boards', 'assets/images/boards.png')
+	.add('circle-target', 'assets/images/circle-target.png')
+	.load(setup);
 
 window.gameModels = [];
 window.current = {
@@ -47,21 +47,21 @@ window.emitterParent = new PIXI.Container();
 let stageGraphics = new PIXI.Graphics();
 
 
-function setup( loader, resources ) {
+function setup(loader, resources) {
 	window.emitterParent.width = viewWidth;
 	window.emitterParent.height = viewHeight;
 	window.emitterParent.pivot.x = viewWidth / 2;
 	window.emitterParent.pivot.y = viewHeight / 2;
-	app.stage.addChild( window.emitterParent );
+	app.stage.addChild(window.emitterParent);
 	emitterManager = EmitterManager(
 		resources.emitter.data,
 		window.emitterParent,
 		// {
 		// 	min: Vec2(),
-		// 	max: Vec2( viewWidth / 2, viewHeight / 2 )
+		// 	max: Vec2(viewWidth / 2, viewHeight / 2)
 		// },
-		Vec2( viewWidth / 2, viewHeight / 2 ),
-		[ resources[ 'particle' ].texture ],
+		Vec2(viewWidth / 2, viewHeight / 2),
+		[resources['particle'].texture],
 		{ w: viewWidth, h: viewHeight },
 		17,
 		current.direction
@@ -69,14 +69,14 @@ function setup( loader, resources ) {
 	emitterManager.start();
 
 	gameModels = loadGameModels();
-	for ( let i = 0, l = gameModels.length; i < l; i++ ) {
-		app.stage.addChild( gameModels[ i ].base.sprite );
+	for (let i = 0, l = gameModels.length; i < l; i++) {
+		app.stage.addChild(gameModels[i].base.sprite);
 	}
-	app.stage.addChild( stageGraphics );
+	app.stage.addChild(stageGraphics);
 // app.stage.width *= 0.5;
 // app.stage.height *= 0.5;
 
-	window.turtle = gameModels.find( ( model ) => model.base.name === 'turtle' ).base;
+	window.turtle = gameModels.find((model) => model.base.name === 'turtle').base;
 
 	// setup the camera to follow turtle/player.
 	app.stage.position.x = (app.renderer.width / scale) / 2;
@@ -86,7 +86,7 @@ function setup( loader, resources ) {
 
 	SteeringKeyboard();
 
-	app.ticker.add( animate );
+	app.ticker.add(animate);
 }
 
 window.animating = true;
@@ -94,15 +94,15 @@ window.animating = true;
 let activeTarget;
 let docked = false;
 
-window.addEventListener( 'draw-clip-point', e => {
-	stageGraphics.beginFill( 0xff0000 );
-	stageGraphics.drawCircle( e.detail.x, e.detail.y, 2.5 );
+window.addEventListener('draw-clip-point', e => {
+	stageGraphics.beginFill(0xff0000);
+	stageGraphics.drawCircle(e.detail.x, e.detail.y, 2.5);
 	stageGraphics.endFill();
 	console.log('received');
-} );
+});
 
-window.addEventListener( 'dock', function() {
-	if ( activeTarget && !docked ) {
+window.addEventListener('dock', function() {
+	if (activeTarget && !docked) {
 		turtle.basePosition.x = activeTarget.base.basePosition.x;
 		turtle.basePosition.y = activeTarget.base.basePosition.y;
 		turtle.positionConstraints.pos = { x: 0, y: 0 };
@@ -110,7 +110,7 @@ window.addEventListener( 'dock', function() {
 		turtle.rotationConstraints.pos = 0;
 		turtle.rotationConstraints.neg = 0;
 		docked = true;
-	} else if ( docked ) {
+	} else if (docked) {
 		turtle.basePosition.x = 0;
 		turtle.basePosition.y = 0;
 		turtle.positionConstraints.pos = { x: Infinity, y: Infinity };
@@ -119,52 +119,52 @@ window.addEventListener( 'dock', function() {
 		turtle.rotationConstraints.neg = Infinity;
 		docked = false;
 	}
-}, false );
+}, false);
 
 let fps = 60;
 let dt = 1 / fps;
 let accumulator = 0;
 
-function animate( delta ) {
+function animate(delta) {
 	stageGraphics.clear();
 
-	document.getElementById( 'frame-rate' ).dataset.framerate = app.ticker.FPS.toPrecision( 2 );
+	document.getElementById('frame-rate').dataset.framerate = app.ticker.FPS.toPrecision(2);
 
 	accumulator += app.ticker.elapsedMS / 1000;
 	var numUpdateSteps = 0;
-	if ( accumulator > 0.1 ) accumulator = 0.1;
-	while ( accumulator > dt ) {
+	if (accumulator > 0.1) accumulator = 0.1;
+	while (accumulator > dt) {
 		accumulator -= dt;
-		updateGameModels( dt );
-		checkCollisions( dt );
-		updateFollowCamera( dt );
-		emitterManager.update( dt, [ current ] );
+		updateGameModels(dt);
+		checkCollisions(dt);
+		updateFollowCamera(dt);
+		emitterManager.update(dt, [current]);
 		// if (++numUpdateSteps >= 240) {
 		// 	accumulator = 0;
 		// 	break;
 		// }
-		// if ( accumulator >= dt) console.log( accumulator );
+		// if (accumulator >= dt) console.log(accumulator);
 	}
 
-	// console.log( delta );
-	// updateGameModels( app.ticker.elapsedMS / 100 );
-	// checkCollisions( app.ticker.elapsedMS / 100 );
+	// console.log(delta);
+	// updateGameModels(app.ticker.elapsedMS / 100);
+	// checkCollisions(app.ticker.elapsedMS / 100);
 
-	// emitterManager.update( app.ticker.elapsedMS / 100, [ current ] );
+	// emitterManager.update(app.ticker.elapsedMS / 100, [current]);
 
-	// updateFollowCamera( app.ticker.elapsedMS / 100 );
+	// updateFollowCamera(app.ticker.elapsedMS / 100);
 
 }
 
-function updateFollowCamera( delta ) {
+function updateFollowCamera(delta) {
 	// make the camera follow the turtle, but only once the turtle is a certain distance (50) on either axis.
 	let xDist = app.stage.pivot.x - turtle.currentPosition.x;
 	let yDist = app.stage.pivot.y - turtle.currentPosition.y;
 
-	if ( Math.abs( xDist ) > 50 ) {
+	if (Math.abs(xDist) > 50) {
 		app.stage.pivot.x -= xDist / 1 * delta;
 	}
-	if ( Math.abs( yDist ) > 50 ) {
+	if (Math.abs(yDist) > 50) {
 		app.stage.pivot.y -= yDist / 1 * delta;
 	}
 }
@@ -172,38 +172,38 @@ function updateFollowCamera( delta ) {
 function checkCollisions() {
 	// Check each moving (movable really) object for a collision with every other object.
 	// @TODO check only actually moving and check w/i same area.
-	let collideables = gameModels.filter( ( model ) => {
+	let collideables = gameModels.filter((model) => {
 		return model.base.positionConstraints.neg.x !== 0 ||
 		model.base.positionConstraints.neg.y !== 0 ||
 		model.base.positionConstraints.pos.x !== 0 ||
 		model.base.positionConstraints.pos.y !== 0
-	} );
+	});
 
-	for ( let i = 0; i < collideables.length; i++ ) {
-		for ( let ii = 0; ii < gameModels.length; ii++ ) {
-			if ( collideables[ i ] !== gameModels[ ii ] ) {
-				let collision = checkCollision( collideables[ i ], gameModels[ ii ] );
-				if ( collision ) {
-					if ( gameModels[ ii ].base.solid ) {
+	for (let i = 0; i < collideables.length; i++) {
+		for (let ii = 0; ii < gameModels.length; ii++) {
+			if (collideables[i] !== gameModels[ii]) {
+				let collision = checkCollision(collideables[i], gameModels[ii]);
+				if (collision) {
+					if (gameModels[ii].base.solid) {
 						// Just pushes one away. Should be better.@TODO better
 						// collision.one.base.currentPosition.x -= collision.overlapV.x;
 						// collision.one.base.currentPosition.y -= collision.overlapV.y;
 					} else {
 						// non-solid game models are the dock targets, make them interactable
 						// @TODO this does not belong. Move.
-						gameModels[ ii ].base.sprite.children[ 0 ].tint = 0x4ae9f9;
-						gameModels[ ii ].base.children.target.alpha = .5;
-						activeTarget = gameModels[ ii ];
+						gameModels[ii].base.sprite.children[0].tint = 0x4ae9f9;
+						gameModels[ii].base.children.target.alpha = .5;
+						activeTarget = gameModels[ii];
 					}
-				} else if ( gameModels[ ii ] === activeTarget ) {
+				} else if (gameModels[ii] === activeTarget) {
 					// deactivate activeTarget if it's become inactive
 					// @TODO this doesn't belong here, move it somewhere better.
 					activeTarget = undefined;
-					gameModels[ ii ].base.sprite.children[ 0 ].tint = 0xffffff;
-					gameModels[ ii ].base.children.target.alpha = .25;
+					gameModels[ii].base.sprite.children[0].tint = 0xffffff;
+					gameModels[ii].base.children.target.alpha = .25;
 				}
 				// do something with different collisions here.
-				// if ( collision && collision.twoInOne ) {
+				// if (collision && collision.twoInOne) {
 				// 	collision.two.base.currentPosition.x += collision.overlapV.x;
 				// 	collision.two.base.currentPosition.y += collision.overlapV.y;
 				// }
@@ -212,34 +212,34 @@ function checkCollisions() {
 	}
 }
 
-function updateGameModels( delta ) {
-	for ( let i = 0, l = gameModels.length; i < l; i++ ) {
-		let model = gameModels[ i ];
+function updateGameModels(delta) {
+	for (let i = 0, l = gameModels.length; i < l; i++) {
+		let model = gameModels[i];
 
-		model.base.update( delta, {
-			velocities: [ {
-				x: window.current.force * math.cos( math.unit( window.current.direction, 'deg' ) ),
-				y: window.current.force * math.sin( math.unit( window.current.direction, 'deg' ) )
-			} ],
-			forces: [ window.current ],
-			frictions: [ window.friction ]
-		} );
+		model.base.update(delta, {
+			velocities: [{
+				x: window.current.force * math.cos(math.unit(window.current.direction, 'deg')),
+				y: window.current.force * math.sin(math.unit(window.current.direction, 'deg'))
+			}],
+			forces: [window.current],
+			frictions: [window.friction]
+		});
 
-		if ( model.base.debug )
-			drawDebug( model );
+		if (model.base.debug)
+			drawDebug(model);
 	}
 }
 
-function applyTransformsToPoint( point, source ) {
-	point.sub( source.base.pivot.x, source.base.pivot.y )
-		// @TODO needs the mul( 2 ) or detection only works on objects
+function applyTransformsToPoint(point, source) {
+	point.sub(source.base.pivot.x, source.base.pivot.y)
+		// @TODO needs the mul(2) or detection only works on objects
 		// with .5 scale. Figure out why.
-		.scale( Vec2( source.base.sprite.scale ).mul( 2 ) )
-		.rotate( source.base.currentRotation )
-		.add( source.base.currentPosition );
+		.scale(Vec2(source.base.sprite.scale).mul(2))
+		.rotate(source.base.currentRotation)
+		.add(source.base.currentPosition);
 }
 
-function checkCollision( one, two ) {
+function checkCollision(one, two) {
 	let lengthOne = one.base.sprite.hitArea.points.length;
 	let lengthTwo = two.base.sprite.hitArea.points.length;
 	let pointsOne = [];
@@ -259,31 +259,31 @@ function checkCollision( one, two ) {
 
 	// make vector arrays of the incoming points.
 	// points have the game object's transform applied
-	for ( let i = 0, l = lengthOne + lengthTwo; i < l; i += 2 ) {
-		if ( i < lengthOne ) {
-			p = Vec2( one.base.sprite.hitArea.points[ i ], one.base.sprite.hitArea.points[ i + 1 ] );
-			applyTransformsToPoint( p, one );
-			pointsOne.push( p );
+	for (let i = 0, l = lengthOne + lengthTwo; i < l; i += 2) {
+		if (i < lengthOne) {
+			p = Vec2(one.base.sprite.hitArea.points[i], one.base.sprite.hitArea.points[i + 1]);
+			applyTransformsToPoint(p, one);
+			pointsOne.push(p);
 		} else {
-			p = Vec2( two.base.sprite.hitArea.points[ i - lengthOne ], two.base.sprite.hitArea.points[ i - lengthOne + 1 ] );
-			applyTransformsToPoint( p, two );
-			pointsTwo.push( p );
+			p = Vec2(two.base.sprite.hitArea.points[i - lengthOne], two.base.sprite.hitArea.points[i - lengthOne + 1]);
+			applyTransformsToPoint(p, two);
+			pointsTwo.push(p);
 		}
 	}
 
 	// loop through the points of the first poly
-	for ( let i = 0, l = pointsOne.length; i < l; i++ ) {
-		let normal = one.base.sprite.hitArea.normals[ i ];
-		let rangeOne = projectPoints( pointsOne, normal );
-		let rangeTwo = projectPoints( pointsTwo, normal );
-		let offset =  Vec2( two.base.currentPosition ).sub( one.base.currentPosition ).dot( normal );
+	for (let i = 0, l = pointsOne.length; i < l; i++) {
+		let normal = one.base.sprite.hitArea.normals[i];
+		let rangeOne = projectPoints(pointsOne, normal);
+		let rangeTwo = projectPoints(pointsTwo, normal);
+		let offset =  Vec2(two.base.currentPosition).sub(one.base.currentPosition).dot(normal);
 
 		rangeTwo.min += offset;
 		rangeTwo.max += offset;
 
-		if ( rangesOverlap( rangeOne, rangeTwo) ) {
+		if (rangesOverlap(rangeOne, rangeTwo)) {
 			// if the ranges overlap, it's not a separating axis. get the collision
-			collision = setCollision( rangeOne, rangeTwo, normal, collision );
+			collision = setCollision(rangeOne, rangeTwo, normal, collision);
 		} else {
 			// if not, it is a separating axis. only one is necessary, so exit.
 			return false;
@@ -291,54 +291,54 @@ function checkCollision( one, two ) {
 	}
 
 	// then the second
-	for ( let i = 0, l = pointsTwo.length; i < l; i++ ) {
-		let normal = two.base.sprite.hitArea.normals[ i ];
-		let rangeOne = projectPoints( pointsOne, normal );
-		let rangeTwo = projectPoints( pointsTwo, normal );
-		let offset =  Vec2( two.base.currentPosition ).sub( one.base.currentPosition ).dot( normal );
+	for (let i = 0, l = pointsTwo.length; i < l; i++) {
+		let normal = two.base.sprite.hitArea.normals[i];
+		let rangeOne = projectPoints(pointsOne, normal);
+		let rangeTwo = projectPoints(pointsTwo, normal);
+		let offset =  Vec2(two.base.currentPosition).sub(one.base.currentPosition).dot(normal);
 
 		rangeTwo.min += offset;
 		rangeTwo.max += offset;
 
-		if ( rangesOverlap( rangeOne, rangeTwo) ) {
+		if (rangesOverlap(rangeOne, rangeTwo)) {
 			// if the ranges overlap, it's not a separating axis. get the collision
-			collision = setCollision( rangeOne, rangeTwo, normal, collision );
+			collision = setCollision(rangeOne, rangeTwo, normal, collision);
 		} else {
 			// if not, it is a separating axis. only one is necessary, so exit.
 			return false;
 		}
 	}
 
-	collision.overlapV = Vec2( collision.overlapN ).scale( collision.overlap );
+	collision.overlapV = Vec2(collision.overlapN).scale(collision.overlap);
 
 	// wrap in an if cause it will likely be turned on/off
-	if ( 1 === 1 ) {
-		featureOne = getFeature( pointsOne, collision.overlapN );
-		featureTwo = getFeature( pointsTwo, collision.overlapN.copy().reverse() );
+	if (1 === 1) {
+		featureOne = getFeature(pointsOne, collision.overlapN);
+		featureTwo = getFeature(pointsTwo, collision.overlapN.copy().reverse());
 		featureOne.edge
-				// .sub( one.base.pivot )
-				// .scale( one.base.sprite.scale )
-				// .rotate( one.base.sprite.rotation )
-				// .add( one.base.currentPosition );
+				// .sub(one.base.pivot)
+				// .scale(one.base.sprite.scale)
+				// .rotate(one.base.sprite.rotation)
+				// .add(one.base.currentPosition);
 		featureTwo.edge
-				// .sub( two.base.pivot )
-				// .scale( two.base.sprite.scale )
-				// .rotate( two.base.sprite.rotation )
-				// .add( two.base.currentPosition );
-		// console.log( "one " + pointsOne.indexOf( featureOne.max ) );
-		// console.log( "two " + pointsTwo.indexOf( featureTwo.max ) );
-		doClipping( featureOne, featureTwo, collision.overlapN )
+				// .sub(two.base.pivot)
+				// .scale(two.base.sprite.scale)
+				// .rotate(two.base.sprite.rotation)
+				// .add(two.base.currentPosition);
+		// console.log("one " + pointsOne.indexOf(featureOne.max));
+		// console.log("two " + pointsTwo.indexOf(featureTwo.max));
+		doClipping(featureOne, featureTwo, collision.overlapN)
 	}
 	return collision;
 }
 
-function doClipping( one, two, normal ) {
+function doClipping(one, two, normal) {
 	let ref;
 	let inc;
 	let flip = false;
 	let refv = Vec2();
 
-	if ( Math.abs( one.edge.dot( normal ) ) <= Math.abs( two.edge.dot( normal ) ) ) {
+	if (Math.abs(one.edge.dot(normal)) <= Math.abs(two.edge.dot(normal))) {
 		ref = one;
 		inc = two;
 	} else {
@@ -347,75 +347,75 @@ function doClipping( one, two, normal ) {
 		flip = true;
 	}
 
-	refv.set( ref.edge ).nor();
+	refv.set(ref.edge).nor();
 
-	let o1 = refv.dot( ref.v1 );
-	let cp = clip( inc.v1, inc.v2, refv, o1 );
+	let o1 = refv.dot(ref.v1);
+	let cp = clip(inc.v1, inc.v2, refv, o1);
 
-	if ( cp.length < 2 ) return;
+	if (cp.length < 2) return;
 
-	let o2 = refv.dot( ref.v2 );
+	let o2 = refv.dot(ref.v2);
 
-	cp = clip( cp[0], cp[1], refv.copy().reverse(), -o2 );
+	cp = clip(cp[0], cp[1], refv.copy().reverse(), -o2);
 
-	if ( cp.length < 2 ) return;
+	if (cp.length < 2) return;
 
-	// let refNorm = Vec2( ref.edge.y, -ref.edge.x );
+	// let refNorm = Vec2(ref.edge.y, -ref.edge.x);
 	let refNorm = ref.edge.copy().perp();
-	// refNorm = ref.v2.copy().sub( ref.v1 ).perp();
+	// refNorm = ref.v2.copy().sub(ref.v1).perp();
 
-	if ( flip ) refNorm.reverse();
+	if (flip) refNorm.reverse();
 
-	let max = refNorm.dot( ref.max );
+	let max = refNorm.dot(ref.max);
 
 	// check 1 first so it doesn't fall back if 0 is spliced.
-	if ( refNorm.dot( cp[ 1 ] ) - max < 0.0 )
-		cp.splice( 1, 1 );
+	if (refNorm.dot(cp[1]) - max < 0.0)
+		cp.splice(1, 1);
 
-	if ( refNorm.dot( cp[ 0 ] ) - max < 0.0 )
-		cp.splice( 0, 1 );
+	if (refNorm.dot(cp[0]) - max < 0.0)
+		cp.splice(0, 1);
 
-	for ( let i = 0, l = cp.length; i < l; i++ ) {
-		let e = new CustomEvent('draw-clip-point', { detail: cp[ i ] } );
-		window.dispatchEvent( e );
+	for (let i = 0, l = cp.length; i < l; i++) {
+		let e = new CustomEvent('draw-clip-point', { detail: cp[i] });
+		window.dispatchEvent(e);
 	}
 
 	return cp;
 }
 
-function clip( v1, v2, normal, o ) {
+function clip(v1, v2, normal, o) {
 	let points = [];
 
-	let d1 = normal.dot( v1 ) - o;
-	let d2 = normal.dot( v2 ) - o;
+	let d1 = normal.dot(v1) - o;
+	let d2 = normal.dot(v2) - o;
 
-	if ( d1 >= 0 ) points.push( v1 );
-	if ( d2 >= 0 ) points.push( v2 );
+	if (d1 >= 0) points.push(v1);
+	if (d2 >= 0) points.push(v2);
 
-	if ( d1 * d2  < 0 ) {
-		let e = v2.copy().sub( v1 );
-		let u = d1 / ( d1 - d2 );
-		e.mul( u );
-		e.add( v1 );
-		points.push( e );
+	if (d1 * d2  < 0) {
+		let e = v2.copy().sub(v1);
+		let u = d1 / (d1 - d2);
+		e.mul(u);
+		e.add(v1);
+		points.push(e);
 	}
 
 	return points;
 }
-function getFeature( points, normal ) {
-	let vertex = farthestVertex( points, normal );
-	let index = points.indexOf( vertex );
-	let prev = points[ ( index + points.length - 1 ) % points.length ];
-	let next = points[ ( index + 1 ) % points.length ];
-	let l = vertex.copy().sub( next ).nor();
-	let r = vertex.copy().sub( prev ).nor();
+function getFeature(points, normal) {
+	let vertex = farthestVertex(points, normal);
+	let index = points.indexOf(vertex);
+	let prev = points[(index + points.length - 1) % points.length];
+	let next = points[(index + 1) % points.length];
+	let l = vertex.copy().sub(next).nor();
+	let r = vertex.copy().sub(prev).nor();
 
-	if ( r.dot( normal ) <= l.dot( normal ) ) {
+	if (r.dot(normal) <= l.dot(normal)) {
 		// prev (right) is closer to perp
 		// max, 1st, last
 		return {
 			max: vertex,
-			edge: vertex.copy().sub( prev ),
+			edge: vertex.copy().sub(prev),
 			v1: prev,
 			v2: vertex
 		};
@@ -424,36 +424,36 @@ function getFeature( points, normal ) {
 		// max, 1st, last
 		return {
 			max: vertex,
-			edge: next.copy().sub( vertex ),
+			edge: next.copy().sub(vertex),
 			v1: vertex,
 			v2: next
 		};
 	}
 }
 
-function farthestVertex( points, direction ) {
+function farthestVertex(points, direction) {
 	let farthestProjection = -Number.MAX_VALUE;
 	let farthestVertex;
 	let projection;
 
-	for ( let i = 0, l = points.length; i < l; i++ ) {
-		projection = direction.dot( points[ i ] );
+	for (let i = 0, l = points.length; i < l; i++) {
+		projection = direction.dot(points[i]);
 
-		if ( projection > farthestProjection ) {
+		if (projection > farthestProjection) {
 			farthestProjection = projection;
-			farthestVertex = points[ i ];
+			farthestVertex = points[i];
 		}
 	}
 
 	return farthestVertex;
 }
 // populates a collision object.
-function setCollision( rangeOne, rangeTwo, normal, collision ) {
+function setCollision(rangeOne, rangeTwo, normal, collision) {
 	let overlap = 0;
 	let overlap1;
 	let overlap2;
 	let absOverlap;
-	// collision = Object.assign( {
+	// collision = Object.assign({
 	// 	one: one,
 	// 	two: two,
 	// 	active: true,
@@ -461,12 +461,12 @@ function setCollision( rangeOne, rangeTwo, normal, collision ) {
 	// 	overlap: Number.MAX_VALUE,
 	// 	oneInTwo: true,
 	// 	twoInOne: true
-	// }, collision );
+	// }, collision);
 	// one starts lower than two
-	if ( rangeOne.min < rangeTwo.min ) {
+	if (rangeOne.min < rangeTwo.min) {
 		collision.oneInTwo = false;
 		// one ends before two does. We have to pull one out of two
-		if ( rangeOne.max < rangeTwo.max ) {
+		if (rangeOne.max < rangeTwo.max) {
 			overlap = rangeOne.max - rangeTwo.min;
 			collision.twoInOne = false;
 		// two is fully inside one. Pick the shortest way out.
@@ -479,7 +479,7 @@ function setCollision( rangeOne, rangeTwo, normal, collision ) {
 	} else {
 		collision.twoInOne = false;
 		// two ends before one ends. push one out of two
-		if ( rangeOne.max > rangeTwo.max ) {
+		if (rangeOne.max > rangeTwo.max) {
 			overlap = rangeOne.min - rangeTwo.max;
 			collision.oneInTwo = false;
 		// one is fully inside two. pick the shortest way out.
@@ -490,12 +490,12 @@ function setCollision( rangeOne, rangeTwo, normal, collision ) {
 		}
 	}
 
-	absOverlap = Math.abs( overlap );
+	absOverlap = Math.abs(overlap);
 
-	if ( absOverlap < collision.overlap ) {
+	if (absOverlap < collision.overlap) {
 		collision.overlap = absOverlap;
-		collision.overlapN.set( normal );
-		if ( overlap < 0 ) {
+		collision.overlapN.set(normal);
+		if (overlap < 0) {
 			collision.overlapN.reverse();
 		}
 	}
@@ -503,7 +503,7 @@ function setCollision( rangeOne, rangeTwo, normal, collision ) {
 	return collision;
 }
 
-function rangesOverlap( one, two ) {
+function rangesOverlap(one, two) {
 	return one.min <= two.max && two.min <= one.max
 }
 
@@ -511,13 +511,13 @@ function rangesOverlap( one, two ) {
  * Projects a set of points onto an axis/normal.
  * Returns the minimum/maximum range of the projected points.
  */
-function projectPoints( points, normal ) {
+function projectPoints(points, normal) {
 	let min = Number.MAX_VALUE;
 	let max = -Number.MAX_VALUE;
 	let dot;
 
-	for ( let i = 0, l = points.length; i < l; i++ ) {
-		dot = points[ i ].dot( normal );
+	for (let i = 0, l = points.length; i < l; i++) {
+		dot = points[i].dot(normal);
 		min = dot < min ? dot : min;
 		max = dot > max ? dot : max;
 	}
@@ -525,78 +525,78 @@ function projectPoints( points, normal ) {
 	return { min: min, max: max };
 }
 
-function drawDebug( model ) {
+function drawDebug(model) {
 	// draw the hitarea if it has it. only works for collision polygons.
-	if ( model.base.sprite.hitArea ) {
-		stageGraphics.lineStyle( 1, 0x00ff32, 1 );
+	if (model.base.sprite.hitArea) {
+		stageGraphics.lineStyle(1, 0x00ff32, 1);
 
 		// set the first point before the loop for moveTo
 		let p = Vec2(
-			model.base.sprite.hitArea.points[ 0 ] - model.base.pivot.x,
-			model.base.sprite.hitArea.points[ 1 ] - model.base.pivot.y
-		).scale( model.base.sprite.scale )
-		.rotate( model.base.sprite.rotation )
-		.add( model.base.currentPosition );
+			model.base.sprite.hitArea.points[0] - model.base.pivot.x,
+			model.base.sprite.hitArea.points[1] - model.base.pivot.y
+		).scale(model.base.sprite.scale)
+		.rotate(model.base.sprite.rotation)
+		.add(model.base.currentPosition);
 
-		stageGraphics.moveTo( p.x, p.y );
+		stageGraphics.moveTo(p.x, p.y);
 
 		// draw a line from each point to the one after it
-		for ( let i = 2, l = model.base.sprite.hitArea.points.length; i < l; i += 2 ) {
+		for (let i = 2, l = model.base.sprite.hitArea.points.length; i < l; i += 2) {
 			p.set(
-				model.base.sprite.hitArea.points[ i ],
-				model.base.sprite.hitArea.points[ i + 1 ]
-			).sub( model.base.pivot.x, model.base.pivot.y )
-			.scale( model.base.sprite.scale )
-			.rotate( model.base.sprite.rotation )
-			.add( model.base.currentPosition );
+				model.base.sprite.hitArea.points[i],
+				model.base.sprite.hitArea.points[i + 1]
+			).sub(model.base.pivot.x, model.base.pivot.y)
+			.scale(model.base.sprite.scale)
+			.rotate(model.base.sprite.rotation)
+			.add(model.base.currentPosition);
 
-			stageGraphics.lineTo( p.x, p.y );
+			stageGraphics.lineTo(p.x, p.y);
 		}
 
 		// draw a final line back to the original point to close the polygon.
 		p.set(
-			model.base.sprite.hitArea.points[ 0 ],
-			model.base.sprite.hitArea.points[ 1 ]
-		).sub( model.base.pivot.x, model.base.pivot.y )
-		.scale( model.base.sprite.scale )
-		.rotate( model.base.sprite.rotation )
-		.add( model.base.currentPosition );
+			model.base.sprite.hitArea.points[0],
+			model.base.sprite.hitArea.points[1]
+		).sub(model.base.pivot.x, model.base.pivot.y)
+		.scale(model.base.sprite.scale)
+		.rotate(model.base.sprite.rotation)
+		.add(model.base.currentPosition);
 
-		stageGraphics.lineTo( p.x, p.y );
+		stageGraphics.lineTo(p.x, p.y);
 
 		// draw the normal lines
-		for ( let i = 0, l = model.base.sprite.hitArea.points.length; i < l; i += 2 ) {
+		for (let i = 0, l = model.base.sprite.hitArea.points.length; i < l; i += 2) {
 			// get the point in the middle of the edge.
 			let halfEdge = Vec2(
-				model.base.sprite.hitArea.points[ i ] + ( model.base.sprite.hitArea.edges[ Math.ceil( i / 2 ) ].x / 2 ),
-				model.base.sprite.hitArea.points[ i + 1 ] + ( model.base.sprite.hitArea.edges[ Math.ceil( i / 2 ) ].y / 2 )
+				model.base.sprite.hitArea.points[i] + (model.base.sprite.hitArea.edges[Math.ceil(i / 2)].x / 2),
+				model.base.sprite.hitArea.points[i + 1] + (model.base.sprite.hitArea.edges[Math.ceil(i / 2)].y / 2)
 			);
 
 			// get the endpoint for the normal line.
-			let end = halfEdge.copy().add( model.base.sprite.hitArea.normals[ Math.ceil( i / 2 ) ].copy().reverse().mul( 10 ) )
-				.sub( model.base.pivot )
-				.scale( model.base.sprite.scale.x, model.base.sprite.scale.y )
-				.rotate( model.base.sprite.rotation )
-				.add( model.base.currentPosition );
+			let end = halfEdge.copy().add(model.base.sprite.hitArea.normals[Math.ceil(i / 2)].copy().reverse().mul(10))
+				.sub(model.base.pivot)
+				.scale(model.base.sprite.scale.x, model.base.sprite.scale.y)
+				.rotate(model.base.sprite.rotation)
+				.add(model.base.currentPosition);
 
 			// apply the sprite's transform to the halfEdge point to get the start of the normal line.
-			p.set( halfEdge )
-				.sub( model.base.pivot )
-				.scale( model.base.sprite.scale )
-				.rotate( model.base.sprite.rotation )
-				.add( model.base.currentPosition );
+			p.set(halfEdge)
+				.sub(model.base.pivot)
+				.scale(model.base.sprite.scale)
+				.rotate(model.base.sprite.rotation)
+				.add(model.base.currentPosition);
 
 			// start a line at the half-way point.
-			stageGraphics.moveTo( p.x, p.y );
+			stageGraphics.moveTo(p.x, p.y);
 			// draw a line to the half-way point rotated by the normal * 10
-			stageGraphics.lineTo( end.x, end.y );
+			stageGraphics.lineTo(end.x, end.y);
 		}
 	}
 
 	// draw the AABB for the sprite.
 	let bounds = model.base.sprite.getBounds();
 
-	stageGraphics.lineStyle( 1, 0xff4cc7, 1 );
+	stageGraphics.lineStyle(1, 0xff4cc7, 1);
 	stageGraphics.moveTo(
 		bounds.x + app.stage.pivot.x - app.stage.position.x,
 	bounds.y + app.stage.pivot.y - app.stage.position.y
@@ -623,40 +623,40 @@ function drawDebug( model ) {
 
 function loadGameModels() {
 	let gameModels = [];
-	for ( let i = Config.gameModels.length - 1; i >= 0; i-- ) {
-		gameModels.push( loadGameModel( Config.gameModels[ i ] ) );
+	for (let i = Config.gameModels.length - 1; i >= 0; i--) {
+		gameModels.push(loadGameModel(Config.gameModels[i]));
 	}
 	return gameModels;
 }
 
-function loadGameModel( model ) {
-	const base = GameModels.TransformableGroup( model.options );
+function loadGameModel(model) {
+	const base = GameModels.TransformableGroup(model.options);
 
-	for ( let i = 0, l = model.children ? model.children.length : 0; i < l; i++ ) {
-		let child = model.children[ i ];
+	for (let i = 0, l = model.children ? model.children.length : 0; i < l; i++) {
+		let child = model.children[i];
 		let texture;
 		let sprite;
 		let tr;
 
-		 if ( model.spriteSheet )
-			texture = PIXI.loader.resources[ Config.spriteSheetPath + model.spriteSheet ].textures[ child.id ];
+		 if (model.spriteSheet)
+			texture = PIXI.loader.resources[Config.spriteSheetPath + model.spriteSheet].textures[child.id];
 		else
-			texture = PIXI.loader.resources[ child.texture ].texture;
+			texture = PIXI.loader.resources[child.texture].texture;
 
-		sprite = child.options.tiling ? new PIXI.extras.TilingSprite( texture, child.options.dimensions.w, child.options.dimensions.h ) : new Sprite( texture );
-		tr = GameModels.TransformableRenderable( Object.assign( { sprite: sprite }, child.options ) );
+		sprite = child.options.tiling ? new PIXI.extras.TilingSprite(texture, child.options.dimensions.w, child.options.dimensions.h) : new Sprite(texture);
+		tr = GameModels.TransformableRenderable(Object.assign({ sprite: sprite }, child.options));
 
-		base.addChild( child.options.name, tr, child.init );
+		base.addChild(child.options.name, tr, child.init);
 	}
 
-	typeof model.init === 'function' && model.init( base );
-	base.update( 0 );
+	typeof model.init === 'function' && model.init(base);
+	base.update(0);
 	return { base: base }
 }
 
 function setupCoords() {
-	const xValue = document.createElement( 'input' );
-	const yValue = document.createElement( 'input' );
+	const xValue = document.createElement('input');
+	const yValue = document.createElement('input');
 
 	xValue.type = 'number';
 	xValue.type = 'number';

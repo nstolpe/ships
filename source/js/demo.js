@@ -2,13 +2,13 @@
 
 const Turms = require('turms');
 const Util = require('app/util.js');
-const Game = require('app/game.js');
+const GameScreen = require('app/game-screen.js');
 
 const env = Object.assign({
     id: 'default'
 }, Util.locationArgs(window));
 
-const game = Game({
+const game = GameScreen({
     id: env.id,
     element: document.getElementById('game'),
     resolution: window.devicePixelRatio

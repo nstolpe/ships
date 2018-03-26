@@ -1,7 +1,7 @@
 'use strict';
 
 const PIXI = require('pixi.js');
-const Util = require('../util');
+const Util = require('app/util');
 
 const proto = {
     loader: PIXI.loader,
@@ -15,27 +15,26 @@ const proto = {
      * Entry point, kicks off loading.
      */
     load() {
-        this.stage1();
-        // this.hub.sendMessage({
-        //     type: 'config-loaded',
-        //     data: { config: {} }
-        // });
+        this.loadConfig();
     },
-    stage1() {
+    /**
+     * Loads the config file.
+     */
+    loadConfig() {
         this.loader
             .add('config', `${this.dataPath}/${this.id}.json`)
-            .load(this.stage2.bind(this));
+            .load(this.loadAssets.bind(this));
 
         return this;
     },
-    stage2() {
+    loadAssets() {
         const config = Util.property(this.loader, 'resources.config');
-        // store incoming config
-        // Object.assign(this.config, config.data);
-        this.hub.sendMessage({
-            type: 'config-loaded',
+
+        this.sendMessage({
+           type: 'config-loaded',
             data: { config: config.data }
-        });
+        })
+
         // queue all sprite sheets for loading.
         // @TODO add other resources (sounds, etc) here once ready.
         Util.property(config.data, 'spritesheets', []).forEach(sheet => {
@@ -44,25 +43,31 @@ const proto = {
         });
 
         // send
-        this.loader.load((loader, assets) => {
-            this.hub.sendMessage({
+        this.loader.load((loader, resources) => {
+            this.sendMessage({
                 type: 'assets-loaded',
-                data: { assets }
+                data: { resources }
             });
         });
     },
+    getTexture(spritesheet, id) {
+        const resources = Util.property(this.loader, 'resources');
+        const resourceKey = `spritesheets::${spritesheet}`;
+        return Util.property(resources,[resourceKey, 'textures', id]);
+    },
+    /**
+     * Wrapper for `this.hub.sendMessage`. Catches in case the hub passed in was invalide.
+     */
     sendMessage({ type, data }) {
         const message = { type, data };
-        try {
-            this.hub.sendMessage(message)
-        } catch (error) {
-            console.log(error);
-        }
+        if (typeof this.hub.sendMessage === 'function')
+            this.hub.sendMessage(message);
+        else
+            console.warn('unable to send message:', message);
     }
 };
 
 module.exports = (hub, { id='default', dataPath='assets/data' } = {}) => {
-    // const defaultBody = Matter.Body.create();
     const config = {
         spritesheets: [],
         environment: {
@@ -71,6 +76,7 @@ module.exports = (hub, { id='default', dataPath='assets/data' } = {}) => {
         },
         actors: []
     };
+    console.log(hub);
     return Object.assign(Object.create(proto), {
         id,
         dataPath,

@@ -52,7 +52,7 @@ module.exports = function(options) {
         dataPath: 'assets/data',
         config: defaultConfig,
         engine: Engine(),
-        loader: PIXI.loader,
+        loader: null,
         screenManager: null,
         hub: Hub(),
         receiveMessage(action, message) {
@@ -61,7 +61,7 @@ module.exports = function(options) {
                     this.updateConfig(Util.property(message.data, 'config', {}))
                     break;
                 case 'assets-loaded':
-                    this.startSystems();
+                    this.startSystems(Util.property(message.data, 'resources', {}));
                     break;
                 default:
                     break;
@@ -74,14 +74,17 @@ module.exports = function(options) {
          * Entry point, kicks off loading.
          */
         start() {
-            const loader = Loader(this.hub,{
+            this.loader = Loader(this.hub,{
                 id: this.id,
                 dataPath: this.dataPath
             });
+
             this.setUpScreen(options);
+
             this.hub.addSubscription(this, 'config-loaded');
             this.hub.addSubscription(this, 'assets-loaded');
-            loader.load();
+
+            this.loader.load();
 
             return this;
         },
@@ -114,15 +117,16 @@ module.exports = function(options) {
          * @TODO last loading step, the entity setup can move to another package.
          */
         startSystems() {
-            // activates all inputs
-            ActivateInputs.activate(this.hub);
             this.loadEnvironment();
             this.loadActors(this.config.actors);
             this.loadConstraints(this.config.constraints);
+
             const physicsSystem = PhysicsSystem({ hub: this.hub });
+console.log('dsfg')
             const renderSystem = RenderSystem({
                 app: this.app,
-                backgroundColor: this.getEnvironment().components.find(component => component.is(Components.Color)).data,
+                backgroundColor: this.getEnvironment().data.Color.data,
+                // backgroundColor: this.getEnvironment().components.find(component => component.is(Components.Color)).data,
                 graphics: new PIXI.Graphics(),
                 hub: this.hub,
                 // debug: true
@@ -137,6 +141,8 @@ module.exports = function(options) {
 
             // engine updates are trigerred by pixi ticker.
             this.app.ticker.add(this.engine.update.bind(this.engine));
+            // activates all inputs
+            ActivateInputs.activate(this.hub);
         },
         /**
          * Returns the environment entity.
@@ -184,7 +190,6 @@ module.exports = function(options) {
          */
         loadSkinning(actor, entity) {
             const type = Util.property(actor.geometry, 'display.type');
-            const resources = this.loader.resources;
             let skinningComponent;
             let texture;
             let fillComponent;
@@ -193,11 +198,17 @@ module.exports = function(options) {
 
             switch (type) {
                 case 'sprite':
-                    texture = this.getTexture(actor, resources);
+                    texture = this.loader.getTexture(
+                        Util.property(actor.geometry, 'display.spritesheet'),
+                        Util.property(actor.geometry, 'display.id')
+                    );
                     skinningComponent = Components.Sprite.create(texture);
                     break;
                 case 'tiling-sprite':
-                    texture = this.getTexture(actor, resources);
+                    texture = this.loader.getTexture(
+                        Util.property(actor.geometry, 'display.spritesheet'),
+                        Util.property(actor.geometry, 'display.id')
+                    );
                     const w = Util.property(actor.geometry, 'width');
                     const h = Util.property(actor.geometry, 'height');
                     skinningComponent = Components.TilingSprite.create(texture, w, h);
@@ -245,11 +256,6 @@ module.exports = function(options) {
             );
 
             return skinningComponent;
-        },
-        getTexture(actor, resources) {
-            const resourceKey = 'spritesheets::' + Util.property(actor.geometry, 'display.spritesheet');
-            const textureKey = Util.property(actor.geometry, 'display.id');
-            return resources[resourceKey].textures[textureKey];
         },
         /**
          * Loads geometry from an `actor` from a config and turns it into
@@ -383,8 +389,7 @@ module.exports = function(options) {
             });
         },
         loadEnvironment() {
-            const config = this.config;
-            const environment = config.environment;
+            const environment = Util.property(this.config, 'environment');
             const entity = Entity(
                 Components.Color.create(environment.background),
                 Components.Name.create('Environment')

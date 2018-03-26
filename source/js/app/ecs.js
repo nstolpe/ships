@@ -1,9 +1,9 @@
 'use strict';
 
-const PIXI = require( 'pixi.js' );
-const Matter = require( 'matter-js' );
-const Emitter = require( './emitter.js' );
-const Util = require( './util.js' );
+const PIXI = require('pixi.js');
+const Matter = require('matter-js');
+const Emitter = require('./emitter.js');
+const Util = require('./util.js');
 
 const Vector = Matter.Vector;
 const Bodies = Matter.Bodies;
@@ -15,7 +15,7 @@ const Application = PIXI.Application;
 // weakmap for private data (components array) accessible w/ prototype methods
 const ComponentsMap = new WeakMap();
 
-const EntityProto = Emitter( {
+const EntityProto = Emitter({
     'class': { value: 'Entity' },
     'id': { value: 0 },
     'data': {
@@ -25,14 +25,22 @@ const EntityProto = Emitter( {
     },
     'flatten': {
         value: function() {
-            const componentKeys = Object.keys( Components );
+            const componentKeys = Object.keys(Components);
             const flat = {};
 
             // store each component on flat with its prototype name as key
-            this.components.forEach( component => {
-                const componentKey = componentKeys.find( key => Components[ key ].isPrototypeOf( component ) );
-                flat[ componentKey ] = component;
-            } );
+            this.components.forEach(component => {
+                const componentKey = componentKeys.find(key => Components[key].isPrototypeOf(component));
+
+                // if (flat[componentKey] === undefined) {
+                    flat[componentKey] = component;
+                // } else if (!Array.isArray(flat[componentKey])) {
+                //     flat[componentKey] = [flat[componentKey]];
+                //     flat[componentKey].push(component);
+                // } else {
+                //     flat[componentKey].push(component);
+                // }
+            });
 
             this.data = flat;
         }
@@ -44,8 +52,8 @@ const EntityProto = Emitter( {
      */
     'components': {
         get: function() {
-            const components = ComponentsMap.get( this );
-            return components.slice( 0, components.length )
+            const components = ComponentsMap.get(this);
+            return components.slice(0, components.length)
         },
         enumerable: true
     },
@@ -53,39 +61,39 @@ const EntityProto = Emitter( {
      * Adds the incoming components to the array in ComponentsMap
      */
     'addComponents': {
-        value: function( ...additions ) {
-            const components = ComponentsMap.get( this );
+        value: function(...additions) {
+            const components = ComponentsMap.get(this);
 
-            additions.forEach( component => {
+            additions.forEach(component => {
                 const callbacks = component.addCallbacks || [];
-                components.push( component );
-                callbacks.forEach( callback => {
-                    typeof callback === 'function' && callback( component, this )
-                } );
-                this.emit( 'component-added', component );
-            } );
+                components.push(component);
+                callbacks.forEach(callback => {
+                    typeof callback === 'function' && callback(component, this)
+                });
+                this.emit('component-added', component);
+            });
 
             this.flatten();
         }
     },
     'removeComponents': {
-        value: function( ...subtractions ) {
-            const components = ComponentsMap.get( this );
+        value: function(...subtractions) {
+            const components = ComponentsMap.get(this);
             const spliced = [];
 
-            subtractions.forEach( component => {
-                let index = components.indexOf( component );
-                if ( index >= 0 ) {
+            subtractions.forEach(component => {
+                let index = components.indexOf(component);
+                if (index >= 0) {
                     const callbacks = component.removeCallbacks || [];
 
-                    callbacks.forEach( callback => {
-                        typeof callback === 'function' && callback.call( component, this )
-                    } );
+                    callbacks.forEach(callback => {
+                        typeof callback === 'function' && callback.call(component, this)
+                    });
 
-                    spliced.push( components.splice( index, 1 )[ 0 ] );
-                    this.emit( 'component-removed', component );
+                    spliced.push(components.splice(index, 1)[0]);
+                    this.emit('component-removed', component);
                 }
-            } );
+            });
 
             this.flatten();
             return spliced;
@@ -93,24 +101,24 @@ const EntityProto = Emitter( {
     },
     'clearComponents': {
         value: function() {
-            const components = ComponentsMap.get( this );
-            components.splice( 0, components.length );
+            const components = ComponentsMap.get(this);
+            components.splice(0, components.length);
             this.flatten();
-            this.emit( 'components-cleared' );
+            this.emit('components-cleared');
             return components;
         }
     }
-} );
+});
 
-function Entity( ...components ) {
-    const entity = Object.create( EntityProto, {
+function Entity(...components) {
+    const entity = Object.create(EntityProto, {
         'id': {
-            value: ( +new Date() ).toString( 16 ) + ( Math.random() * 100000000 | 0 ).toString( 16 ),
+            value: (+new Date()).toString(16) + (Math.random() * 100000000 | 0).toString(16),
             enumerable: true
         }
-    } );
+    });
 
-    ComponentsMap.set( entity, components );
+    ComponentsMap.set(entity, components);
     entity.flatten();
     return entity;
 }
@@ -119,115 +127,115 @@ function Entity( ...components ) {
 const EntitiesMap = new WeakMap();
 const SystemsMap = new WeakMap();
 
-const EngineProto = Emitter( {
+const EngineProto = Emitter({
     'class': { value: 'Engine' },
     'id': { value: 0 },
     'entities': {
         get: function() {
-            const entities = EntitiesMap.get( this );
-            return entities.slice( 0, entities.length )
+            const entities = EntitiesMap.get(this);
+            return entities.slice(0, entities.length)
         },
         enumerable: true
     },
     'addEntities': {
-        value: function( ...additions ) {
-            const entities = EntitiesMap.get( this );
+        value: function(...additions) {
+            const entities = EntitiesMap.get(this);
 
-            additions.forEach( entity => {
-                entities.push( entity );
-                this.emit( 'entity-added', entity );
-                SystemsMap.get( this ).forEach( system => {
+            additions.forEach(entity => {
+                entities.push(entity);
+                this.emit('entity-added', entity);
+                SystemsMap.get(this).forEach(system => {
                         system.setEntities();
-                } );
-            } );
+                });
+            });
         }
     },
     'removeEntites': {
-        value: function( ...subtractions ) {
-            const entities = EntitiesMap.get( this );
+        value: function(...subtractions) {
+            const entities = EntitiesMap.get(this);
             const spliced = [];
 
-            subtractions.forEach( entity => {
-                let index = entities.indexOf( entity );
-                if ( index >= 0 ) spliced.push( entities.splice( index, 1 )[ 0 ] );
-            } );
+            subtractions.forEach(entity => {
+                let index = entities.indexOf(entity);
+                if (index >= 0) spliced.push(entities.splice(index, 1)[0]);
+            });
 
             return spliced;
         }
     },
     'clearEntities': {
         value: function() {
-            const entities = EntitiesMap.get( this );
-            this.emit( 'entities-cleared' );
-            return entities.splice( 0, entities.length );
+            const entities = EntitiesMap.get(this);
+            this.emit('entities-cleared');
+            return entities.splice(0, entities.length);
         }
     },
     'addSystems': {
-        value: function( ...additions ) {
-            const systems = SystemsMap.get( this );
+        value: function(...additions) {
+            const systems = SystemsMap.get(this);
 
-            additions.forEach( system => {
-                systems.push( system );
+            additions.forEach(system => {
+                systems.push(system);
                 system.engine = this;
-                system.emit( 'added-to-engine', this );
-                this.emit( 'system-added', system );
-            } );
+                system.emit('added-to-engine', this);
+                this.emit('system-added', system);
+            });
         }
     },
     'removeSystems': {
-        value: function( ...subtractions ) {
-            const systems = SystemsMap.get( this );
+        value: function(...subtractions) {
+            const systems = SystemsMap.get(this);
             const spliced = [];
 
-            subtractions.forEach( system => {
-                let index = systems.indexOf( system );
-                if ( index >= 0 ) {
-                    spliced.push( systems.splice( index, 1 )[ 0 ] );
-                    system.emit( 'removed-from-engine', engine );
-                    this.emit( 'system-removed', system );
+            subtractions.forEach(system => {
+                let index = systems.indexOf(system);
+                if (index >= 0) {
+                    spliced.push(systems.splice(index, 1)[0]);
+                    system.emit('removed-from-engine', engine);
+                    this.emit('system-removed', system);
                 }
-            } );
+            });
 
             return spliced;
         }
     },
     'clearSystems': {
         value: function() {
-            const systems = SystemsMap.get( this );
-            this.emit( 'systems-cleared' );
-            return systems.splice( 0, systems.length );
+            const systems = SystemsMap.get(this);
+            this.emit('systems-cleared');
+            return systems.splice(0, systems.length);
         }
     },
     'update': {
-        value: function( delta ) {
-            const systems = SystemsMap.get( this );
-            this.emit( 'update-start' );
+        value: function(delta) {
+            const systems = SystemsMap.get(this);
+            this.emit('update-start');
 
-            for ( let i = 0, l = systems.length; i < l; i++)
-                systems[ i ].update( delta );
+            for (let i = 0, l = systems.length; i < l; i++)
+                systems[i].update(delta);
 
-            this.emit( 'update-end' );
+            this.emit('update-end');
         }
     }
-} );
+});
 
-function Engine( ...entities ) {
-    const engine =  Object.create( EngineProto, {
+function Engine(...entities) {
+    const engine =  Object.create(EngineProto, {
         'id': {
-            value: ( +new Date() ).toString( 16 ) + ( Math.random() * 100000000 | 0 ).toString( 16 ),
+            value: (+new Date()).toString(16) + (Math.random() * 100000000 | 0).toString(16),
             enumerable: true
         }
-    } );
+    });
 
-    EntitiesMap.set( engine, entities );
-    SystemsMap.set( engine, [] );
+    EntitiesMap.set(engine, entities);
+    SystemsMap.set(engine, []);
     return engine;
 }
 
 /**
  * Prototype for systems. See RenderSystem for implementation.
  */
-const System = Emitter( {
+const System = Emitter({
     'engine': {
         value: null,
         enumerable: true,
@@ -240,19 +248,19 @@ const System = Emitter( {
     },
     'update': {
         value: function() {
-            this.emit( 'system-update', this );
+            this.emit('system-update', this);
         }
     },
     'start': {
         value: function() {
             this.started = true;
-            this.emit( 'start' );
+            this.emit('start');
         }
     },
     'stop': {
         value: function() {
             this.started = false;
-            this.emit( 'stop' );
+            this.emit('stop');
         }
     },
     /**
@@ -260,20 +268,20 @@ const System = Emitter( {
      */
     'setEntities': {
         value: function() {
-            Object.keys( this.entities ).forEach( e => {
-                this.entities[ e ]( true );
-            } );
+            Object.keys(this.entities).forEach(e => {
+                this.entities[e](true);
+            });
         }
     },
     'entitySources': {
         value: []
     },
     'entities': {
-        value: Object.create( null )
+        value: Object.create(null)
     }
-} );
+});
 
-const Component = Object.create( Object.prototype, {
+const Component = Object.create(Object.prototype, {
     'class': { value: 'Component' },
     'type': {
         value: 'component',
@@ -286,24 +294,24 @@ const Component = Object.create( Object.prototype, {
         writable: true
     },
     'create': {
-        value: ( proto, data ) => {
+        value: (proto, data) => {
             return Object.assign(
-                Object.create( proto, {
+                Object.create(proto, {
                     'create': {
                         value: function() {
-                            return proto.create.apply( proto, arguments );
+                            return proto.create.apply(proto, arguments);
                         },
                         configurable: false
                     }
-                } ),
+                }),
                 { data: data }
-            );
+           );
         },
         configurable: true
     },
     'is': {
-        value: function( proto ) {
-            return Object.getPrototypeOf( this ) === proto;
+        value: function(proto) {
+            return Object.getPrototypeOf(this) === proto;
         }
     },
     'addCallbacks': {
@@ -312,264 +320,264 @@ const Component = Object.create( Object.prototype, {
     'removeCallbacks': {
         value: []
     }
-} );
+});
 
 const Components = {
     /**
      * A component that stores a 2d position in a `Matter.Vector`
      */
-    Position: Object.create( Component, {
+    Position: Object.create(Component, {
         'create': {
-            value: function( x, y ) {
-                return Object.getPrototypeOf( this ).create( this, Vector.create( Number( x ), Number( y ) ) );
+            value: function(x, y) {
+                return Object.getPrototypeOf(this).create(this, Vector.create(Number(x), Number(y)));
             },
             configurable: false
         }
-    } ),
+    }),
     /**
      * A component that stores an angle in radians
      */
-    Rotation: Object.create( Component, {
+    Rotation: Object.create(Component, {
         'create': {
-            value: function( angle ) {
-                return Object.getPrototypeOf( this ).create( this, Number( angle ) );
+            value: function(angle) {
+                return Object.getPrototypeOf(this).create(this, Number(angle));
             },
             configurable: false
         }
-    } ),
+    }),
     /**
      * A component that stores a scalar float scale
      */
-    Scale: Object.create( Component, {
+    Scale: Object.create(Component, {
         'create': {
-            value: function( x, y ) {
-                return Object.getPrototypeOf( this ).create( this, Vector.create( Number( x ), Number( y ) ) );
+            value: function(x, y) {
+                return Object.getPrototypeOf(this).create(this, Vector.create(Number(x), Number(y)));
             },
             configurable: false
         }
-    } ),
+    }),
     /**
      * A component that stores a float alpha clamped between 0 and 1
      */
-    Alpha: Object.create( Component, {
+    Alpha: Object.create(Component, {
         'create': {
-            value: function( alpha ) {
-                alpha = Util.isNumeric( alpha ) ? parseFloat( alpha ) : 1;
-                return Object.getPrototypeOf( this ).create( this, Util.clamp( alpha, 0, 1 ) );
+            value: function(alpha) {
+                alpha = Util.isNumeric(alpha) ? parseFloat(alpha) : 1;
+                return Object.getPrototypeOf(this).create(this, Util.clamp(alpha, 0, 1));
             },
             configurable: false
         }
-    } ),
+    }),
     /**
      * A component that stores an int tint clamped between 0x000000 and 0xffffff
      */
-    Tint: Object.create( Component, {
+    Tint: Object.create(Component, {
         'create': {
-            value: function( tint ) {
-                tint = !Util.isNumeric( tint ) ? 0xffffff : Number.isInteger( tint ) ? tint : parseInt( tint, 16 );
-                return Object.getPrototypeOf( this ).create( this, Util.clamp( tint, 0x000000, 0xffffff ) );
+            value: function(tint) {
+                tint = !Util.isNumeric(tint) ? 0xffffff : Number.isInteger(tint) ? tint : parseInt(tint, 16);
+                return Object.getPrototypeOf(this).create(this, Util.clamp(tint, 0x000000, 0xffffff));
             },
             configurable: false
         }
-    } ),
+    }),
     /**
      * A component that stores a polygon object created from `Matter.Bodies`
      */
-    Polygon: Object.create( Component, {
+    Polygon: Object.create(Component, {
         'create': {
-            value: function( vertices, options ) {
-                return Object.getPrototypeOf( this ).create(
+            value: function(vertices, options) {
+                return Object.getPrototypeOf(this).create(
                     this,
-                    Bodies.fromVertices( 0, 0, vertices, Object.assign( {}, options ) )
-                );
+                    Bodies.fromVertices(0, 0, vertices, Object.assign({}, options))
+               );
             },
             configurable: false
         },
         'addCallbacks': {
             value: [
-                ( component, entity ) => component.data.plugin.entity = entity
-            ]
+                (component, entity) => component.data.plugin.entity = entity
+           ]
         }
-    } ),
-    CompoundBody: Object.create( Component, {
+    }),
+    CompoundBody: Object.create(Component, {
         'create': {
-            value: function( parts, options ) {
-                return Object.getPrototypeOf( this ).create(
+            value: function(parts, options) {
+                return Object.getPrototypeOf(this).create(
                     this,
-                    Body.create( Object.assign( { parts: parts }, options ) )
-                );
+                    Body.create(Object.assign({ parts: parts }, options))
+               );
             },
             configurable: false
         }
-    } ),
+    }),
     /**
      * A component that stores a rectangle object created from `Matter.Bodies`
      */
-    Rectangle: Object.create( Component, {
+    Rectangle: Object.create(Component, {
         'create': {
-            value: function( width, height, options ) {
-                return Object.getPrototypeOf( this ).create(
+            value: function(width, height, options) {
+                return Object.getPrototypeOf(this).create(
                     this,
-                    Bodies.rectangle( 0, 0, Number( width ), Number( height ), Object.assign( {}, options ) )
-                );
+                    Bodies.rectangle(0, 0, Number(width), Number(height), Object.assign({}, options))
+               );
             },
             configurable: false
         }
-    } ),
+    }),
     /**
      * A component that stores a circle object created from `Matter.Bodies`
      */
-    Circle: Object.create( Component, {
+    Circle: Object.create(Component, {
         'create': {
-            value: function( radius, options ) {
-                return Object.getPrototypeOf( this ).create(
+            value: function(radius, options) {
+                return Object.getPrototypeOf(this).create(
                     this,
-                    Bodies.circle( 0, 0, Number( radius ), Object.assign( {}, options ) )
-                );
+                    Bodies.circle(0, 0, Number(radius), Object.assign({}, options))
+               );
             },
             configurable: false
         }
-    } ),
+    }),
     /**
      * A component that stores a constraint object created from `Matter.Constraint`
      */
-    Constraint: Object.create( Component, {
+    Constraint: Object.create(Component, {
         'create': {
-            value: function( options ) {
-                return Object.getPrototypeOf( this ).create(
+            value: function(options) {
+                return Object.getPrototypeOf(this).create(
                     this,
-                    Constraint.create( options )
-                );
+                    Constraint.create(options)
+               );
             },
             configurable: false
         }
-    } ),
+    }),
     /**
      * A component that stores a sprite object created from `PIXI.Sprite`
      */
-    Sprite: Object.create( Component, {
+    Sprite: Object.create(Component, {
         'create': {
-            value: function( texture ) {
-                return Object.getPrototypeOf( this ).create( this, new PIXI.Sprite( texture ) );
+            value: function(texture) {
+                return Object.getPrototypeOf(this).create(this, new PIXI.Sprite(texture));
             },
             configurable: false
         }
-    } ),
+    }),
     /**
      * A component that stores a `PIXI.extras.TilingSprite`
      */
-    TilingSprite: Object.create( Component, {
+    TilingSprite: Object.create(Component, {
         'create': {
-            value: function( texture, width, height ) {
-                return Object.getPrototypeOf( this ).create( this, new PIXI.extras.TilingSprite( texture, width, height ) );
+            value: function(texture, width, height) {
+                return Object.getPrototypeOf(this).create(this, new PIXI.extras.TilingSprite(texture, width, height));
             },
             configurable: false
         }
-    } ),
+    }),
     /**
      * A component that stores a `PIXI.Graphics`
      */
-    Graphics: Object.create( Component, {
+    Graphics: Object.create(Component, {
         'create': {
             value: function() {
-                return Object.getPrototypeOf( this ).create( this, new PIXI.Graphics() );
+                return Object.getPrototypeOf(this).create(this, new PIXI.Graphics());
             },
             configurable: false
         }
-    } ),
+    }),
     /**
      * A component that stores a `PIXI.Container`
      */
-    Container: Object.create( Component, {
+    Container: Object.create(Component, {
         'create': {
             value: function() {
-                return Object.getPrototypeOf( this ).create( this, new Container() );
+                return Object.getPrototypeOf(this).create(this, new Container());
             },
             configurable: false
         }
-    } ),
+    }),
     /**
      * A component that stores a parent `Entity`
      */
-    Parent: Object.create( Component, {
+    Parent: Object.create(Component, {
         'create': {
-            value: function( parent ) {
-                return Object.getPrototypeOf( this ).create( this, parent );
+            value: function(parent) {
+                return Object.getPrototypeOf(this).create(this, parent);
             },
             configurable: false
         }
-    } ),
+    }),
     /**
      * A component that stores an array of child `Entities`
      */
-    Children: Object.create( Component, {
+    Children: Object.create(Component, {
         'create': {
-            value: function( children ) {
-                return Object.getPrototypeOf( this ).create( this, Array.isArray( children ) ? children : [] );
+            value: function(children) {
+                return Object.getPrototypeOf(this).create(this, Array.isArray(children) ? children : []);
             },
             configurable: false
         }
-    } ),
+    }),
     /**
      * A component that stores a force as a direction and magnitude
      */
-    Force: Object.create( Component, {
+    Force: Object.create(Component, {
         'create': {
-            value: function( direction, magnitude ) {
-                return Object.getPrototypeOf( this ).create( this, { direction: Number( direction ), magnitude: Number( magnitude ) } );
+            value: function(direction, magnitude) {
+                return Object.getPrototypeOf(this).create(this, { direction: Number(direction), magnitude: Number(magnitude) });
             },
             configurable: false
         }
-    } ),
+    }),
     /**
      * A component that stores a hex color
      */
-    Color: Object.create( Component, {
+    Color: Object.create(Component, {
         'create': {
-            value: function( color ) {
-                return Object.getPrototypeOf( this ).create( this, parseInt( color, 16 ) );
+            value: function(color) {
+                return Object.getPrototypeOf(this).create(this, parseInt(color, 16));
             },
             configurable: false
         }
-    } ),
+    }),
     /**
      * A component that stores a name string
      */
-    Name: Object.create( Component, {
+    Name: Object.create(Component, {
         'create': {
-            value: function( name ) {
-                return Object.getPrototypeOf( this ).create( this, String( name ) );
+            value: function(name) {
+                return Object.getPrototypeOf(this).create(this, String(name));
             },
             configurable: false
         }
-    } ),
+    }),
     /**
      * A component that stores a manager
      */
-    PlayerManager: Object.create( Component, {
+    PlayerManager: Object.create(Component, {
         'create': {
             value: function() {
-                return Object.getPrototypeOf( this ).create( this, true );
+                return Object.getPrototypeOf(this).create(this, true);
             },
             configurable: false
         }
-    } ),
-    Stroke: Object.create( Component, {
+    }),
+    Stroke: Object.create(Component, {
         'create': {
-            value: function( color, width ) {
-                return Object.getPrototypeOf( this ).create( this, { color: color, width: width } );
+            value: function(color, width) {
+                return Object.getPrototypeOf(this).create(this, { color: color, width: width });
             },
             configurable: false
         }
-    } ),
-    Fill: Object.create( Component, {
+    }),
+    Fill: Object.create(Component, {
         'create': {
-            value: function( color ) {
-                return Object.getPrototypeOf( this ).create( this, color );
+            value: function(color) {
+                return Object.getPrototypeOf(this).create(this, color);
             },
             configurable: false
         }
-    } )
+    })
 };
 
 module.exports = {

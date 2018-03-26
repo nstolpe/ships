@@ -1,17 +1,17 @@
 'use strict'
 
-const math = require( 'mathjs' );
-const PIXI = require( 'pixi.js' );
-const Util = require( './lib/util.js' );
-const Vec2 = require( './lib/vector2.js');
-const Shapes = require( './lib/shapes.js' );
+const math = require('mathjs');
+const PIXI = require('pixi.js');
+const Util = require('app/util.js');
+const Vec2 = require('app/vector2.js');
+const Shapes = require('app/shapes.js');
 const Sprite = PIXI.Sprite;
 const loader = PIXI.loader;
 const view = document.getElementById('view');
 const scale = window.devicePixelRatio;
 const viewWidth = document.body.offsetWidth;
 const viewHeight = document.body.offsetHeight;
-const app = new PIXI.Application( viewWidth, viewHeight, { view: view, backgroundColor : 0x000000 } );
+const app = new PIXI.Application(viewWidth, viewHeight, { view: view, backgroundColor : 0x000000 });
 
 const graphics = new PIXI.Graphics();
 
@@ -20,102 +20,102 @@ const GraphicsManager = {
 	shapes: [],
 	draw() {
 		this.graphics.clear();
-		for ( let i = 0, l = this.shapes.length; i < l; i ++ ) {
-			let shape = this.shapes[ i ];
-			this.graphics.beginFill( shape.color );
-			this.graphics[ shape.drawMethod ].apply( this.graphics, shape.drawArgs() );
+		for (let i = 0, l = this.shapes.length; i < l; i ++) {
+			let shape = this.shapes[i];
+			this.graphics.beginFill(shape.color);
+			this.graphics[shape.drawMethod].apply(this.graphics, shape.drawArgs());
 			this.graphics.endFill();
 		}
 	}
 }
 
 let circles = [
-	Shapes.Circle( {
+	Shapes.Circle({
 		color: 0x01f34f,
-		position: [ 200, 200 ],
+		position: [200, 200],
 		mass: 5,
 		radius: 50
-	} ),
-	Shapes.Circle( {
+	}),
+	Shapes.Circle({
 		color: 0x00c3f1,
-		position: [ 600, 230 ],
+		position: [600, 230],
 		mass: 3,
 		radius: 30
-	} ),
-	Shapes.Circle( {
+	}),
+	Shapes.Circle({
 		color: 0x00c3f1,
-		position: [ 500, 400 ],
+		position: [500, 400],
 		mass: 0.2,
 		radius: 20
-	} ),
-	Shapes.Circle( {
+	}),
+	Shapes.Circle({
 		color: 0xff0000,
-		position: [ 20, 20 ],
+		position: [20, 20],
 		mass: .01,
 		radius: 5
-	} ),
-	Shapes.Circle( {
+	}),
+	Shapes.Circle({
 		color: 0xcc143f,
-		position: [ 200, 400 ],
+		position: [200, 400],
 		mass: 10,
 		radius: 16,
 		forces: [
 			{
 				name: 'anti-gravity',
 				magnitude: .2,
-				direction: Vec2( 0, 0 ),
+				direction: Vec2(0, 0),
 				mass: false
 			},
 			{
 				name: 'east-wind',
 				magnitude: .002,
-				direction: Vec2( 0, 0 ),
+				direction: Vec2(0, 0),
 				mass: true
 			}
 		],
 		postUpdates: [
-			function( delta ) {
-				let ag = this.forces.find( ( f ) => f.name === 'anti-gravity' );
-				if ( ag ) {
-					if ( this.position.y > 400 )
+			function(delta) {
+				let ag = this.forces.find((f) => f.name === 'anti-gravity');
+				if (ag) {
+					if (this.position.y > 400)
 						ag.direction.y = -1;
-					if ( this.position.y < 425 )
+					if (this.position.y < 425)
 						ag.direction.y = 0;
 				}
-				let ew = this.forces.find( ( f ) => f.name === 'east-wind' );
-				if ( ew ) {
-					if ( this.position.x > 400 )
+				let ew = this.forces.find((f) => f.name === 'east-wind');
+				if (ew) {
+					if (this.position.x > 400)
 						ew.direction.x = -1;
-					if ( this.position.x < 200 )
+					if (this.position.x < 200)
 						ew.direction.x = 0;
 				}
 			}
 		]
-	} ),
+	}),
 ];
 
-GraphicsManager.shapes.push.apply( GraphicsManager.shapes, circles );
+GraphicsManager.shapes.push.apply(GraphicsManager.shapes, circles);
 let rectangles = [
-	// Shapes.Rectangle( {
+	// Shapes.Rectangle({
 	// 	color: 0xffffff,
-	// 	position: [ 100, 800 ],
-	// 	dimensions: [ 400, 80 ],
+	// 	position: [100, 800],
+	// 	dimensions: [400, 80],
 	// 	mass: 100,
 	// 	static: true
-	// } );
+	// });
 ]
 /**
  * Ties an oscillator to an object and binds its frequency
  * to the object's position.
  */
-function OscillatorManager( source ) {
+function OscillatorManager(source) {
 	let audioCtx = new window.AudioContext();
 	// create Oscillator node
 	let oscillator = audioCtx.createOscillator();
 
 	oscillator.type = 'sawtooth';
 	oscillator.frequency.value = 200; // value in hertz
-	oscillator.connect( audioCtx.destination );
+	oscillator.connect(audioCtx.destination);
 
 	return {
 		source: source,
@@ -127,7 +127,7 @@ function OscillatorManager( source ) {
 			this.oscillator.stop();
 		},
 		update() {
-			this.oscillator.frequency.value = Math.sqrt( Math.pow( source.velocity.x, 2 ) + Math.pow( source.velocity.y, 2 ) ) * 10;
+			this.oscillator.frequency.value = Math.sqrt(Math.pow(source.velocity.x, 2) + Math.pow(source.velocity.y, 2)) * 10;
 		}
 	};
 }
@@ -136,9 +136,9 @@ let sign = 1;
 let oscillatorManager;
 
 function setup() {
-	app.stage.addChild( GraphicsManager.graphics );
-	app.ticker.add( animate );
-	oscillatorManager = OscillatorManager( circles[ 4 ] );
+	app.stage.addChild(GraphicsManager.graphics);
+	app.ticker.add(animate);
+	oscillatorManager = OscillatorManager(circles[4]);
 	// oscillatorManager.start();
 }
 
@@ -146,13 +146,13 @@ let forces = [
 	{
 		name: 'gravity',
 		magnitude: .1,
-		direction: Vec2( 0, 1 ),
+		direction: Vec2(0, 1),
 		mass: false
 	},
 	{
 		name: 'west wind',
 		magnitude: .001,
-		direction: Vec2( 1, 0 ),
+		direction: Vec2(1, 0),
 		mass: true
 	}
 ];
@@ -161,59 +161,59 @@ let fps = 30;
 let dt = 1 / fps;
 let accumulator = 0;
 
-function animate( delta ) {
+function animate(delta) {
 	graphics.clear();
 
 	accumulator += app.ticker.elapsedMS / 1000;
-	if ( accumulator > 0.2 ) accumulator = 0.2;
-	while ( accumulator > dt ) {
+	if (accumulator > 0.2) accumulator = 0.2;
+	while (accumulator > dt) {
 		accumulator -= dt;
-		updateCircles( dt );
+		updateCircles(dt);
 	}
-	// updateCircles( app.ticker.elapsedMS / 100 );
+	// updateCircles(app.ticker.elapsedMS / 100);
 
 	GraphicsManager.draw();
 	// oscillatorManager.update();
 }
-function updateCircles( delta ) {
-	circles.forEach( ( circle, idx ) => {
-		let allForces = forces.concat( circle.forces );
-		let accumulatedForces = accumulateForces( circle, app.ticker.elapsedMS / 10 );
-		let velocity = circle.velocity.copy().add( accumulatedForces );
-		let position = circle.position.copy().add( velocity.copy().mul( app.ticker.elapsedMS / 10 ) );
-		velocity.add( accumulatedForces );
+function updateCircles(delta) {
+	circles.forEach((circle, idx) => {
+		let allForces = forces.concat(circle.forces);
+		let accumulatedForces = accumulateForces(circle, app.ticker.elapsedMS / 10);
+		let velocity = circle.velocity.copy().add(accumulatedForces);
+		let position = circle.position.copy().add(velocity.copy().mul(app.ticker.elapsedMS / 10));
+		velocity.add(accumulatedForces);
 
-		circle.update( {
+		circle.update({
 			velocity: velocity,
 			position: position
-		}, app.ticker.elapsedMS / 10 );
-	} );
+		}, app.ticker.elapsedMS / 10);
+	});
 }
-function updateVelocity( body, delta ) {
+function updateVelocity(body, delta) {
 
 }
 /**
  * Adds all environmental forces and object specific forces to an object.
  */
-function accumulateForces( body, delta ) {
-	let allForces = forces.concat( body.forces );
-	let accumulated = Vec2( 0, 0 );
+function accumulateForces(body, delta) {
+	let allForces = forces.concat(body.forces);
+	let accumulated = Vec2(0, 0);
 
-	for ( let i = 0, l = allForces.length; i < l; i++ ) {
-		let force = allForces[ i ];
+	for (let i = 0, l = allForces.length; i < l; i++) {
+		let force = allForces[i];
 
-		let v = force.direction.copy().nor().mul( force.magnitude * delta / 2 );
+		let v = force.direction.copy().nor().mul(force.magnitude * delta / 2);
 
 		// divide by mass if this force is influenced by mass (gravity isn't)
-		if ( force.mass )
-			v.mul( 1 / body.mass );
+		if (force.mass)
+			v.mul(1 / body.mass);
 
-		accumulated.add( v );
+		accumulated.add(v);
 	}
 
 	return accumulated;
 }
 
 loader
-	.add( "assets/spritesheets/ships.json" )
-	.load( setup );
+	.add("assets/spritesheets/ships.json")
+	.load(setup);
