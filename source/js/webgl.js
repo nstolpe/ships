@@ -1,7 +1,6 @@
 import * as PIXI from 'pixi.js';
 import React from "react";
 import { render } from "react-dom";
-import { Stage, Graphics, Text } from "react-pixi-fiber";
 
 document.oncontextmenu = e => e.preventDefault();
 class Thirixarax extends React.Component {

@@ -5,19 +5,27 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch-server": "cd server && nodemon -e js,hbs -w ./ -w views server.js",
-    "start": "node bin/clean.js && node bin/watch-assets.js & npm run watch-server & npm run watch-scripts",
+    "start": "bin/prepare && (node bin/watch-assets.js & npm run watch-server & npm run watch-scripts)",
     "stop": "echo \"This just stopped\"",
     "watch-scripts": "globify \"source/js/*.js\" --outfile=.static/assets/js --verbose -w",
     "build-static-site": "bin/compile-static-to-pages.sh",
-    "notify": "node bin/notify.js",
     "color": "bin/color.sh"
   },
   "author": "nils",
   "license": "ISC",
   "dependencies": {
-    "eventemitter3": "^2.0.3",
+    "babel": "^6.23.0",
+    "babel-core": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
+    "babel-preset-react": "^6.24.1",
+    "babelify": "^8.0.0",
+    "browserify": "^14.5.0",
+    "browserify-shim": "^3.8.14",
+    "chokidar": "^1.6.1",
     "express": "^4.16.2",
     "express-handlebars": "^3.0.0",
+    "fs-extra": "^5.0.0",
+    "globify": "^2.3.0",
     "hammerjs": "^2.0.8",
     "mathjs": "^3.20.1",
     "matter-attractors": "^0.1.6",
@@ -31,21 +39,7 @@
     "virtualjoystick.js": "file:../virtualjoystick.js",
     "watchify": "^3.10.0"
   },
-  "devDependencies": {
-    "babel": "^6.23.0",
-    "babel-core": "^6.26.0",
-    "babel-preset-env": "^1.6.1",
-    "babel-preset-react": "^6.24.1",
-    "babelify": "^8.0.0",
-    "browserify": "^14.5.0",
-    "browserify-shim": "^3.8.14",
-    "chokidar": "^1.6.1",
-    "freedesktop-notifications": "^1.2.2",
-    "fs-extra": "^5.0.0",
-    "globify": "^2.3.0",
-    "growly": "^1.3.0",
-    "react-pixi-fiber": "^0.2.2"
-  },
+  "devDependencies": {},
   "browserify": {
     "transform": [
       [

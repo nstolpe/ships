@@ -1,0 +1,13 @@
+#!/bin/bash
+
+if [[ ! -d './node_modules' ]]; then
+    printf 'Please run `npm install` first\n';
+    exit 1;
+fi
+
+rm -rf ./.static
+mkdir ./.static
+
+if [ ! -L './node_modules/app' ]; then
+    ln -s ../source/js/app node_modules/app;
+fi

@@ -1,17 +1,10 @@
 'use strict';
 
-// import * as React from 'react';
-import React from "react";
-import ReactDOM from "react-dom";
-import { Stage, Graphics, render, Text } from "react-pixi-fiber";
-// import { render } from 'react-dom';
-import PropTypes from "prop-types";
-//@TODO get this out of here
 /**
  * @param {object}  options                  Key/value set of options
  * @param {object}  options.hub              Turms.Hub instance
  * @param {boolean} options.debug            Debug enabled/disabled
- * @param {object}  options.viewProperties   HTML attributes that will be applied to the React/PIXI canvas (id, className, style, etc.)
+ * @param {object}  options.viewProperties   HTML attributes that will be applied to the PIXI canvas (id, className, style, etc.)
  * @param {string}  options.wrapperSelector  CSS selector of the element the application canvas will be created in.
  * @param {object}  options.element          DOM element that will be parent of the application's canvas and gui layers
  */
@@ -30,7 +23,6 @@ const ScreenManager = function(options) {
         debug: options.debug,
         init() {
             this.registerSubscriptions();
-            // this.app = this.context.aoo
             // render(
             //     ,
             //     app.stage
@@ -63,22 +55,7 @@ const ScreenManager = function(options) {
                 top = parseInt(getComputedStyle(this.element).height, 10) - parseInt( getComputedStyle(menu).height, 10);
             menu.style.left = left + 'px';
             menu.style.top = top + 'px';
-            ReactDOM.render(
-              <ul className="menu">
-                <li>create</li>
-                <li>
-                    <a href="#" onClick={ (e) => { console.log('circle'); e.preventDefault() } }>circle</a>
-                </li>
-                <li>
-                    <a href="#" onClick={ (e) => { console.log('rectangle'); e.preventDefault() } }>rectangle</a>
-                </li>
-                <li>
-                    <a href="#" onClick={ (e) => { console.log('polygon'); e.preventDefault() } }>polygon</a>
-                </li>
-                <li>two</li>
-              </ul>,
-              menu
-            );
+            // @TODO draw the menu
         },
         receiveMessage(action, message) {
             switch (message.type) {

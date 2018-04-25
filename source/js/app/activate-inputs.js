@@ -1,5 +1,5 @@
 import VJS from 'virtualjoystick.js';
-// @TODO clean up and make better. events should be attached to react canvas.
+// @TODO clean up and make better. just draw on the main canvas.
 module.exports = {
     activate(hub) {
         const touchJoystick = Object.create(VJS.prototype);

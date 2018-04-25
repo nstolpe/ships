@@ -1,7 +1,5 @@
 "use strict";
 
-const React = require('react');
-const ReactDOM = require('react-dom');
 const PIXI = require('pixi.js');
 const decomp = require('poly-decomp');
 const ActivateInputs = require('app/activate-inputs.js');
@@ -89,14 +87,17 @@ module.exports = function(options) {
             return this;
         },
         /**
-         * Clears out the parent element, adds a React canvas component that will
+         * Clears out the parent element, adds a canvas element that will
          * be used by the PIXI application.
          */
         setUpScreen(options) {
-            // @TODO move game into react component, so this isn't so hackish.
-            const view = <canvas id="view" tabIndex="0" ref={ref => this.view = ref} className='view'/>;
-            ReactDOM.render(view, this.element);
-            // this.view = document.getElementById('view');
+            // @TODO move game into component, so this isn't so hackish.
+            const view = document.createElement('canvas');
+            view.id = 'view';
+            view.classList.add('view');
+            view.tabIndex = 0;
+            this.element.appendChild(view);
+            this.view = view;
             // @TODO allow hidef through option, use resolution 1
             // see https://github.com/pixijs/pixi.js/issues/3833
             // move PIXI app stuff to setupPIXI()
