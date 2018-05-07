@@ -2,8 +2,8 @@
 
 const Turms = require('turms');
 const Util = require('app/util.js');
-const GameScreen = require('app/game-screen.js');
-
+const GameScreen = require('app/game.js');
+window.RegisterComponent = require('app/dom/register-component');
 const env = Object.assign({
     id: 'default'
 }, Util.locationArgs(window));

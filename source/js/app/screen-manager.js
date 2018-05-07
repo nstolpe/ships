@@ -1,5 +1,8 @@
 'use strict';
 
+const UiMenu = require('app/dom/ui-menu');
+
+let menu;
 /**
  * @param {object}  options                  Key/value set of options
  * @param {object}  options.hub              Turms.Hub instance
@@ -12,8 +15,9 @@ const ScreenManager = function(options) {
     let hub = options.hub;
     let debug = !!options.debug;
     let app = options.app;
-    let menu = document.createElement('div');
+    // let menu = document.createElement('div');
 
+    UiMenu({ hub });
     if (!app)
         throw new Error('No PIXI.Application found', 'The `ScreenManager` requires an instance of PIXI.Application');
 
@@ -21,65 +25,56 @@ const ScreenManager = function(options) {
         view: null,
         element: options.element,
         debug: options.debug,
-        init() {
-            this.registerSubscriptions();
-            // render(
-            //     ,
-            //     app.stage
-            // );
-            return this;
-        },
-        registerSubscriptions() {
-            hub.addSubscription(this, 'touch-click');
-        },
-        openMenu(x, y) {
-            let menu = document.getElementById('menu');
-            let left = x;
-            let top = y;
+        openMenu({ worldX, worldY, clientX, clientY }) {
+            let left = clientX;
+            let top = clientY;
 
             if (menu) {
-
             } else {
-                menu = document.createElement('div');
-                menu.id = 'menu';
-                menu.style.backgroundColor = '#ffffff';
-                menu.style.position = 'absolute';
-                menu.style.fontSize = '14px';
+                menu = document.createElement('ui-menu');
+                menu.dataset.worldX = worldX;
+                menu.dataset.worldY = worldY;
                 this.element.appendChild(menu);
             }
 
-
-            if (left + parseInt(getComputedStyle(menu).width, 10) > parseInt( getComputedStyle(this.element).width, 10))
-                left = parseInt(getComputedStyle(this.element).width, 10) - parseInt( getComputedStyle(menu).width, 10);
-            if (top + parseInt(getComputedStyle(menu).height, 10) > parseInt( getComputedStyle(this.element).height, 10))
-                top = parseInt(getComputedStyle(this.element).height, 10) - parseInt( getComputedStyle(menu).height, 10);
+            if (left + parseInt(getComputedStyle(menu).width, 10) > parseInt(getComputedStyle(this.element).width, 10))
+                left = parseInt(getComputedStyle(this.element).width, 10) - parseInt(getComputedStyle(menu).width, 10);
+            if (top + parseInt(getComputedStyle(menu).height, 10) > parseInt(getComputedStyle(this.element).height, 10))
+                top = parseInt(getComputedStyle(this.element).height, 10) - parseInt(getComputedStyle(menu).height, 10);
             menu.style.left = left + 'px';
             menu.style.top = top + 'px';
-            // @TODO draw the menu
         },
         receiveMessage(action, message) {
             switch (message.type) {
-                case 'touch-click':
-                    // Matter.Body.setPosition( geometryComponent.data, message.data );
-                    // this.engine.addEntities( ECS.Entity(
-                    //     ECS.Components.Circle.create( 20 ),
+                case 'right-click':
+                    // Matter.Body.setPosition(geometryComponent.data, message.data);
+                    // this.engine.addEntities(ECS.Entity(
+                    //     ECS.Components.Circle.create(20),
                     //     ECS.Components.Graphics.create(),
-                    //     ECS.Components.Fill.create( 0xffffff ),
-                    //     ECS.Components.Stroke.create( 0xff0000, 2 ),
-                    //     ECS.Components.Rotation.create( 0 ),
-                    //     ECS.Components.Position.create( message.data.position.x, message.data.position.y ),
-                    //     ECS.Components.Scale.create( 1, 1 ),
-                    //     ECS.Components.Alpha.create( 1 ),
-                    //     ECS.Components.Tint.create( 0xffffff ),
-                    // ) );
-                    this.openMenu(message.data.ui.x, message.data.ui.y);
-                    console.log('touch-click from uisystem');
+                    //     ECS.Components.Fill.create(0xffffff),
+                    //     ECS.Components.Stroke.create(0xff0000, 2),
+                    //     ECS.Components.Rotation.create(0),
+                    //     ECS.Components.Position.create(message.data.position.x, message.data.position.y),
+                    //     ECS.Components.Scale.create(1, 1),
+                    //     ECS.Components.Alpha.create(1),
+                    //     ECS.Components.Tint.create(0xffffff),
+                    //));
+                    this.openMenu(message.data);
                     break;
                 default:
                     break;
             }
+        },
+        addSubscription(type, action) {
+            hub.addSubscription(this, type, action);
+        },
+        addSubscriptions(subscriptions) {
+            subscriptions.forEach(s => this.addSubscription(s.type, s.action))
         }
     };
+
+    // pass subscriptions on instantiation?
+    manager.addSubscription('right-click');
 
     return manager;
 };

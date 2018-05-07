@@ -110,5 +110,10 @@ module.exports = {
             keys.split('.') :
             !Array.isArray(keys) ? [] : keys;
         return kkeys.reduce((obj, key) => obj && obj[key] ? obj[key] : fallback, source);
+    },
+    stringToHTML: (source, single = true) => {
+        const template = document.createElement('template');
+        template.innerHTML = source.trim();
+        return single ? template.content.firstChild : template.content.childNodes;
     }
 };

@@ -81,18 +81,18 @@ class Thirixarax extends React.Component {
             return prev;
         });
         return(
-            <div id={props.id + '-wrapper'} className={props.className + '-wrapper'}>
-                <canvas onContextMenu={on} ref={ref => this.canvas = ref} key={props.id} className={props.className} id={props.id} />
-                {
-                    this.state.menu.active ? <div key="foo" onClick={off} style={this.state.menu.style} className="foo"></div> : null
-                }
-            </div>
+            // <div id={props.id + '-wrapper'} className={props.className + '-wrapper'}>
+            //     <canvas onContextMenu={on} ref={ref => this.canvas = ref} key={props.id} className={props.className} id={props.id} />
+            //     {
+            //         this.state.menu.active ? <div key="foo" onClick={off} style={this.state.menu.style} className="foo"></div> : null
+            //     }
+            // </div>
         );
     }
 }
 
 render(
-    <Thirixarax className="view" id="view"/>,
+    // <Thirixarax className="view" id="view"/>,
     document.getElementById('game')
 );
 // const style = {

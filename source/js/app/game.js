@@ -61,6 +61,20 @@ module.exports = function(options) {
                 case 'assets-loaded':
                     this.startSystems(Util.property(message.data, 'resources', {}));
                     break;
+                case 'add-actor':
+                    console.log(message);
+                    this.engine.addEntities(ECS.Entity(
+                        ECS.Components.Circle.create(20),
+                        ECS.Components.Graphics.create(),
+                        ECS.Components.Fill.create(0xffffff),
+                        ECS.Components.Stroke.create(0xff0000, 2),
+                        ECS.Components.Rotation.create(0),
+                        ECS.Components.Position.create(message.data.positionX, message.data.positionY),
+                        ECS.Components.Scale.create(1, 1),
+                        ECS.Components.Alpha.create(1),
+                        ECS.Components.Tint.create(0xffffff),
+                    ));
+                    break;
                 default:
                     break;
             }
@@ -81,6 +95,7 @@ module.exports = function(options) {
 
             this.hub.addSubscription(this, 'config-loaded');
             this.hub.addSubscription(this, 'assets-loaded');
+            this.hub.addSubscription(this, 'add-actor');
 
             this.loader.load();
 
@@ -102,16 +117,16 @@ module.exports = function(options) {
             // see https://github.com/pixijs/pixi.js/issues/3833
             // move PIXI app stuff to setupPIXI()
             this.app = new PIXI.Application(
-                this.view.clientWidth * this.resolution,
-                this.view.clientHeight * this.resolution,
+                this.view.clientWidth, //* this.resolution,
+                this.view.clientHeight, //* this.resolution,
                 {
                     view: this.view,
-                    resolution: Math.min(2, this.resolution),
+                    resolution: 1,//Math.min(2, this.resolution),
                     autoresize: true
                 }
             );
             // instantiate and initialize the screenmanager
-            this.screenManager = ScreenManager(Object.assign({ hub: this.hub, app: this.app, debug: false }, options)).init();
+            this.screenManager = ScreenManager(Object.assign({ hub: this.hub, app: this.app, debug: false }, options));
         },
         /**
          * Sets up things that need load to be finished first.
@@ -123,7 +138,6 @@ module.exports = function(options) {
             this.loadConstraints(this.config.constraints);
 
             const physicsSystem = PhysicsSystem({ hub: this.hub });
-console.log('dsfg')
             const renderSystem = RenderSystem({
                 app: this.app,
                 backgroundColor: this.getEnvironment().data.Color.data,

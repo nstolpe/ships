@@ -15,29 +15,28 @@
   "license": "ISC",
   "dependencies": {
     "babel": "^6.23.0",
-    "babel-core": "^6.26.0",
+    "babel-core": "^6.26.3",
     "babel-preset-env": "^1.6.1",
     "babel-preset-react": "^6.24.1",
+    "babel-preset-stage-2": "^6.24.1",
     "babelify": "^8.0.0",
-    "browserify": "^14.5.0",
+    "browserify": "^16.2.0",
     "browserify-shim": "^3.8.14",
     "chokidar": "^1.6.1",
-    "express": "^4.16.2",
+    "express": "^4.16.3",
     "express-handlebars": "^3.0.0",
     "fs-extra": "^5.0.0",
-    "globify": "^2.3.0",
+    "globify": "^2.3.1",
     "hammerjs": "^2.0.8",
-    "mathjs": "^3.20.1",
+    "mathjs": "^3.20.2",
     "matter-attractors": "^0.1.6",
     "matter-js": "^0.14.1",
-    "pixi-particles": "^2.1.9",
-    "pixi.js": "^4.7.0",
+    "pixi-particles": "^3.0.0",
+    "pixi.js": "^4.7.3",
     "poly-decomp": "^0.2.1",
-    "react": "^16.2.0",
-    "react-dom": "^16.2.0",
     "turms": "^0.1.1",
     "virtualjoystick.js": "file:../virtualjoystick.js",
-    "watchify": "^3.10.0"
+    "watchify": "^3.11.0"
   },
   "devDependencies": {},
   "browserify": {
@@ -46,7 +45,7 @@
         "babelify",
         {
           "presets": [
-            "react",
+            "stage-2",
             [
               "env",
               {

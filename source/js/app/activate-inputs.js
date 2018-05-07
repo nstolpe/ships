@@ -79,14 +79,14 @@ module.exports = {
                 case 65:
                     if (!e.repeat) {
                         type = 'player-input-turn'
-                        data = -1 * .2;
+                        data = -1 * .5;
                     }
                     break;
                 // D
                 case 68:
                     if (!e.repeat) {
                         type = 'player-input-turn'
-                        data = 1 * .2;
+                        data = 1 * .5;
                     }
                     break;
                 // P
